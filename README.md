@@ -9,11 +9,11 @@ ligado ao que se mede nos mercados.
 ## Como funciona
 
 ```
-A cada 15 min                          Toda manhã (fase 3)
+A cada 15 min (Supabase dispara)       Toda manhã (fase 3)
 Robô (GitHub Actions)                  Redator (tarefa agendada do Claude)
   lê as fontes → grava o que é novo      lê os eventos do dia
   → banco (Supabase)                     → escreve o briefing com links
-  → atualiza o site → avisa no Telegram
+  → atualiza o site → resumo no Telegram (7:30, 12h, 19h)
                   ↓
         Site com o globo (GitHub Pages)
 ```

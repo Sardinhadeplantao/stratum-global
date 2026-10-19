@@ -14,7 +14,10 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
   ou por um `DATABASE_URL` completo. Session pooler, porque o GitHub Actions não tem IPv6.
   Sem isso, o robô usa um SQLite temporário e diz isso na tela Método.
 - **Site** (`web/`, Next.js estático + MapLibre): publicado no GitHub Pages. Só mostra o que o robô gravou.
-- **Avisos**: Telegram (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`), só quando a situação muda.
+- **Agendador**: o Supabase (pg_cron + pg_net) dispara o robô a cada 15 minutos; o GitHub atrasa horas
+  (`agendador.py`, decisão 0004). O token fica no cofre do Supabase, colado pelo dono; o robô nunca o lê.
+- **Avisos**: Telegram (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`), só um resumo às 7:30, 12:00 e 19:00 de Brasília
+  (`resumo.py`, decisão 0005). Problemas entram no resumo; não há mensagem fora desses horários.
 - **IA**: nenhuma é obrigatória. Planejado: tarefa agendada do Claude para o briefing (fase 3) e API gratuita
   (Groq/Gemini) como ajudante opcional. LLM local foi descartada (`docs/decisoes/0001-arquitetura.md`).
 
@@ -33,7 +36,8 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
    vêm prontos no status.json.
 10. **Mostrar o que não se mede** (tela Método).
 11. **Custo zero**: biblioteca gratuita antes de LLM; nada pago obrigatório.
-12. **Segredos só nos Secrets do GitHub.** Nunca em código, log, mensagem de erro ou conversa.
+12. **Segredos só nos Secrets do GitHub**, com uma exceção: o token `stratum_disparo`, que o dono cola no cofre (Vault)
+    do Supabase (decisão 0004); o código nunca o lê, grava ou imprime. Nunca em código, log, mensagem de erro ou conversa.
     Erro de banco imprime só o tipo da exceção (a mensagem pode conter dados da conexão).
 13. **Só a branch `main` grava no banco de produção e manda avisos.** Branches rodam com banco temporário.
 
@@ -47,7 +51,9 @@ jobs/stratum/
   db.py          esquema; mudou? crie migração nova em migracoes/versions/
   robo.py        uma rodada: coletar, gravar, registrar, avisar
   export.py      status.json para o site
-  avisos.py      Telegram
+  avisos.py      Telegram (envio)
+  resumo.py      resumo das 7:30, 12:00 e 19:00
+  agendador.py   Supabase dispara o robô a cada 15 minutos
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)

@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
+import { classeAgendador, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 
 export const metadata = { title: "Método · Stratum Global" };
@@ -91,6 +91,16 @@ export default function Metodo() {
           <dt>Última rodada</dt>
           <dd><span className={`ponto ${sit.classe}`} aria-hidden /> {sit.texto} · {dataHora(rodada?.iniciada_em)} (Brasília)</dd>
           <dt>Banco</dt><dd>{s.banco ? BANCO[s.banco] : "—"}</dd>
+          <dt>Agendador</dt>
+          <dd>
+            {s.agendador ? (<>
+              <span className={`ponto ${classeAgendador(s.agendador.situacao)}`} aria-hidden />{" "}
+              {s.agendador.texto.charAt(0).toUpperCase() + s.agendador.texto.slice(1)}.
+              {s.agendador.ultima_chamada && <> Última chamada: {dataHora(s.agendador.ultima_chamada)}.</>}
+              {s.agendador.token_vence_em && <> O token vence em {dataHora(s.agendador.token_vence_em)}.</>}
+            </>) : <span className="sem-dado-texto">—</span>}
+          </dd>
+          <dt>Telegram</dt><dd>Um resumo às 7:30, 12:00 e 19:00 (Brasília). Problemas entram no resumo seguinte.</dd>
           <dt>Fontes funcionando</dt>
           <dd>{rodada ? `${s.totais.fontes_ok} de ${s.totais.fontes}` : <span className="sem-dado-texto">—</span>}</dd>
           <dt>Documentos</dt>

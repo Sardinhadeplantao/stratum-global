@@ -40,7 +40,7 @@ def quando(d):
     return conhecido if publicado is None or publicado > conhecido + TOLERANCIA_FUTURO else publicado
 
 
-def _documentos_desde(c, inicio) -> list[dict]:
+def documentos_desde(c, inicio) -> list[dict]:
     """Documentos cuja data (regra de quando()) é a partir de inicio, do mais recente para o mais antigo."""
     candidatos = c.execute(select(db.documento).where(
         or_(db.documento.c.publicado_em >= inicio, db.documento.c.conhecido_em >= inicio))).mappings().all()
@@ -48,12 +48,12 @@ def _documentos_desde(c, inicio) -> list[dict]:
     return sorted((d for d in docs if d["quando"] >= inicio), key=lambda d: (d["quando"], d["id"]), reverse=True)
 
 
-def _ordem_alfabetica(nome: str) -> str:
+def ordem_alfabetica(nome: str) -> str:
     """Índia antes de Zâmbia: ordena sem acento."""
     return unicodedata.normalize("NFD", nome).encode("ascii", "ignore").decode().casefold()
 
 
-def montar(engine, agora=db.agora) -> dict:
+def montar(engine, agora=db.agora, agendador: dict | None = None) -> dict:
     momento = agora()
     limite_24h = momento - timedelta(hours=24)
     inicio_janela = momento - timedelta(hours=JANELA_HORAS)
@@ -72,7 +72,7 @@ def montar(engine, agora=db.agora) -> dict:
                                        .where(db.documento.c.conhecido_em >= limite_24h)
                                        .group_by(db.documento.c.fonte_id)).all())
         fontes = c.execute(select(db.fonte).order_by(db.fonte.c.tipo, db.fonte.c.nome)).mappings().all()
-        janela = _documentos_desde(c, inicio_janela)
+        janela = documentos_desde(c, inicio_janela)
         if len(janela) < ULTIMOS_DOCUMENTOS:  # janela curta (fontes paradas): mostra os mais recentes mesmo assim
             recentes_coletados = c.execute(select(db.documento).order_by(db.documento.c.id.desc())
                                            .limit(ULTIMOS_DOCUMENTOS * 5)).mappings().all()
@@ -113,7 +113,7 @@ def montar(engine, agora=db.agora) -> dict:
             if len(lista) < DOCUMENTOS_POR_PAIS:
                 lista.append(resumo_documento(d))
     maximo = max(contagem.values(), default=0)
-    ranking = sorted(contagem.items(), key=lambda kv: (-kv[1], _ordem_alfabetica(dicionario.nome(kv[0]) or kv[0]), kv[0]))
+    ranking = sorted(contagem.items(), key=lambda kv: (-kv[1], ordem_alfabetica(dicionario.nome(kv[0]) or kv[0]), kv[0]))
 
     lista_fontes = []
     for f in fontes:
@@ -138,6 +138,7 @@ def montar(engine, agora=db.agora) -> dict:
         "ultima_rodada": None if ultima is None else {
             "id": ultima["id"], "iniciada_em": _iso(ultima["iniciada_em"]), "terminada_em": _iso(ultima["terminada_em"]),
             "situacao": ultima["situacao"]},
+        "agendador": agendador,
         "rodadas_recentes": [{"iniciada_em": _iso(r["iniciada_em"]), "situacao": r["situacao"]} for r in recentes],
         "totais": {
             "documentos": sum(total_por_fonte.values()),
@@ -179,7 +180,7 @@ def diagnostico(engine, agora=db.agora) -> list[str]:
     """Uma linha por notícia da janela com os países encontrados, para conferir a regra com manchetes reais."""
     momento = agora()
     with engine.connect() as c:
-        docs = _documentos_desde(c, momento - timedelta(hours=JANELA_HORAS))
+        docs = documentos_desde(c, momento - timedelta(hours=JANELA_HORAS))
     dicionario = paises.carregar()
     linhas = []
     for d in sorted(docs, key=lambda d: (d["fonte_id"], d["id"])):
@@ -191,8 +192,8 @@ def diagnostico(engine, agora=db.agora) -> list[str]:
     return linhas
 
 
-def escrever(engine, caminho: str) -> None:
-    dados = montar(engine)
+def escrever(engine, caminho: str, agendador: dict | None = None) -> None:
+    dados = montar(engine, agendador=agendador)
     _gravar_json(caminho, dados)
     if os.environ.get("STRATUM_DIAGNOSTICO"):
         print("::group::Diagnóstico da regra de países (uma linha por notícia)")
@@ -210,7 +211,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "rodadas_recentes": [],
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],
         "atencao": None, "paises": {}, "mais_citados": [], "origem_fontes": [],
     })

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { continente, dataHora, datasDocumento, diaHora, faixas, hora, plural, situacao, tipoFonte } from "./formatar.ts";
+import { classeAgendador, continente, dataHora, datasDocumento, diaHora, faixas, hora, plural, situacao, tipoFonte } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -13,6 +13,15 @@ test("datas em horário de Brasília", () => {
 test("notícia mostra as duas datas; sem data da fonte, diz isso", () => {
   assert.equal(datasDocumento("2026-10-16T10:30:00Z", "2026-10-16T10:52:00Z"), "publicado 16/10, 07:30 · coletado 16/10, 07:52");
   assert.equal(datasDocumento(null, "2026-10-16T10:52:00Z"), "sem data da fonte · coletado 16/10, 07:52");
+});
+
+test("cor do agendador só para estado medido; sem dado é cinza", () => {
+  assert.equal(classeAgendador("ok"), "sit-ok");
+  assert.equal(classeAgendador("vence_logo"), "sit-parcial");
+  assert.equal(classeAgendador("token_invalido"), "sit-falhou");
+  assert.equal(classeAgendador(null), "sem-dado");
+  assert.equal(classeAgendador("sem_banco"), "sem-dado");
+  assert.equal(classeAgendador("aguardando"), "sem-dado");
 });
 
 test("situação desconhecida aparece como sem dado (cinza)", () => {

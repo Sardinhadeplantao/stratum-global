@@ -95,17 +95,6 @@ def test_fonte_que_sai_da_lista_fica_inativa_e_mantem_os_documentos(engine, cfg,
     assert export.montar(engine)["totais"]["fontes"] == 1
 
 
-def test_aviso_so_na_mudanca_de_situacao():
-    enviados = []
-    falhou = robo.Resultado(rodada_id=2, situacao="falhou")
-    ok = robo.Resultado(rodada_id=3, situacao="ok")
-    robo.avisar_mudanca("ok", falhou, enviados.append)
-    robo.avisar_mudanca("falhou", falhou, enviados.append)   # continua falhando: não repete
-    robo.avisar_mudanca("falhou", ok, enviados.append)       # voltou: avisa
-    robo.avisar_mudanca("ok", ok, enviados.append)
-    assert len(enviados) == 2 and "falharam" in enviados[0] and "voltou" in enviados[1]
-
-
 def test_status_para_o_site(engine, cfg, feed_rss):
     relogio = Relogio()
     robo.rodar(engine, [fonte("a", URL_A), fonte("b", URL_B)], SessaoFalsa({URL_A: feed_rss}), cfg, agora=relogio)
@@ -146,3 +135,19 @@ def test_endereco_do_banco_so_com_a_senha(monkeypatch):
     assert config.endereco_do_banco() == "postgresql://postgres.abc:a%40b%23c%2Fd@aws-0-us-east-2.pooler.supabase.com:5432/postgres"
     monkeypatch.setenv("DATABASE_URL", "postgresql://x")
     assert config.endereco_do_banco() == "postgresql://x"  # o endereço completo, se existir, vence
+
+
+def test_rodada_completa_grava_o_status_do_site(tmp_path, monkeypatch, feed_rss):
+    """A rodada inteira (coleta, agendador, resumo, status.json), como no GitHub Actions, sem rede e sem segredos."""
+    from stratum import fontes as catalogo
+    from stratum.connectors import rss
+    f = fonte("a", "https://a/feed")
+    monkeypatch.setattr(catalogo, "FONTES", [f])
+    monkeypatch.setattr(rss, "nova_sessao", lambda: SessaoFalsa({"https://a/feed": feed_rss}))
+    for nome in ("DATABASE_URL", "SUPABASE_SENHA", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "GITHUB_REPOSITORY"):
+        monkeypatch.delenv(nome, raising=False)
+    caminho = tmp_path / "status.json"
+    assert robo.main(["--exportar", str(caminho)]) == 0
+    dados = json.loads(caminho.read_text(encoding="utf-8"))
+    assert dados["banco"] == "temporario" and dados["totais"]["documentos"] == 2
+    assert dados["agendador"]["situacao"] == "sem_banco"
