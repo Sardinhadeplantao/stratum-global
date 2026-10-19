@@ -1,7 +1,7 @@
 # Configurar (passo a passo, sem programar)
 
-Faça na ordem. Cada passo leva poucos minutos. Senhas e chaves vão **só** nos Secrets do GitHub:
-nunca cole em conversa (nem com o Claude), em arquivo ou em print.
+Faça na ordem. Cada passo leva poucos minutos. Senhas e chaves vão **só** nos Secrets do GitHub (a única exceção é
+a chave do passo 6, que vai no cofre do Supabase): nunca cole em conversa (nem com o Claude), em arquivo ou em print.
 
 ## 1. Ligar o site
 
@@ -62,7 +62,9 @@ Se algo não funcionar, a tela Método diz o que falhou. Numa sessão do Claude,
 ## 6. Ligar o agendador (o robô roda a cada 15 minutos e o resumo sai na hora)
 
 O agendamento do GitHub atrasa horas. Com este passo, o Supabase dispara o robô a cada 15 minutos (decisão 0004).
-O robô nunca vê esta chave: você a cola direto no cofre do Supabase.
+O código do robô nunca lê esta chave: você a cola direto no cofre do Supabase, e o próprio Supabase a usa.
+Quem tem a senha do banco consegue ler a chave no cofre. Se um dia a senha do banco vazar, troque a senha e
+revogue também esta chave (GitHub → Settings → Developer settings → Fine-grained tokens → **Revoke**).
 
 **Criar a chave no GitHub:**
 
@@ -70,7 +72,8 @@ O robô nunca vê esta chave: você a cola direto no cofre do Supabase.
 2. No fim do menu da esquerda, abra **Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
 3. Preencha:
    - **Token name:** `stratum-agendador`
-   - **Expiration:** o prazo mais longo oferecido. O resumo do Telegram avisa 14 dias antes de vencer.
+   - **Expiration:** escolha **Custom** e uma data daqui a 1 ano. Não escolha *No expiration*.
+     O resumo do Telegram avisa 14 dias antes de vencer.
    - **Repository access:** **Only select repositories** → `stratum-global`.
    - **Permissions → Repository permissions → Actions:** **Read and write**. Só essa.
 4. Clique em **Generate token** e copie o código, que começa com `github_pat_`.

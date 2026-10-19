@@ -53,7 +53,7 @@ def ordem_alfabetica(nome: str) -> str:
     return unicodedata.normalize("NFD", nome).encode("ascii", "ignore").decode().casefold()
 
 
-def montar(engine, agora=db.agora) -> dict:
+def montar(engine, agora=db.agora, agendador: dict | None = None) -> dict:
     momento = agora()
     limite_24h = momento - timedelta(hours=24)
     inicio_janela = momento - timedelta(hours=JANELA_HORAS)
@@ -138,6 +138,7 @@ def montar(engine, agora=db.agora) -> dict:
         "ultima_rodada": None if ultima is None else {
             "id": ultima["id"], "iniciada_em": _iso(ultima["iniciada_em"]), "terminada_em": _iso(ultima["terminada_em"]),
             "situacao": ultima["situacao"]},
+        "agendador": agendador,
         "rodadas_recentes": [{"iniciada_em": _iso(r["iniciada_em"]), "situacao": r["situacao"]} for r in recentes],
         "totais": {
             "documentos": sum(total_por_fonte.values()),
@@ -191,8 +192,8 @@ def diagnostico(engine, agora=db.agora) -> list[str]:
     return linhas
 
 
-def escrever(engine, caminho: str) -> None:
-    dados = montar(engine)
+def escrever(engine, caminho: str, agendador: dict | None = None) -> None:
+    dados = montar(engine, agendador=agendador)
     _gravar_json(caminho, dados)
     if os.environ.get("STRATUM_DIAGNOSTICO"):
         print("::group::Diagnóstico da regra de países (uma linha por notícia)")
@@ -210,7 +211,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "rodadas_recentes": [],
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],
         "atencao": None, "paises": {}, "mais_citados": [], "origem_fontes": [],
     })

@@ -23,7 +23,6 @@ class Resultado:
     situacao: str                       # ok | parcial | falhou
     novos: int = 0
     falhas: list[str] = field(default_factory=list)
-    motivos: dict[str, str] = field(default_factory=dict)   # fonte -> erro legível, para o resumo
 
 
 def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES) -> Resultado:
@@ -45,7 +44,6 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
         except Exception as exc:  # isola a falha: as outras fontes seguem
             resultado.falhas.append(f["id"])
             linha = dict(situacao="falhou", itens_lidos=0, itens_novos=0, erro=erro_legivel(exc))
-            resultado.motivos[f["nome"]] = linha["erro"]
         with engine.begin() as c:
             c.execute(db.coleta.insert().values(rodada_id=rid, fonte_id=f["id"], iniciada_em=inicio, terminada_em=agora(), **linha))
         print(f"{f['id']}: {linha['situacao']}, {linha['itens_lidos']} lidos, {linha['itens_novos']} novos"
@@ -119,9 +117,8 @@ def main(argv=None) -> int:
         estado = agendador.cuidar(engine, cfg.banco_permanente, cfg.repositorio, db.agora())
         print(f"Agendador: {estado.situacao}" + (f" ({estado.erro})" if estado.erro else ""))
         envio = resumo.talvez_enviar(
-            engine, db.agora(), [f"{nome} ({motivo})" for nome, motivo in resultado.motivos.items()],
-            None if estado.situacao in ("ok", "aguardando", "sem_banco") else estado.texto(),
-            cfg.repositorio, cfg.telegram_configurado, lambda t: avisos.enviar(t, cfg))
+            engine, db.agora(), None if estado.situacao in ("ok", "aguardando", "sem_banco") else estado.texto(),
+            cfg.repositorio, cfg.telegram_configurado, lambda t: avisos.enviar(t, cfg), cfg.banco_permanente)
         print(f"Resumo do Telegram: {envio}")
         if args.exportar:
             export.escrever(engine, args.exportar, agendador=estado.para_status())

@@ -17,6 +17,9 @@ from sqlalchemy import text
 
 NOME_SEGREDO = "stratum_disparo"
 NOME_TAREFA = "stratum-robo"
+NOME_LIMPEZA = "stratum-limpeza"
+LIMPEZA = ("delete from cron.job_run_details where jobid in (select jobid from cron.job where jobname in "
+           "('stratum-robo', 'stratum-limpeza')) and end_time < now() - interval '7 days'")
 HORARIO = "2,17,32,47 * * * *"          # a cada 15 minutos, fora da hora cheia
 WORKFLOW = "robo.yml"
 REF = "main"
@@ -92,6 +95,10 @@ def configurar(engine, repositorio: str) -> None:
         # Com o mesmo nome, o pg_cron atualiza a tarefa em vez de criar outra
         c.execute(text("select cron.schedule(:nome, :horario, :comando)"),
                   {"nome": NOME_TAREFA, "horario": HORARIO, "comando": comando(repositorio)})
+        # O pg_cron anota cada execução para sempre (uns 23 MB por ano). É registro da ferramenta, não dado do
+        # projeto: guarda 7 dias (decisão 0004)
+        c.execute(text("select cron.schedule(:nome, :horario, :comando)"),
+                  {"nome": NOME_LIMPEZA, "horario": "23 3 * * *", "comando": LIMPEZA})
 
 
 def _utc(d: datetime | None) -> datetime | None:
@@ -140,6 +147,8 @@ def avaliar(agora: datetime, chamada: datetime | None = None, resposta: int | No
         return Estado("falhando", **base)  # o próprio comando agendado deu erro no banco
     if resposta is not None and not 200 <= resposta < 300:
         return Estado("falhando", **base)
+    if chamada is not None and resposta is None:
+        return Estado("falhando", **base)  # o pg_net não recebeu resposta (tempo esgotado, rede, cabeçalho recusado)
     if chamada is not None and agora - chamada > SEM_CHAMADA_HA:
         return Estado("falhando", **base)
     if chamada is None and execucao is not None and agora - execucao > timedelta(minutes=5):

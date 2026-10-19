@@ -32,6 +32,7 @@ def test_le_o_vencimento_do_cabecalho_do_github():
     (dict(chamada=AGORA - timedelta(minutes=10), resposta=204), "ok"),
     (dict(chamada=AGORA - timedelta(minutes=10), resposta=401), "token_invalido"),
     (dict(chamada=AGORA - timedelta(minutes=10), resposta=500), "falhando"),
+    (dict(chamada=AGORA - timedelta(minutes=3), resposta=None), "falhando"),             # não chegou ao GitHub
     (dict(chamada=AGORA - timedelta(minutes=50), resposta=204), "falhando"),            # parou de chamar
     (dict(execucao=AGORA - timedelta(minutes=10)), "falhando"),                         # roda, mas não chama
     (dict(execucao=AGORA - timedelta(minutes=2)), "aguardando"),

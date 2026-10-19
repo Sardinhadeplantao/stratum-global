@@ -135,3 +135,19 @@ def test_endereco_do_banco_so_com_a_senha(monkeypatch):
     assert config.endereco_do_banco() == "postgresql://postgres.abc:a%40b%23c%2Fd@aws-0-us-east-2.pooler.supabase.com:5432/postgres"
     monkeypatch.setenv("DATABASE_URL", "postgresql://x")
     assert config.endereco_do_banco() == "postgresql://x"  # o endereço completo, se existir, vence
+
+
+def test_rodada_completa_grava_o_status_do_site(tmp_path, monkeypatch, feed_rss):
+    """A rodada inteira (coleta, agendador, resumo, status.json), como no GitHub Actions, sem rede e sem segredos."""
+    from stratum import fontes as catalogo
+    from stratum.connectors import rss
+    f = fonte("a", "https://a/feed")
+    monkeypatch.setattr(catalogo, "FONTES", [f])
+    monkeypatch.setattr(rss, "nova_sessao", lambda: SessaoFalsa({"https://a/feed": feed_rss}))
+    for nome in ("DATABASE_URL", "SUPABASE_SENHA", "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "GITHUB_REPOSITORY"):
+        monkeypatch.delenv(nome, raising=False)
+    caminho = tmp_path / "status.json"
+    assert robo.main(["--exportar", str(caminho)]) == 0
+    dados = json.loads(caminho.read_text(encoding="utf-8"))
+    assert dados["banco"] == "temporario" and dados["totais"]["documentos"] == 2
+    assert dados["agendador"]["situacao"] == "sem_banco"

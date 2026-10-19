@@ -9,7 +9,8 @@ Cada fase entrega algo usável e termina num "pronto quando" verificável.
 - [x] Banco com migrações automáticas; banco temporário quando o Supabase não está configurado
 - [x] Primeiras fontes (oficiais e imprensa de vários blocos), sem duplicatas, com registro de cada coleta
 - [x] Site com o globo (países do Natural Earth, cinza = sem medição), painel do país e tela Método
-- [x] Avisos no Telegram quando a coleta para ou volta
+- [x] Resumo no Telegram às 7:30, 12:00 e 19:00 de Brasília (decisão 0005)
+- [x] Agendador pelo Supabase: o robô roda a cada 15 minutos, sem depender do horário do GitHub (decisão 0004)
 - [ ] Supabase, Telegram e GitHub Pages ligados pelo dono (passo a passo em `docs/configurar.md`)
 
 **Pronto quando:** o site está no ar, a tela Método diz "Banco: Permanente" e a mensagem de teste chega no Telegram.

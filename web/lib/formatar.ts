@@ -60,7 +60,7 @@ export function situacao(s: string | null | undefined): { texto: string; classe:
 
 /** Cor do ponto do agendador: verde funcionando, amarelo atenção, vermelho falha, cinza sem dado. */
 export function classeAgendador(s: string | null | undefined): string {
-  if (s === "ok" || s === "aguardando") return "sit-ok";
+  if (s === "ok") return "sit-ok";  // "aguardando" ainda não mediu nada: cinza
   if (s === "vence_logo" || s === "sem_token") return "sit-parcial";
   if (s === "falhando" || s === "token_invalido" || s === "erro") return "sit-falhou";
   return "sem-dado";

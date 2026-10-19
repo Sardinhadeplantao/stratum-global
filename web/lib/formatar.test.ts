@@ -21,6 +21,7 @@ test("cor do agendador só para estado medido; sem dado é cinza", () => {
   assert.equal(classeAgendador("token_invalido"), "sit-falhou");
   assert.equal(classeAgendador(null), "sem-dado");
   assert.equal(classeAgendador("sem_banco"), "sem-dado");
+  assert.equal(classeAgendador("aguardando"), "sem-dado");
 });
 
 test("situação desconhecida aparece como sem dado (cinza)", () => {

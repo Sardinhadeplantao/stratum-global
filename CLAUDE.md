@@ -36,7 +36,8 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
    vêm prontos no status.json.
 10. **Mostrar o que não se mede** (tela Método).
 11. **Custo zero**: biblioteca gratuita antes de LLM; nada pago obrigatório.
-12. **Segredos só nos Secrets do GitHub.** Nunca em código, log, mensagem de erro ou conversa.
+12. **Segredos só nos Secrets do GitHub**, com uma exceção: o token `stratum_disparo`, que o dono cola no cofre (Vault)
+    do Supabase (decisão 0004); o código nunca o lê, grava ou imprime. Nunca em código, log, mensagem de erro ou conversa.
     Erro de banco imprime só o tipo da exceção (a mensagem pode conter dados da conexão).
 13. **Só a branch `main` grava no banco de produção e manda avisos.** Branches rodam com banco temporário.
 

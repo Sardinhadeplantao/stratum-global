@@ -34,6 +34,8 @@ Alternativas consideradas:
   - Só agenda se o token já estiver no cofre.
   - Renomear o repositório não exige mexer no Supabase.
   - A validade do token vem da própria resposta do GitHub a cada chamada (cabeçalho com a data de vencimento).
+- O pg_cron anota cada execução para sempre (uns 23 MB por ano). Essa anotação é registro da ferramenta, não dado
+  do projeto (a regra 2 vale para os dados): uma segunda tarefa, `stratum-limpeza`, guarda só os últimos 7 dias.
 - O agendamento do GitHub continua como reserva. Se o Supabase falhar, o robô ainda roda de vez em quando.
   Uma rodada por vez: o GitHub enfileira as chamadas que chegam durante uma rodada.
 - O robô publica o estado do agendador no status.json e na tela Método:
@@ -46,6 +48,10 @@ Alternativas consideradas:
 
 - O site passa a ter dados de no máximo uns 20 minutos, enquanto o Supabase estiver de pé.
 - O token vence em até um ano. O dono gera outro e o troca no cofre do Supabase; o aviso chega antes.
+- Quem tem a senha do banco consegue ler o token no cofre e disparar ou cancelar rodadas do robô (o token só tem
+  permissão de Actions neste repositório; não mexe em código). Se a senha do banco vazar, o dono revoga também o token.
+- Se o Supabase chamar o GitHub e não houver resposta (rede, tempo esgotado, token colado com quebra de linha),
+  a situação é "falhando", nunca "funcionando".
 - Se o Supabase pausar o projeto gratuito por falta de uso, o agendador para junto. Com o robô gravando a cada
   15 minutos, isso não deve acontecer. Se acontecer, o aviso de dados parados aparece no site.
 - Custo zero: o Actions é gratuito em repositório público, e `pg_cron` e `pg_net` fazem parte do plano gratuito
