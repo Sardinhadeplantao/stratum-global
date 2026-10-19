@@ -75,8 +75,21 @@ Sem fase ainda:
   É só dos EUA e puxa para investimento.
 - Empresas expostas, só depois do placar de hipóteses: universo por regra, exposição medida em documento, sem nota
   e sem ranking.
-- Guardar o texto de atos oficiais de domínio público, se a fase 3 precisar da frase de prova.
+- Guardar o texto de atos oficiais de domínio público, se a fase 3 precisar da frase de prova (exceção à decisão
+  0001; pede decisão própria).
 - Estética de atlas (serifa nos títulos, textura discreta), sem significado de cor.
 - Amostra semanal de 20 eventos conferida pelo dono, com a taxa de acerto publicada.
 - Exportação dos eventos em CSV, respeitando as licenças.
-- Ao abrir ao público: bloqueio automático do que o termo de uso de uma fonte não deixa publicar.
+- Ao abrir ao público: bloqueio automático do que o termo de uso de uma fonte não deixa publicar; seguir países ou
+  entidades (só faz sentido com mais de um usuário); slogans, sem os que falam de capital.
+- Tabela de vieses no Método, cada um com a regra que o evita.
+- Poucos conceitos (evento, série, mudança, hipótese): tela que precise de um conceito novo está errada.
+- Fase 5: descida em camadas (país → recurso → cadeia → exposição), com a fonte em cada passo; a IA pode redigir o
+  "por que importa", mas só a partir de um caminho que já está no grafo. Hipóteses geradas pelo sistema por modelo
+  fixo, só depois do placar do dono.
+- Candidatos do piloto da fase 5: Ásia dos chips (METI, comércio de Coreia e Taiwan), medidas comerciais da OMC,
+  insumo-produto da OCDE, dados gratuitos da IEA sobre minerais e petróleo (licença a conferir).
+- Só se dinheiro público e empresas entrarem: avisos de compra pública (SAM.gov) e lei anual de defesa, política
+  industrial dos EUA (DOE, CHIPS), mudança de texto nos balanços anuais (10-K), comunicados de empresas por RSS.
+- Indicadores da indústria (encomendas, uso da capacidade, emprego, usinas, Eurostat), só se a economia de guerra
+  virar tema.

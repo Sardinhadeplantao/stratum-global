@@ -25,30 +25,34 @@ Já entregue:
 - nome Stratum Global e página inicial no formato do esboço (globo, últimas atualizações, indicadores, cartões);
 - regra de citação de países: dicionário com nomes, gentílicos, capitais e siglas; versão atual em
   `docs/decisoes/0003-regra-paises-0.2.md`;
-- gabarito de eventos: 520 manchetes de dois dias agrupadas em eventos por duas anotações independentes,
-  reconciliadas, em `jobs/tests/gabarito/`.
+- gabarito de eventos: 520 manchetes de dois dias agrupadas em eventos pelo Claude, em duas anotações independentes
+  e reconciliadas, em `jobs/tests/gabarito/`.
 
 Falta, em duas voltas. A primeira entrega o monitor usável; a segunda refina.
 
 Primeira volta:
 
 - Cópia semanal das tabelas do projeto (nunca o cofre), num workflow separado, só na `main`, com a restauração
-  testada. Vem antes de tudo: o Supabase gratuito não faz cópia de segurança.
-- Retenção: medir o tamanho do banco e decidir o que fica para sempre. A decisão 0001 ("notícias por uns 90 dias")
-  conflita com a regra 2.
+  testada. Vem antes de tudo: o Supabase gratuito não faz cópia de segurança. A cópia fica no GitHub e é pública,
+  como o repositório: só entram tabelas sem dado pessoal ou de conexão.
+- Retenção: medir o tamanho do banco e quanto ele cresce por semana. A decisão 0001 previa apagar o detalhe das
+  notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova mantém tudo ou muda a regra 2 por escrito.
+- O dono confere uma amostra de 30 pares do gabarito, para o acerto medido não depender só do Claude.
 - Ficha de cada fonte:
   - nível: 1 governo, 2 organismo multilateral, 3 empresa, 4 imprensa, 5 rede social;
   - controlador: privado, público ou estatal; qual grupo ou Estado, documentado com fonte;
   - termos de uso e volume esperado por dia.
 
   Fonte nova entra com uma amostra real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
-- Lista de fontes completa: oficiais de pelo menos 3 blocos (diários oficiais, sanções, chancelarias, ONU, UE);
-  imprensa das regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel); GDELT para volume.
+- Lista de fontes completa: oficiais de pelo menos 3 blocos (diários oficiais, sanções, chancelarias, ONU, UE),
+  com os feeds do governo britânico (GOV.UK) de reserva e a China só se a coleta funcionar; GDELT para volume.
+  A imprensa das regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois
+  da decisão de retenção.
 - Antes das tabelas novas, uma decisão curta com o modelo dos objetos da fase 1: campos, de onde vêm e que regra os muda.
 - Caminho do documento até o evento:
   - idioma e tradução (Argos/Opus-MT), com o original a um clique;
   - quase-duplicatas (MinHash);
-  - nomes com código (GLiNER + Wikidata): órgãos do Estado, como PLA e IDF, contam o país; empresas não;
+  - nomes com código (GLiNER + Wikidata): órgãos do Estado, como PLA e IDF, contam o país;
   - lugar (GeoNames);
   - agrupamento em eventos.
 
@@ -62,7 +66,8 @@ Primeira volta:
   - oficial: documento do próprio órgão (governo ou organismo multilateral) sobre o próprio ato;
   - contestado: a regra do que conta como contradição é escrita nos casos de referência.
 
-  Mudança de grau vira registro novo e aparece no resumo.
+  Mudança de grau vira registro novo e aparece no resumo. O Método diz o limite: não detectamos dois veículos que
+  reescrevem a mesma agência sem dar o crédito.
 - Fato × declaração: "Trump diz X", confirmado, quer dizer que ele disse, não que X é verdade. Primeiro esse rótulo
   entra no gabarito; depois vem a regra.
 - Telas (uma tela, uma pergunta; cada coisa num lugar só):
@@ -80,7 +85,8 @@ Segunda volta:
 
 - Importância (alta, média, baixa) por fórmula publicada no Método: grau, ato oficial novo, países envolvidos e
   novidade. Nunca preço (regra 8), nunca IA (regra 7). Antes, 5 ou 6 casos de referência.
-- Acerto do agrupamento publicado no Método, ao lado do "nada juntado".
+- Acerto do agrupamento publicado no Método, ao lado do "nada juntado", dizendo que o gabarito foi feito pelo Claude
+  e quantos pares o dono conferiu.
 - Tipo de evento (lista curta, com "outro"), depois de anotado no gabarito.
 - Reações: quem mais se manifestou sobre o mesmo assunto.
 - Todo número da tela leva aos documentos que o produziram.
@@ -89,9 +95,14 @@ Segunda volta:
 **Pronto quando:**
 
 - você acompanha o mundo por uma semana só pelo Stratum Global;
-- no gabarito de teste (284 manchetes de 16/10, que não é usado para ajustar a regra), pelo menos 90% dos pares que
-  o agrupamento junta estão certos, e ele encontra pelo menos 60% dos pares certos;
-- a rodada inteira continua cabendo nos 15 minutos.
+- no gabarito de teste (284 manchetes de 16/10, que não é usado para ajustar a regra), contando pares (par = duas
+  manchetes do mesmo evento):
+  - pelo menos 90% dos pares que o agrupamento junta estão certos;
+  - ele encontra pelo menos 60% dos pares certos;
+  - em pelo menos metade dos 30 eventos que têm 2 ou mais manchetes, ele junta ao menos duas delas
+    (sem isso, acertar só os 5 maiores eventos já bateria a meta);
+- a rodada inteira (testes, coleta e montagem do site) termina em até 10 minutos no log do GitHub, abaixo do limite
+  de 14 do workflow.
 
 ## Fase 2. Mercados (3 a 4 semanas)
 
@@ -108,7 +119,7 @@ Segunda volta:
 - API gratuita (Groq, com Gemini de reserva) para títulos e resumos dos eventos importantes.
 - Conjunto de ~100 documentos anotados para medir se a IA melhora sem inventar fonte.
   Troca de modelo só passa se a precisão não cair. Cada campo que a IA extrair traz a frase do documento, conferida
-  por programa.
+  por programa no título e no trecho guardados, ou no documento baixado na hora, sem guardá-lo.
 
 **Pronto quando:** o briefing é melhor que o extrativo no conjunto anotado e toda citação confere.
 

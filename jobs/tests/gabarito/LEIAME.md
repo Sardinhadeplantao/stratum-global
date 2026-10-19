@@ -11,7 +11,8 @@ Manchetes reais coletadas pelo robô, agrupadas em eventos e assuntos. Servem pa
 ## Arquivos
 
 - `<conjunto>.jsonl`: uma manchete por linha (`id`, `fonte`, `titulo`, `resumo`, `paises`). `paises` saiu da regra
-  de países da época e não faz parte do gabarito.
+  de países da época e não faz parte do gabarito. As manchetes vieram do log do robô: não têm link nem data. Cada
+  conjunto é de um dia, então o gabarito não testa a janela de tempo do agrupamento.
 - `gabarito_<conjunto>.json`: o resultado final. Cada assunto tem eventos; cada evento tem `tipo` (`fato`, `analise`
   ou `resenha`) e os `ids` das manchetes. Toda manchete está em exatamente um evento. `duvidas` lista os casos de
   fronteira.
@@ -23,7 +24,7 @@ Manchetes reais coletadas pelo robô, agrupadas em eventos e assuntos. Servem pa
 Duas anotações independentes, feitas pelo Claude em sessões separadas, seguindo as diretrizes abaixo. Depois, uma
 reconciliação decidiu cada divergência, caso a caso. Os dois anotadores concordaram quase sempre sobre o que é o mesmo
 evento (B-cubed F de 0,98 a 0,99). Sobre o assunto, concordaram bem menos (cerca de 64% dos pares no teste).
-Por isso, a meta da fase 1 mede só os eventos. O ideal é o dono conferir uma amostra de 30 pares.
+Por isso, a meta da fase 1 mede só os eventos. O dono confere uma amostra de 30 pares (item da fase 1).
 
 O gabarito não marca grau de confirmação, tipo de evento nem fato × declaração. Esses rótulos, quando forem medidos,
 entram aqui antes da regra.

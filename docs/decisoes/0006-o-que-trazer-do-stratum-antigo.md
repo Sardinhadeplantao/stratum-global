@@ -32,12 +32,16 @@ Os dois começam por outro lugar:
   - volume de notícia mede atenção, não importância;
   - o sistema mede o próprio acerto, com meta escrita antes de medir;
   - cada número guarda a versão da regra que o produziu.
-- **Nada de carteira, nota de empresa ou recomendação.** Vale a regra de ouro dos dois PDFs: não prever o futuro,
-  e sim mapear as forças que podem produzi-lo. Na fase 5, as "teses" viram hipóteses verificáveis com placar,
-  e o placar mostra também as erradas. Motivos:
+- **Nada de carteira, nota de empresa ou recomendação.** Vale a regra de ouro do texto original: não prever o futuro,
+  e sim mapear as forças que podem produzi-lo. Do manual vem a lista do que isso exclui: guerra, eleição ou preço;
+  compra ou venda. Na fase 5, as "teses" viram hipóteses verificáveis com placar, e o placar mostra também as
+  erradas. Motivos:
   - regras 7 e 8;
   - ACLED, OpenSanctions e dados de mercado não oficiais são só para uso não comercial;
   - o próprio original avisa que começar pela carteira vira máquina de confirmar o que já se acha.
+
+  A regra de ouro fica no plano e na tela Método, e não vira regra do CLAUDE.md. As hipóteses da fase 5 têm prazo e
+  probabilidade, ou seja, são previsões verificáveis; uma regra "não prever" brigaria com elas.
 - **Largo no monitor, estreito na profundidade**: os eventos são do mundo todo. As camadas caras da fase 5
   começam por um piloto, EUA × China em chips e terras raras.
 - **Ficam como estão**:
@@ -48,16 +52,22 @@ Os dois começam por outro lugar:
 - A fase 1 ganha os itens dos PDFs que cabem nela, em duas voltas, e um "pronto quando" com número.
   O detalhe das fases 2 a 5 vai para `docs/ideias.md`, como manda o CLAUDE.md.
 - O gabarito de eventos sai da pasta temporária da sessão e entra no repositório (`jobs/tests/gabarito/`).
+  Ele foi feito pelo Claude, em duas anotações independentes e reconciliadas. O dono confere uma amostra de 30 pares,
+  e o Método diz isso.
+- **Regra 12**: segredo que aparecer em código, log, mensagem de erro, conversa ou captura de tela é trocado no mesmo
+  dia, como já pedia o manual antigo.
 
 ## Consequências
 
 - O "pronto quando" da fase 1 passa a ter uma meta medida, fixada antes de o agrupamento existir. No gabarito de
   teste:
   - pelo menos 90% dos pares que o sistema junta estão certos;
-  - ele encontra pelo menos 60% dos pares certos.
+  - ele encontra pelo menos 60% dos pares certos;
+  - em pelo menos metade dos 30 eventos com 2 ou mais manchetes, ele junta ao menos duas delas.
 
-  A meta é sobre os pares porque quase todo evento tem uma manchete só: não juntar nada já dá nota alta na medida
-  usual (B-cubed 0,87).
+  A meta é sobre os pares porque quase todo evento tem uma manchete só: não juntar nada já tira 0,87 de 1 na medida
+  usual (B-cubed). A terceira condição existe porque os pares se concentram nos eventos grandes: no teste, os 5
+  maiores somam 65% dos pares.
 - Com as 11 fontes de hoje, a maioria dos eventos vai sair "relatado" (uma fonte só). Além disso, 36% das manchetes
   do gabarito são da TASS. Isso é honesto, e o que faz "corroborado" aparecer é ampliar as fontes.
 - A decisão 0001 previa guardar o detalhe das notícias por uns 90 dias, o que conflita com a regra 2.
