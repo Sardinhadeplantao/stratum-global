@@ -18,6 +18,8 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
   (`agendador.py`, decisão 0004). O token fica no cofre do Supabase, colado pelo dono; o robô nunca o lê.
 - **Avisos**: Telegram (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`), só um resumo às 7:30, 12:00 e 19:00 de Brasília
   (`resumo.py`, decisão 0005). Problemas entram no resumo; não há mensagem fora desses horários.
+- **Cópia**: toda semana, `.github/workflows/copia.yml` copia as tabelas do projeto e testa a restauração
+  (`copia.py`, decisão 0007). Fica como artefato do GitHub, público; tabela com dado pessoal não entra sem decisão.
 - **IA**: nenhuma é obrigatória. Planejado: tarefa agendada do Claude para o briefing (fase 3) e API gratuita
   (Groq/Gemini) como ajudante opcional. LLM local foi descartada (`docs/decisoes/0001-arquitetura.md`).
 
@@ -56,6 +58,7 @@ jobs/stratum/
   avisos.py      Telegram (envio)
   resumo.py      resumo das 7:30, 12:00 e 19:00
   agendador.py   Supabase dispara o robô a cada 15 minutos
+  copia.py       cópia semanal do banco e restauração
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)

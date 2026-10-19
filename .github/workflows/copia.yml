@@ -1,0 +1,43 @@
+name: Cópia do banco
+
+# Uma vez por semana, copia as tabelas do projeto e testa a restauração (decisão 0007).
+# O Supabase gratuito não faz cópia de segurança. A cópia fica guardada aqui, como artefato, por 90 dias;
+# como o banco só recebe inserções, a cópia mais nova sempre tem tudo.
+on:
+  schedule:
+    - cron: "41 9 * * 0"   # domingo, 6:41 em Brasília
+  workflow_dispatch:
+
+permissions: { contents: read }
+concurrency: { group: copia-do-banco, cancel-in-progress: false }
+
+jobs:
+  copia:
+    # Só a main conhece a senha do banco de produção (regra 13)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
+
+      - name: Copiar o banco e testar a restauração
+        working-directory: jobs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
+        run: |
+          pip install -r requirements.txt
+          python -m stratum.copia --saida ../copia
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: copia-banco
+          path: copia/
+          retention-days: 90
+          if-no-files-found: error
+          compression-level: 0   # os arquivos já vêm comprimidos

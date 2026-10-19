@@ -74,7 +74,8 @@ def _hora(d: datetime) -> str:
     return f"{x.day:02d}/{x.month:02d} {x.hour}:{x.minute:02d}"
 
 
-def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | None, site: str | None) -> str:
+def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | None, site: str | None,
+           copia: dict | None = None) -> str:
     """O texto do resumo.
 
     O período é pelo momento em que o robô soube da notícia (conhecido_em): cada notícia entra em um resumo só,
@@ -137,6 +138,10 @@ def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | No
         problemas.insert(0, "Fontes com problema desde o último resumo:")
     if linha_agendador:
         problemas.append(f"Agendador: {linha_agendador}.")
+    if copia and copia["situacao"] in ("atrasada", "nenhuma"):  # cópia semanal do banco (decisão 0007)
+        problemas.append(f"Cópia do banco: {copia['texto']}"
+                         + (f" (a última é de {_hora(datetime.fromisoformat(copia['ultima'].rstrip('Z')))})"
+                            if copia["ultima"] else "") + ".")
     if problemas:
         linhas += ["", *problemas]
     if site:
@@ -160,7 +165,7 @@ def site_do_repositorio(repositorio: str | None) -> str | None:
 
 
 def talvez_enviar(engine, agora: datetime, linha_agendador: str | None, repositorio: str | None,
-                  telegram_configurado: bool, enviar, banco_permanente: bool = True) -> str:
+                  telegram_configurado: bool, enviar, banco_permanente: bool = True, copia: dict | None = None) -> str:
     """Manda o resumo se for a hora.
     Devolve o que aconteceu: sem_banco | fora_do_horario | enviado | sem_telegram | falhou."""
     if not banco_permanente:
@@ -168,7 +173,7 @@ def talvez_enviar(engine, agora: datetime, linha_agendador: str | None, reposito
     horario = pendente(engine, agora)
     if horario is None:
         return "fora_do_horario"
-    texto = montar(engine, agora, horario, linha_agendador, site_do_repositorio(repositorio))
+    texto = montar(engine, agora, horario, linha_agendador, site_do_repositorio(repositorio), copia)
     if not telegram_configurado:
         registrar(engine, horario, agora, "sem_telegram", texto)
         return "sem_telegram"

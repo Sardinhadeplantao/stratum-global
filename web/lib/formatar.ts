@@ -66,6 +66,12 @@ export function classeAgendador(s: string | null | undefined): string {
   return "sem-dado";
 }
 
+export function classeCopia(s: string | null | undefined): string {
+  if (s === "ok") return "sit-ok";
+  if (s === "atrasada" || s === "nenhuma") return "sit-falhou";
+  return "sem-dado";  // não conferida nesta rodada: cinza
+}
+
 const TIPOS: Record<string, string> = { oficial: "Oficial", imprensa: "Imprensa", dados: "Dados", social: "Rede social (pista)" };
 
 export function tipoFonte(t: string | null | undefined): string {

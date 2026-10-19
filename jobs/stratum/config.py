@@ -13,6 +13,7 @@ class Config:
     telegram_chat: str | None
     user_agent: str
     repositorio: str | None = None     # dono/nome, que o GitHub Actions informa sozinho
+    ultima_copia: str | None = None    # data da última cópia do banco no GitHub ("" = nenhuma; None = não conferida)
 
     @property
     def banco_permanente(self) -> bool:
@@ -46,4 +47,5 @@ def ler() -> Config:
         telegram_chat=_env("TELEGRAM_CHAT_ID"),
         user_agent=_env("STRATUM_USER_AGENT") or USER_AGENT_PADRAO,
         repositorio=_env("GITHUB_REPOSITORY"),
+        ultima_copia=os.environ.get("STRATUM_ULTIMA_COPIA"),  # vazio tem significado: não usa _env
     )

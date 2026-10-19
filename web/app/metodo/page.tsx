@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
+import { classeAgendador, classeCopia, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 
 export const metadata = { title: "Método · Stratum Global" };
@@ -98,6 +98,15 @@ export default function Metodo() {
               {s.agendador.texto.charAt(0).toUpperCase() + s.agendador.texto.slice(1)}.
               {s.agendador.ultima_chamada && <> Última chamada: {dataHora(s.agendador.ultima_chamada)}.</>}
               {s.agendador.token_vence_em && <> O token vence em {dataHora(s.agendador.token_vence_em)}.</>}
+            </>) : <span className="sem-dado-texto">—</span>}
+          </dd>
+          <dt>Cópia do banco</dt>
+          <dd>
+            {s.copia ? (<>
+              <span className={`ponto ${classeCopia(s.copia.situacao)}`} aria-hidden />{" "}
+              {s.copia.texto.charAt(0).toUpperCase() + s.copia.texto.slice(1)}.
+              {s.copia.ultima && <> Última: {dataHora(s.copia.ultima)}.</>} Uma por semana, guardada no GitHub por 90 dias,
+              com a restauração testada.
             </>) : <span className="sem-dado-texto">—</span>}
           </dd>
           <dt>Telegram</dt><dd>Um resumo às 7:30, 12:00 e 19:00 (Brasília). Problemas entram no resumo seguinte.</dd>

@@ -26,16 +26,14 @@ Já entregue:
 - regra de citação de países: dicionário com nomes, gentílicos, capitais e siglas; versão atual em
   `docs/decisoes/0003-regra-paises-0.2.md`;
 - gabarito de eventos: 520 manchetes de dois dias agrupadas em eventos pelo Claude, em duas anotações independentes
-  e reconciliadas, em `jobs/tests/gabarito/`.
+  e reconciliadas, em `jobs/tests/gabarito/`;
+- cópia semanal do banco, com a restauração testada e a data da última cópia na tela Método (decisão 0007).
 
 Falta, em duas voltas. A primeira entrega o monitor usável; a segunda refina.
 
 Primeira volta:
 
-- Cópia semanal das tabelas do projeto (nunca o cofre), num workflow separado, só na `main`, com a restauração
-  testada. Vem antes de tudo: o Supabase gratuito não faz cópia de segurança. A cópia fica no GitHub e é pública,
-  como o repositório: só entram tabelas sem dado pessoal ou de conexão.
-- Retenção: medir o tamanho do banco e quanto ele cresce por semana. A decisão 0001 previa apagar o detalhe das
+- Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois). A decisão 0001 previa apagar o detalhe das
   notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova mantém tudo ou muda a regra 2 por escrito.
 - O dono confere uma amostra de 30 pares do gabarito, para o acerto medido não depender só do Claude.
 - Ficha de cada fonte:

@@ -94,3 +94,10 @@ Para trocar a chave quando ela vencer, gere outra e edite o segredo `stratum_dis
 
 O Telegram recebe só três mensagens por dia, às 7:30, ao meio-dia e às 19:00 (Brasília), com o que aconteceu
 desde o resumo anterior. Problemas do robô aparecem no resumo seguinte, nunca em mensagens fora desses horários.
+
+## 8. Cópia do banco (não precisa fazer nada)
+
+Todo domingo de manhã, o GitHub copia o banco e confere que a cópia volta idêntica. A tela Método mostra a data da
+última cópia; se ela atrasar, o aviso entra no resumo do Telegram. Para baixar uma cópia: no GitHub, **Actions** →
+**Cópia do banco** → a rodada mais recente → **copia-banco**. Para restaurar num Supabase novo, peça ao Claude: o
+comando é `python -m stratum.copia --restaurar PASTA`, e ele só aceita banco vazio.
