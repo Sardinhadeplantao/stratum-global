@@ -1,0 +1,2727 @@
+{
+ "conjunto": "teste_16out",
+ "assuntos": [
+  {
+   "id": "A1",
+   "titulo": "Violência de colonos israelenses na Cisjordânia na colheita de azeitonas (out 2026)",
+   "eventos": [
+    {
+     "id": "A1.E1",
+     "titulo": "Colonos atacam palestinos e ferem fotojornalista americana na colheita de azeitonas (16 out)",
+     "tipo": "fato",
+     "ids": [
+      6,
+      7,
+      10,
+      27,
+      48,
+      101
+     ]
+    },
+    {
+     "id": "A1.E2",
+     "titulo": "Oliveiras palestinas incendiadas enquanto ataques de colonos se intensificam",
+     "tipo": "analise",
+     "ids": [
+      23
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A2",
+   "titulo": "Gaza: situação humanitária",
+   "eventos": [
+    {
+     "id": "A2.E1",
+     "titulo": "ONU alerta que quase 1 milhão em Gaza corre risco de enchentes no inverno",
+     "tipo": "fato",
+     "ids": [
+      25
+     ]
+    },
+    {
+     "id": "A2.E2",
+     "titulo": "UNICEF: mais de 340 crianças mortas em Gaza apesar do cessar-fogo",
+     "tipo": "fato",
+     "ids": [
+      123
+     ]
+    },
+    {
+     "id": "A2.E3",
+     "titulo": "Guterres pede cessar-fogo em Gaza antes do aniversário de 7 de outubro",
+     "tipo": "fato",
+     "ids": [
+      238
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A3",
+   "titulo": "Catar e Líbano",
+   "eventos": [
+    {
+     "id": "A3.E1",
+     "titulo": "Premiê e chanceler do Catar no Líbano: usina solar e pedido de retirada israelense",
+     "tipo": "fato",
+     "ids": [
+      1,
+      3
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A4",
+   "titulo": "Cúpula da CICA em Baku: agenda do chanceler chinês Wang Yi",
+   "eventos": [
+    {
+     "id": "A4.E1",
+     "titulo": "Wang Yi pede a Herzog fim dos assentamentos na Cisjordânia e abertura de rotas para Gaza",
+     "tipo": "fato",
+     "ids": [
+      35,
+      53
+     ]
+    },
+    {
+     "id": "A4.E2",
+     "titulo": "Wang Yi recebe chanceler palestina e reafirma apoio aos direitos palestinos",
+     "tipo": "fato",
+     "ids": [
+      63
+     ]
+    },
+    {
+     "id": "A4.E3",
+     "titulo": "Wang Yi apresenta quatro propostas para a cooperação na CICA",
+     "tipo": "fato",
+     "ids": [
+      54
+     ]
+    },
+    {
+     "id": "A4.E4",
+     "titulo": "Wang Yi conversa com o chanceler do Azerbaijão em Baku",
+     "tipo": "fato",
+     "ids": [
+      56
+     ]
+    },
+    {
+     "id": "A4.E5",
+     "titulo": "Wang Yi encontra o chanceler russo no Azerbaijão",
+     "tipo": "fato",
+     "ids": [
+      59
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A5",
+   "titulo": "Ucrânia: atrito Zelensky–Trump e apoio europeu",
+   "eventos": [
+    {
+     "id": "A5.E1",
+     "titulo": "Zelensky em Bruxelas busca apoio europeu em meio ao atrito com Trump (16 out)",
+     "tipo": "fato",
+     "ids": [
+      26,
+      80,
+      109,
+      114,
+      131,
+      139,
+      266
+     ]
+    },
+    {
+     "id": "A5.E2",
+     "titulo": "Cúpula da UE em Bruxelas: orçamento, preços de energia e Ucrânia",
+     "tipo": "fato",
+     "ids": [
+      55,
+      115,
+      215
+     ]
+    },
+    {
+     "id": "A5.E3",
+     "titulo": "Zelensky volta a alertar para falta grave de mísseis Patriot",
+     "tipo": "fato",
+     "ids": [
+      132
+     ]
+    },
+    {
+     "id": "A5.E4",
+     "titulo": "Washington Post: Ucrânia com estoque crítico de interceptadores Patriot",
+     "tipo": "fato",
+     "ids": [
+      184
+     ]
+    },
+    {
+     "id": "A5.E5",
+     "titulo": "Zakharova comenta a 'desgraça' de Zelensky e a 'caça a jornalistas' de Kiev",
+     "tipo": "fato",
+     "ids": [
+      146
+     ]
+    },
+    {
+     "id": "A5.E6",
+     "titulo": "Trump chama a Crimeia de 'o mais belo pedaço de terra' que a Ucrânia cedeu",
+     "tipo": "fato",
+     "ids": [
+      194
+     ]
+    },
+    {
+     "id": "A5.E7",
+     "titulo": "Lukashenko fala de prazos para acordo na Ucrânia e de interferência dos EUA",
+     "tipo": "fato",
+     "ids": [
+      145
+     ]
+    },
+    {
+     "id": "A5.E8",
+     "titulo": "Jeffrey Sachs: só a neutralidade da Ucrânia garante a segurança",
+     "tipo": "analise",
+     "ids": [
+      127
+     ]
+    },
+    {
+     "id": "A5.E9",
+     "titulo": "Bélgica vai entregar 10 caças F-16 à Ucrânia até o fim do ano",
+     "tipo": "fato",
+     "ids": [
+      160
+     ]
+    },
+    {
+     "id": "A5.E10",
+     "titulo": "Merz anuncia nova ajuda à Ucrânia em Kiev",
+     "tipo": "fato",
+     "ids": [
+      283
+     ]
+    },
+    {
+     "id": "A5.E11",
+     "titulo": "Senador russo acusa autoridades de Kiev de desviar verbas de defesa",
+     "tipo": "fato",
+     "ids": [
+      213
+     ]
+    },
+    {
+     "id": "A5.E12",
+     "titulo": "Resenha da imprensa russa (TASS, 16 out): ativos russos e Starlink",
+     "tipo": "resenha",
+     "ids": [
+      191
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A6",
+   "titulo": "Ucrânia: restrição do Starlink pelos EUA",
+   "eventos": [
+    {
+     "id": "A6.E1",
+     "titulo": "Reuters: Casa Branca mandou limitar o serviço de comunicação das tropas ucranianas",
+     "tipo": "fato",
+     "ids": [
+      219
+     ]
+    },
+    {
+     "id": "A6.E2",
+     "titulo": "Senadores dos EUA pedem investigação sobre a restrição do Starlink à Ucrânia",
+     "tipo": "fato",
+     "ids": [
+      31
+     ]
+    },
+    {
+     "id": "A6.E3",
+     "titulo": "Zelensky reclama que os EUA ainda restringem o Starlink para os militares",
+     "tipo": "fato",
+     "ids": [
+      162
+     ]
+    },
+    {
+     "id": "A6.E4",
+     "titulo": "Vídeo: o que o Starlink tem a ver com a guerra",
+     "tipo": "analise",
+     "ids": [
+      49
+     ]
+    },
+    {
+     "id": "A6.E5",
+     "titulo": "Como a Starlink de Musk influencia a geopolítica",
+     "tipo": "analise",
+     "ids": [
+      73
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A7",
+   "titulo": "Guerra na Ucrânia: ataques e combates",
+   "eventos": [
+    {
+     "id": "A7.E1",
+     "titulo": "Ucrânia encerra trégua energética e ataca refinaria russa",
+     "tipo": "fato",
+     "ids": [
+      39,
+      254
+     ]
+    },
+    {
+     "id": "A7.E2",
+     "titulo": "Vance, Witkoff e Kushner pedem a Zelensky que não ataque refinarias russas (jornal)",
+     "tipo": "fato",
+     "ids": [
+      216
+     ]
+    },
+    {
+     "id": "A7.E3",
+     "titulo": "Rússia ataca o oeste da Ucrânia e Polônia aciona caças",
+     "tipo": "fato",
+     "ids": [
+      21
+     ]
+    },
+    {
+     "id": "A7.E4",
+     "titulo": "Drone atinge supermercado na região de Odessa",
+     "tipo": "fato",
+     "ids": [
+      50
+     ]
+    },
+    {
+     "id": "A7.E5",
+     "titulo": "Rússia diz ter atingido ponte em Kiev e dois navios no mar Negro",
+     "tipo": "fato",
+     "ids": [
+      278
+     ]
+    },
+    {
+     "id": "A7.E6",
+     "titulo": "Navio pega fogo e afunda no mar Negro; ataques com drones deixam dois mortos",
+     "tipo": "fato",
+     "ids": [
+      245,
+      253
+     ]
+    },
+    {
+     "id": "A7.E7",
+     "titulo": "Defesa russa diz ter derrubado 644 drones; civil ferido em Rostov",
+     "tipo": "fato",
+     "ids": [
+      211
+     ]
+    },
+    {
+     "id": "A7.E8",
+     "titulo": "Drones russos atingem hangar, abrigos e terminais Starlink ucranianos",
+     "tipo": "fato",
+     "ids": [
+      128
+     ]
+    },
+    {
+     "id": "A7.E9",
+     "titulo": "Aviões e drones russos atingem postos de controle de drones ucranianos",
+     "tipo": "fato",
+     "ids": [
+      144
+     ]
+    },
+    {
+     "id": "A7.E10",
+     "titulo": "Rússia diz ter tomado 12 localidades na semana",
+     "tipo": "fato",
+     "ids": [
+      166
+     ]
+    },
+    {
+     "id": "A7.E11",
+     "titulo": "Grupo Norte russo toma rodovia Volchansk–Budarki, em Kharkiv",
+     "tipo": "fato",
+     "ids": [
+      179
+     ]
+    },
+    {
+     "id": "A7.E12",
+     "titulo": "Grupo Oeste russo diz ter derrubado 142 multicópteros",
+     "tipo": "fato",
+     "ids": [
+      202
+     ]
+    },
+    {
+     "id": "A7.E13",
+     "titulo": "Ataque russo maciço a redutos cercados em Kharkiv",
+     "tipo": "fato",
+     "ids": [
+      205
+     ]
+    },
+    {
+     "id": "A7.E14",
+     "titulo": "Grupo Sul russo diz ter derrubado 86 drones",
+     "tipo": "fato",
+     "ids": [
+      208
+     ]
+    },
+    {
+     "id": "A7.E15",
+     "titulo": "Ministério da Defesa russo elogia sistema antidrone Citadel",
+     "tipo": "fato",
+     "ids": [
+      174
+     ]
+    },
+    {
+     "id": "A7.E16",
+     "titulo": "Ombudsman russa ajuda a retirar três mulheres de aldeia na linha de frente",
+     "tipo": "fato",
+     "ids": [
+      130
+     ]
+    },
+    {
+     "id": "A7.E17",
+     "titulo": "Ombudsman: operadores de drones ucranianos usam Oleshki como campo de treino",
+     "tipo": "fato",
+     "ids": [
+      193
+     ]
+    },
+    {
+     "id": "A7.E18",
+     "titulo": "Oleshki, cidade sitiada na 'zona da morte', ameaçada pela fome",
+     "tipo": "analise",
+     "ids": [
+      84
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A8",
+   "titulo": "Rússia: gestão temporária de empresas estrangeiras",
+   "eventos": [
+    {
+     "id": "A8.E1",
+     "titulo": "Putin põe ativos de empresas estrangeiras sob gestão temporária; Kremlin explica a medida",
+     "tipo": "fato",
+     "ids": [
+      163,
+      189,
+      190,
+      212
+     ]
+    },
+    {
+     "id": "A8.E2",
+     "titulo": "Shokhin: um quinto das empresas ocidentais saiu da Rússia",
+     "tipo": "fato",
+     "ids": [
+      157
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A9",
+   "titulo": "Semana Russa de Energia (Moscou, out 2026)",
+   "eventos": [
+    {
+     "id": "A9.E1",
+     "titulo": "Vice-premiê Novak: mercado de energia, Europa e diesel para os EUA",
+     "tipo": "fato",
+     "ids": [
+      133,
+      136,
+      141,
+      142,
+      155,
+      177
+     ]
+    },
+    {
+     "id": "A9.E2",
+     "titulo": "Assessor do Kremlin Kobyakov: petróleo, Ormuz, carvão, GNL e comércio global",
+     "tipo": "fato",
+     "ids": [
+      151,
+      152,
+      153,
+      164,
+      178,
+      180,
+      182
+     ]
+    },
+    {
+     "id": "A9.E3",
+     "titulo": "Ministro Tsivilev: contratos longos de gás e energia para a África",
+     "tipo": "fato",
+     "ids": [
+      176,
+      206,
+      210
+     ]
+    },
+    {
+     "id": "A9.E4",
+     "titulo": "Azerbaijão quer voltar a comprar gás da Gazprom",
+     "tipo": "fato",
+     "ids": [
+      137,
+      199
+     ]
+    },
+    {
+     "id": "A9.E5",
+     "titulo": "Gazprom e Turquia discutem cooperação em gás",
+     "tipo": "fato",
+     "ids": [
+      167
+     ]
+    },
+    {
+     "id": "A9.E6",
+     "titulo": "Rosatom vai fornecer eletricidade à Indonésia com usinas flutuantes",
+     "tipo": "fato",
+     "ids": [
+      150
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A10",
+   "titulo": "Rússia–EUA: diesel, sanções e projetos econômicos",
+   "eventos": [
+    {
+     "id": "A10.E1",
+     "titulo": "Checagem: petroleiro não levou diesel russo aos EUA",
+     "tipo": "fato",
+     "ids": [
+      117
+     ]
+    },
+    {
+     "id": "A10.E2",
+     "titulo": "FT: EUA estudam aliviar sanções a petroleiros russos",
+     "tipo": "fato",
+     "ids": [
+      221
+     ]
+    },
+    {
+     "id": "A10.E3",
+     "titulo": "Dmitriev: projetos conjuntos Rússia–EUA de data centers e iniciativas a anunciar",
+     "tipo": "fato",
+     "ids": [
+      125,
+      126
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A11",
+   "titulo": "Energia na Europa antes do inverno",
+   "eventos": [
+    {
+     "id": "A11.E1",
+     "titulo": "Injeção de gás nos estoques europeus diminui",
+     "tipo": "fato",
+     "ids": [
+      134
+     ]
+    },
+    {
+     "id": "A11.E2",
+     "titulo": "Von der Leyen propõe reservas estratégicas de gás da UE (Politico)",
+     "tipo": "fato",
+     "ids": [
+      224
+     ]
+    },
+    {
+     "id": "A11.E3",
+     "titulo": "Zakharova: sem perspectiva de retomar a cooperação energética UE–Rússia",
+     "tipo": "fato",
+     "ids": [
+      154
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A12",
+   "titulo": "Rússia–Irã",
+   "eventos": [
+    {
+     "id": "A12.E1",
+     "titulo": "Lavrov fará visita de trabalho ao Irã em 19 de outubro",
+     "tipo": "fato",
+     "ids": [
+      135
+     ]
+    },
+    {
+     "id": "A12.E2",
+     "titulo": "Vice-ministro iraniano Tavakoli: cooperação com a Rússia e convite à Gazprom",
+     "tipo": "fato",
+     "ids": [
+      175,
+      195
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A13",
+   "titulo": "Guerra EUA/Israel–Irã e o Estreito de Ormuz",
+   "eventos": [
+    {
+     "id": "A13.E1",
+     "titulo": "EUA estudam usar a 'mãe de todas as bombas' contra o Irã",
+     "tipo": "fato",
+     "ids": [
+      113,
+      264
+     ]
+    },
+    {
+     "id": "A13.E2",
+     "titulo": "Trump descarta bomba nuclear contra o Irã",
+     "tipo": "fato",
+     "ids": [
+      24
+     ]
+    },
+    {
+     "id": "A13.E3",
+     "titulo": "Ataques a navios perto de Ormuz batem recorde (BBC Verify)",
+     "tipo": "fato",
+     "ids": [
+      32
+     ]
+    },
+    {
+     "id": "A13.E4",
+     "titulo": "Exportações de petróleo do Golfo superam o pré-guerra, mas ataques a petroleiros aumentam",
+     "tipo": "fato",
+     "ids": [
+      270
+     ]
+    },
+    {
+     "id": "A13.E5",
+     "titulo": "Vitol: aperto no combustível de navios continua",
+     "tipo": "fato",
+     "ids": [
+      173
+     ]
+    },
+    {
+     "id": "A13.E6",
+     "titulo": "Exército iraniano: Ormuz reabre se as forças dos EUA saírem",
+     "tipo": "fato",
+     "ids": [
+      168
+     ]
+    },
+    {
+     "id": "A13.E7",
+     "titulo": "Embaixador iraniano em Moscou critica os EUA",
+     "tipo": "fato",
+     "ids": [
+      138,
+      181,
+      188
+     ]
+    },
+    {
+     "id": "A13.E8",
+     "titulo": "EUA retiram bombardeiros de base britânica alvo de suposto plano terrorista",
+     "tipo": "fato",
+     "ids": [
+      252
+     ]
+    },
+    {
+     "id": "A13.E9",
+     "titulo": "Conselho de Segurança russo: Oriente Médio prejudica a segurança na Eurásia",
+     "tipo": "fato",
+     "ids": [
+      170
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A14",
+   "titulo": "Iêmen: houthis contra o governo e a Arábia Saudita",
+   "eventos": [
+    {
+     "id": "A14.E1",
+     "titulo": "Mísseis houthis atingem palácio presidencial em Áden e matam cinco",
+     "tipo": "fato",
+     "ids": [
+      41,
+      61,
+      93
+     ]
+    },
+    {
+     "id": "A14.E2",
+     "titulo": "Governo do Iêmen e Arábia Saudita lançam contraofensiva contra os houthis",
+     "tipo": "fato",
+     "ids": [
+      227,
+      228
+     ]
+    },
+    {
+     "id": "A14.E3",
+     "titulo": "Paquistão, Arábia Saudita e Turquia acertam força de deslocamento rápido no reino",
+     "tipo": "fato",
+     "ids": [
+      239
+     ]
+    },
+    {
+     "id": "A14.E4",
+     "titulo": "Índia emite novo alerta para cidadãos na Arábia Saudita; aeroporto de Riad fechado",
+     "tipo": "fato",
+     "ids": [
+      230
+     ]
+    },
+    {
+     "id": "A14.E5",
+     "titulo": "Ataques houthis a ativos sauditas ameaçam a liderança de Riad",
+     "tipo": "analise",
+     "ids": [
+      68
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A15",
+   "titulo": "Rússia, Afeganistão e segurança na Eurásia",
+   "eventos": [
+    {
+     "id": "A15.E1",
+     "titulo": "Lavrov: Afeganistão, OTAN na Eurásia e 'revoluções coloridas'",
+     "tipo": "fato",
+     "ids": [
+      183,
+      186,
+      200,
+      203,
+      204
+     ]
+    },
+    {
+     "id": "A15.E2",
+     "titulo": "Secretário-geral da OTSC: paz na Ásia Central e no Afeganistão",
+     "tipo": "fato",
+     "ids": [
+      149,
+      165
+     ]
+    },
+    {
+     "id": "A15.E3",
+     "titulo": "Kabulov: comércio Rússia–Afeganistão cresce",
+     "tipo": "fato",
+     "ids": [
+      129
+     ]
+    },
+    {
+     "id": "A15.E4",
+     "titulo": "A Rússia pode aliviar a tensão entre Paquistão e Afeganistão?",
+     "tipo": "analise",
+     "ids": [
+      4
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A16",
+   "titulo": "Rússia e OTAN no Báltico",
+   "eventos": [
+    {
+     "id": "A16.E1",
+     "titulo": "Zakharova: agressão a Kaliningrado terá resposta devastadora",
+     "tipo": "fato",
+     "ids": [
+      143
+     ]
+    },
+    {
+     "id": "A16.E2",
+     "titulo": "Bombardeiros russos Tu-22M3 sobrevoam o mar Báltico",
+     "tipo": "fato",
+     "ids": [
+      159
+     ]
+    },
+    {
+     "id": "A16.E3",
+     "titulo": "Miroshnik: Ocidente vê os bálticos como bucha de canhão",
+     "tipo": "fato",
+     "ids": [
+      198
+     ]
+    },
+    {
+     "id": "A16.E4",
+     "titulo": "Finlândia restringe espaço aéreo no leste do golfo da Finlândia",
+     "tipo": "fato",
+     "ids": [
+      220
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A17",
+   "titulo": "Cooperação Rússia–Índia",
+   "eventos": [
+    {
+     "id": "A17.E1",
+     "titulo": "Índia vai reconhecer o russo como competência profissional",
+     "tipo": "fato",
+     "ids": [
+      140
+     ]
+    },
+    {
+     "id": "A17.E2",
+     "titulo": "Tartaristão quer trabalhadores indianos de TI, saúde e solda",
+     "tipo": "fato",
+     "ids": [
+      148
+     ]
+    },
+    {
+     "id": "A17.E3",
+     "titulo": "Índia quer trocar experiência em serviços públicos com a Rússia",
+     "tipo": "fato",
+     "ids": [
+      172
+     ]
+    },
+    {
+     "id": "A17.E4",
+     "titulo": "Embaixador indiano vê cooperação com o Tartaristão em TI e finanças",
+     "tipo": "fato",
+     "ids": [
+      185
+     ]
+    },
+    {
+     "id": "A17.E5",
+     "titulo": "Ministério dos Transportes russo vê potencial logístico com a Índia",
+     "tipo": "fato",
+     "ids": [
+      197
+     ]
+    },
+    {
+     "id": "A17.E6",
+     "titulo": "Começa a fase naval do exercício Indra 2026 em Vladivostok",
+     "tipo": "fato",
+     "ids": [
+      171
+     ]
+    },
+    {
+     "id": "A17.E7",
+     "titulo": "Rússia pronta a ampliar entregas de petróleo à Índia",
+     "tipo": "fato",
+     "ids": [
+      222
+     ]
+    },
+    {
+     "id": "A17.E8",
+     "titulo": "Jaishankar defende laços com a Rússia e negocia acordos com Moscou e Kiev",
+     "tipo": "fato",
+     "ids": [
+      281
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A18",
+   "titulo": "Saúde do papa Leão 14",
+   "eventos": [
+    {
+     "id": "A18.E1",
+     "titulo": "Vaticano divulga primeiras fotos do papa após cirurgia; viagem mantida",
+     "tipo": "fato",
+     "ids": [
+      28,
+      82,
+      105
+     ]
+    },
+    {
+     "id": "A18.E2",
+     "titulo": "Papa volta a trabalhar no hospital (15 out)",
+     "tipo": "fato",
+     "ids": [
+      87
+     ]
+    },
+    {
+     "id": "A18.E3",
+     "titulo": "Câncer de pulmão em não fumantes",
+     "tipo": "analise",
+     "ids": [
+      79
+     ]
+    },
+    {
+     "id": "A18.E4",
+     "titulo": "Quem comanda a Igreja durante a recuperação do papa",
+     "tipo": "analise",
+     "ids": [
+      95
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A19",
+   "titulo": "Tiroteio em escola no Oregon",
+   "eventos": [
+    {
+     "id": "A19.E1",
+     "titulo": "Adolescente mata três crianças e uma professora em escola em Bend, Oregon",
+     "tipo": "fato",
+     "ids": [
+      47,
+      60,
+      88,
+      112,
+      217,
+      275
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A20",
+   "titulo": "Índia: movimento 'Cockroach Janta Party'",
+   "eventos": [
+    {
+     "id": "A20.E1",
+     "titulo": "Polícia detém o fundador Abhijeet Dipke antes de protesto em Nova Délhi",
+     "tipo": "fato",
+     "ids": [
+      12,
+      30,
+      119
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A21",
+   "titulo": "Etiópia: conflito no Tigré",
+   "eventos": [
+    {
+     "id": "A21.E1",
+     "titulo": "Abiy anuncia governo interino no Tigré e eleições em seis meses",
+     "tipo": "fato",
+     "ids": [
+      5,
+      104
+     ]
+    },
+    {
+     "id": "A21.E2",
+     "titulo": "Ataques aéreos e artilharia no norte da Etiópia",
+     "tipo": "fato",
+     "ids": [
+      244
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A22",
+   "titulo": "Maduro julgado em Nova York",
+   "eventos": [
+    {
+     "id": "A22.E1",
+     "titulo": "Maduro e Cilia Flores se declaram inocentes de novas acusações de tortura",
+     "tipo": "fato",
+     "ids": [
+      40,
+      97
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A23",
+   "titulo": "Plano de ataque a templo hindu em Illinois",
+   "eventos": [
+    {
+     "id": "A23.E1",
+     "titulo": "Jovem de 19 anos preso; arma falhou e denúncia frustrou o ataque",
+     "tipo": "fato",
+     "ids": [
+      37,
+      268
+     ]
+    },
+    {
+     "id": "A23.E2",
+     "titulo": "Parlamentares dos EUA reagem ao plano frustrado",
+     "tipo": "fato",
+     "ids": [
+      273
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A24",
+   "titulo": "Canadá: tensões com os EUA e referendo em Alberta",
+   "eventos": [
+    {
+     "id": "A24.E1",
+     "titulo": "Carney diz que os EUA tentam 'quebrar' o Canadá na votação de Alberta",
+     "tipo": "fato",
+     "ids": [
+      74,
+      263
+     ]
+    },
+    {
+     "id": "A24.E2",
+     "titulo": "Turismo de Vermont cai com a guerra comercial EUA–Canadá",
+     "tipo": "analise",
+     "ids": [
+      52
+     ]
+    },
+    {
+     "id": "A24.E3",
+     "titulo": "UE e Canadá buscam laços mais próximos",
+     "tipo": "analise",
+     "ids": [
+      108
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A25",
+   "titulo": "Execução de Nidal Hasan (Fort Hood)",
+   "eventos": [
+    {
+     "id": "A25.E1",
+     "titulo": "Trump aprova execução por fuzilamento",
+     "tipo": "fato",
+     "ids": [
+      231
+     ]
+    },
+    {
+     "id": "A25.E2",
+     "titulo": "Trump cancela transmissão ao vivo da execução",
+     "tipo": "fato",
+     "ids": [
+      36
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A26",
+   "titulo": "Terremoto em Kamchatka",
+   "eventos": [
+    {
+     "id": "A26.E1",
+     "titulo": "Terremoto de magnitude 6,9 perto de Ozernovskiy",
+     "tipo": "fato",
+     "ids": [
+      218,
+      260
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A27",
+   "titulo": "Espanha: crise da moradia e eleição antecipada",
+   "eventos": [
+    {
+     "id": "A27.E1",
+     "titulo": "Sánchez convoca eleição antecipada após derrota das medidas de moradia",
+     "tipo": "fato",
+     "ids": [
+      249,
+      250
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A28",
+   "titulo": "Incêndios florestais na Indonésia",
+   "eventos": [
+    {
+     "id": "A28.E1",
+     "titulo": "Incêndios na Indonésia viram crise de saúde no Sudeste Asiático",
+     "tipo": "analise",
+     "ids": [
+      99
+     ]
+    },
+    {
+     "id": "A28.E2",
+     "titulo": "Quatro mortos no combate aos incêndios; Singapura promete processar empresas",
+     "tipo": "fato",
+     "ids": [
+      257
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A29",
+   "titulo": "Protestos estudantis e sociais na França (out 2026)",
+   "eventos": [
+    {
+     "id": "A29.E1",
+     "titulo": "Os protestos estudantis estão sendo manipulados antes da eleição?",
+     "tipo": "analise",
+     "ids": [
+      45
+     ]
+    },
+    {
+     "id": "A29.E2",
+     "titulo": "Revista de imprensa: 'encruzilhada da raiva' antes dos protestos de sábado",
+     "tipo": "resenha",
+     "ids": [
+      116
+     ]
+    },
+    {
+     "id": "A29.E3",
+     "titulo": "Estudantes se juntam aos coletes amarelos (entrevista)",
+     "tipo": "analise",
+     "ids": [
+      118
+     ]
+    },
+    {
+     "id": "A29.E4",
+     "titulo": "Adolescente perde a mão ao pegar granada em protesto escolar",
+     "tipo": "fato",
+     "ids": [
+      240
+     ]
+    },
+    {
+     "id": "A29.E5",
+     "titulo": "Centenas de escolas fecham em 5 de outubro com protestos estudantis",
+     "tipo": "fato",
+     "ids": [
+      271
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A30",
+   "titulo": "Protestos na Albânia",
+   "eventos": [
+    {
+     "id": "A30.E1",
+     "titulo": "Protestos contra Edi Rama ficam violentos em Tirana",
+     "tipo": "fato",
+     "ids": [
+      33,
+      67
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A31",
+   "titulo": "Eleições nos EUA (midterms 2026)",
+   "eventos": [
+    {
+     "id": "A31.E1",
+     "titulo": "Conservadores do Wyoming divididos antes das midterms",
+     "tipo": "analise",
+     "ids": [
+      107
+     ]
+    },
+    {
+     "id": "A31.E2",
+     "titulo": "Democratas e o arrependimento do eleitor latino",
+     "tipo": "analise",
+     "ids": [
+      120
+     ]
+    },
+    {
+     "id": "A31.E3",
+     "titulo": "Não se pode esperar normalidade de um processo eleitoral alterado (opinião)",
+     "tipo": "analise",
+     "ids": [
+      86
+     ]
+    },
+    {
+     "id": "A31.E4",
+     "titulo": "Governo Trump processa a Califórnia para barrar 20 mil eleitores",
+     "tipo": "fato",
+     "ids": [
+      92
+     ]
+    },
+    {
+     "id": "A31.E5",
+     "titulo": "Trump cita eleição indiana que não ocorreu para chamar o sistema dos EUA de corrupto",
+     "tipo": "fato",
+     "ids": [
+      256
+     ]
+    },
+    {
+     "id": "A31.E6",
+     "titulo": "Cartas com substâncias suspeitas enviadas a senadores e escritórios eleitorais",
+     "tipo": "fato",
+     "ids": [
+      43
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A32",
+   "titulo": "Eleição presidencial no Brasil 2026",
+   "eventos": [
+    {
+     "id": "A32.E1",
+     "titulo": "Lula fica atrás de Flávio Bolsonaro no primeiro turno",
+     "tipo": "fato",
+     "ids": [
+      236
+     ]
+    },
+    {
+     "id": "A32.E2",
+     "titulo": "Netanyahu diz que pode voltar ao Brasil para a posse de Bolsonaro",
+     "tipo": "fato",
+     "ids": [
+      94
+     ]
+    },
+    {
+     "id": "A32.E3",
+     "titulo": "A crise global que o próximo presidente enfrentará",
+     "tipo": "analise",
+     "ids": [
+      78
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A33",
+   "titulo": "Nova porta-voz da Casa Branca, Katie Zacharia",
+   "eventos": [
+    {
+     "id": "A33.E1",
+     "titulo": "Porta-voz diz que a China não tem 'banheiros adequados'",
+     "tipo": "fato",
+     "ids": [
+      77
+     ]
+    },
+    {
+     "id": "A33.E2",
+     "titulo": "Porta-voz defende o título de 'advogada'",
+     "tipo": "fato",
+     "ids": [
+      277
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A34",
+   "titulo": "Desarmamento nuclear EUA–Rússia–China",
+   "eventos": [
+    {
+     "id": "A34.E1",
+     "titulo": "Trump diz que os EUA negociam 'desnuclearização' com Rússia e China",
+     "tipo": "fato",
+     "ids": [
+      19
+     ]
+    },
+    {
+     "id": "A34.E2",
+     "titulo": "China rejeita a exigência dos EUA de entrar nas negociações",
+     "tipo": "fato",
+     "ids": [
+      196
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A35",
+   "titulo": "EUA contra o narcotráfico na América Latina",
+   "eventos": [
+    {
+     "id": "A35.E1",
+     "titulo": "EUA enviam centenas de soldados à América Latina",
+     "tipo": "fato",
+     "ids": [
+      89
+     ]
+    },
+    {
+     "id": "A35.E2",
+     "titulo": "Novo ataque dos EUA a barco no Caribe mata quatro",
+     "tipo": "fato",
+     "ids": [
+      267
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A36",
+   "titulo": "ONU: biodiversidade e clima",
+   "eventos": [
+    {
+     "id": "A36.E1",
+     "titulo": "Guterres pede mais ação e financiamento contra a perda de biodiversidade",
+     "tipo": "fato",
+     "ids": [
+      124,
+      248
+     ]
+    },
+    {
+     "id": "A36.E2",
+     "titulo": "Começa a pré-COP da ONU em Fiji",
+     "tipo": "fato",
+     "ids": [
+      272
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A37",
+   "titulo": "Série de críquete Índia x Índias Ocidentais",
+   "eventos": [
+    {
+     "id": "A37.E1",
+     "titulo": "Índia convoca Bhuvneshwar para o último T20",
+     "tipo": "fato",
+     "ids": [
+      9
+     ]
+    },
+    {
+     "id": "A37.E2",
+     "titulo": "Prévia do quinto T20 entre Índia e Índias Ocidentais",
+     "tipo": "fato",
+     "ids": [
+      22
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A38",
+   "titulo": "Malware 'zero-click' de empresa israelense usa anúncios",
+   "eventos": [
+    {
+     "id": "A38.E1",
+     "titulo": "Malware 'zero-click' de empresa israelense usa anúncios",
+     "tipo": "analise",
+     "ids": [
+      2
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A39",
+   "titulo": "FIFA pune a Espanha por cantos islamofóbicos em amistoso com o Egito",
+   "eventos": [
+    {
+     "id": "A39.E1",
+     "titulo": "FIFA pune a Espanha por cantos islamofóbicos em amistoso com o Egito",
+     "tipo": "fato",
+     "ids": [
+      8
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A40",
+   "titulo": "Guterres e os limites da diplomacia discreta",
+   "eventos": [
+    {
+     "id": "A40.E1",
+     "titulo": "Guterres e os limites da diplomacia discreta",
+     "tipo": "analise",
+     "ids": [
+      11
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A41",
+   "titulo": "Cantos pró-nazistas antes de Hajduk Split x Ajax",
+   "eventos": [
+    {
+     "id": "A41.E1",
+     "titulo": "Cantos pró-nazistas antes de Hajduk Split x Ajax",
+     "tipo": "fato",
+     "ids": [
+      13
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A42",
+   "titulo": "Incêndio de caminhão-tanque atinge mercado em Benin City, Nigéria",
+   "eventos": [
+    {
+     "id": "A42.E1",
+     "titulo": "Incêndio de caminhão-tanque atinge mercado em Benin City, Nigéria",
+     "tipo": "fato",
+     "ids": [
+      14
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A43",
+   "titulo": "Paquistão manda inspecionar escolas após desabamento que matou 35",
+   "eventos": [
+    {
+     "id": "A43.E1",
+     "titulo": "Paquistão manda inspecionar escolas após desabamento que matou 35",
+     "tipo": "fato",
+     "ids": [
+      15
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A44",
+   "titulo": "Chipre teme a influência crescente de Israel",
+   "eventos": [
+    {
+     "id": "A44.E1",
+     "titulo": "Chipre teme a influência crescente de Israel",
+     "tipo": "analise",
+     "ids": [
+      16
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A45",
+   "titulo": "Por que a China está comprando ouro",
+   "eventos": [
+    {
+     "id": "A45.E1",
+     "titulo": "Por que a China está comprando ouro",
+     "tipo": "analise",
+     "ids": [
+      17
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A46",
+   "titulo": "Malásia recebe Min Aung Hlaing",
+   "eventos": [
+    {
+     "id": "A46.E1",
+     "titulo": "Malásia recebe Min Aung Hlaing",
+     "tipo": "analise",
+     "ids": [
+      18
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A47",
+   "titulo": "Aldeões indianos acusam fraude em mina da Adani",
+   "eventos": [
+    {
+     "id": "A47.E1",
+     "titulo": "Aldeões indianos acusam fraude em mina da Adani",
+     "tipo": "fato",
+     "ids": [
+      20
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A48",
+   "titulo": "Pai multado após queda fatal do filho em hotel no Chipre",
+   "eventos": [
+    {
+     "id": "A48.E1",
+     "titulo": "Pai multado após queda fatal do filho em hotel no Chipre",
+     "tipo": "fato",
+     "ids": [
+      29
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A49",
+   "titulo": "Pacientes acorrentados resgatados de clínica ilegal na África do Sul",
+   "eventos": [
+    {
+     "id": "A49.E1",
+     "titulo": "Pacientes acorrentados resgatados de clínica ilegal na África do Sul",
+     "tipo": "fato",
+     "ids": [
+      34
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A50",
+   "titulo": "Ônibus bate em trem no túnel do Canal da Mancha; 19 feridos",
+   "eventos": [
+    {
+     "id": "A50.E1",
+     "titulo": "Ônibus bate em trem no túnel do Canal da Mancha; 19 feridos",
+     "tipo": "fato",
+     "ids": [
+      38
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A51",
+   "titulo": "Proibição de véu em escolas gera protestos no Azerbaijão e atrito com a Turquia",
+   "eventos": [
+    {
+     "id": "A51.E1",
+     "titulo": "Proibição de véu em escolas gera protestos no Azerbaijão e atrito com a Turquia",
+     "tipo": "fato",
+     "ids": [
+      42
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A52",
+   "titulo": "Ativistas que fugiram da Rússia são deportados pelo Ocidente",
+   "eventos": [
+    {
+     "id": "A52.E1",
+     "titulo": "Ativistas que fugiram da Rússia são deportados pelo Ocidente",
+     "tipo": "analise",
+     "ids": [
+      44
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A53",
+   "titulo": "Tesla apresenta 'carro voador'",
+   "eventos": [
+    {
+     "id": "A53.E1",
+     "titulo": "Tesla apresenta 'carro voador'",
+     "tipo": "fato",
+     "ids": [
+      46
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A54",
+   "titulo": "China sediará fórum de governança global de 23 a 25 de outubro",
+   "eventos": [
+    {
+     "id": "A54.E1",
+     "titulo": "China sediará fórum de governança global de 23 a 25 de outubro",
+     "tipo": "fato",
+     "ids": [
+      51
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A55",
+   "titulo": "Ajuda continua chegando aos desalojados pelo terremoto no Panamá",
+   "eventos": [
+    {
+     "id": "A55.E1",
+     "titulo": "Ajuda continua chegando aos desalojados pelo terremoto no Panamá",
+     "tipo": "fato",
+     "ids": [
+      57
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A56",
+   "titulo": "Estratégias de Cuba contra as sanções dos EUA",
+   "eventos": [
+    {
+     "id": "A56.E1",
+     "titulo": "Estratégias de Cuba contra as sanções dos EUA",
+     "tipo": "analise",
+     "ids": [
+      58
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A57",
+   "titulo": "Li Qiang recebe o presidente do Conselho do Togo",
+   "eventos": [
+    {
+     "id": "A57.E1",
+     "titulo": "Li Qiang recebe o presidente do Conselho do Togo",
+     "tipo": "fato",
+     "ids": [
+      62
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A58",
+   "titulo": "Cápsula de carga da SpaceX acopla à ISS",
+   "eventos": [
+    {
+     "id": "A58.E1",
+     "titulo": "Cápsula de carga da SpaceX acopla à ISS",
+     "tipo": "fato",
+     "ids": [
+      64
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A59",
+   "titulo": "Rússia investiga suspeita de surto de mpox perto de Moscou",
+   "eventos": [
+    {
+     "id": "A59.E1",
+     "titulo": "Rússia investiga suspeita de surto de mpox perto de Moscou",
+     "tipo": "fato",
+     "ids": [
+      65
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A60",
+   "titulo": "Irã: crimes de 'honra' contra mulheres",
+   "eventos": [
+    {
+     "id": "A60.E1",
+     "titulo": "Irã: crimes de 'honra' contra mulheres",
+     "tipo": "analise",
+     "ids": [
+      66
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A61",
+   "titulo": "A UE e a revolução da IA",
+   "eventos": [
+    {
+     "id": "A61.E1",
+     "titulo": "A UE e a revolução da IA",
+     "tipo": "analise",
+     "ids": [
+      69
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A62",
+   "titulo": "IA nos locais de trabalho da Índia",
+   "eventos": [
+    {
+     "id": "A62.E1",
+     "titulo": "IA nos locais de trabalho da Índia",
+     "tipo": "analise",
+     "ids": [
+      70
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A63",
+   "titulo": "Quão preparado está o Quênia para o ebola",
+   "eventos": [
+    {
+     "id": "A63.E1",
+     "titulo": "Quão preparado está o Quênia para o ebola",
+     "tipo": "analise",
+     "ids": [
+      71
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A64",
+   "titulo": "Itália corta o tráfego aéreo pela metade por falha na transmissão de dados",
+   "eventos": [
+    {
+     "id": "A64.E1",
+     "titulo": "Itália corta o tráfego aéreo pela metade por falha na transmissão de dados",
+     "tipo": "fato",
+     "ids": [
+      72
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A65",
+   "titulo": "Polícia faz batida na Halk TV, na Turquia",
+   "eventos": [
+    {
+     "id": "A65.E1",
+     "titulo": "Polícia faz batida na Halk TV, na Turquia",
+     "tipo": "fato",
+     "ids": [
+      75
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A66",
+   "titulo": "Coreia do Norte exibe arsenal militar em novo museu",
+   "eventos": [
+    {
+     "id": "A66.E1",
+     "titulo": "Coreia do Norte exibe arsenal militar em novo museu",
+     "tipo": "fato",
+     "ids": [
+      76
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A67",
+   "titulo": "Nacionalismo e eleições na Europa (newsletter Euro Radar)",
+   "eventos": [
+    {
+     "id": "A67.E1",
+     "titulo": "Nacionalismo e eleições na Europa (newsletter Euro Radar)",
+     "tipo": "analise",
+     "ids": [
+      81
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A68",
+   "titulo": "Brasil no Conselho de Direitos Humanos da ONU (opinião)",
+   "eventos": [
+    {
+     "id": "A68.E1",
+     "titulo": "Brasil no Conselho de Direitos Humanos da ONU (opinião)",
+     "tipo": "analise",
+     "ids": [
+      83
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A69",
+   "titulo": "Argentina barra mais estrangeiros com as regras de Milei",
+   "eventos": [
+    {
+     "id": "A69.E1",
+     "titulo": "Argentina barra mais estrangeiros com as regras de Milei",
+     "tipo": "analise",
+     "ids": [
+      85
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A70",
+   "titulo": "Editor-chefe da Novaia Gazeta é detido na Rússia",
+   "eventos": [
+    {
+     "id": "A70.E1",
+     "titulo": "Editor-chefe da Novaia Gazeta é detido na Rússia",
+     "tipo": "fato",
+     "ids": [
+      90
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A71",
+   "titulo": "Megaprotesto na Argentina por financiamento universitário",
+   "eventos": [
+    {
+     "id": "A71.E1",
+     "titulo": "Megaprotesto na Argentina por financiamento universitário",
+     "tipo": "fato",
+     "ids": [
+      91
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A72",
+   "titulo": "China e Coreia do Norte inauguram nova ponte",
+   "eventos": [
+    {
+     "id": "A72.E1",
+     "titulo": "China e Coreia do Norte inauguram nova ponte",
+     "tipo": "fato",
+     "ids": [
+      96
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A73",
+   "titulo": "OFAC publica ação de sanções (Federal Register)",
+   "eventos": [
+    {
+     "id": "A73.E1",
+     "titulo": "OFAC publica ação de sanções (Federal Register)",
+     "tipo": "fato",
+     "ids": [
+      98
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A74",
+   "titulo": "Riscos para mulheres migrantes na Europa",
+   "eventos": [
+    {
+     "id": "A74.E1",
+     "titulo": "Riscos para mulheres migrantes na Europa",
+     "tipo": "analise",
+     "ids": [
+      100
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A75",
+   "titulo": "A obra do artista ganês Ibrahim Mahama",
+   "eventos": [
+    {
+     "id": "A75.E1",
+     "titulo": "A obra do artista ganês Ibrahim Mahama",
+     "tipo": "analise",
+     "ids": [
+      102
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A76",
+   "titulo": "Jogador sul-africano de rúgbi Hyron Andrews morre na França",
+   "eventos": [
+    {
+     "id": "A76.E1",
+     "titulo": "Jogador sul-africano de rúgbi Hyron Andrews morre na França",
+     "tipo": "fato",
+     "ids": [
+      103
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A77",
+   "titulo": "Entrevista: eurodeputado Bernard Guetta critica Trump",
+   "eventos": [
+    {
+     "id": "A77.E1",
+     "titulo": "Entrevista: eurodeputado Bernard Guetta critica Trump",
+     "tipo": "analise",
+     "ids": [
+      106
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A78",
+   "titulo": "Semana de Moda de Paris destaca a África",
+   "eventos": [
+    {
+     "id": "A78.E1",
+     "titulo": "Semana de Moda de Paris destaca a África",
+     "tipo": "analise",
+     "ids": [
+      110
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A79",
+   "titulo": "Livros escaneados e destruídos para treinar IA",
+   "eventos": [
+    {
+     "id": "A79.E1",
+     "titulo": "Livros escaneados e destruídos para treinar IA",
+     "tipo": "analise",
+     "ids": [
+      111
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A80",
+   "titulo": "Livros de Sally Rooney retirados das livrarias britânicas",
+   "eventos": [
+    {
+     "id": "A80.E1",
+     "titulo": "Livros de Sally Rooney retirados das livrarias britânicas",
+     "tipo": "fato",
+     "ids": [
+      121
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A81",
+   "titulo": "Olympique de Marseille perde de novo na Liga Europa",
+   "eventos": [
+    {
+     "id": "A81.E1",
+     "titulo": "Olympique de Marseille perde de novo na Liga Europa",
+     "tipo": "fato",
+     "ids": [
+      122
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A82",
+   "titulo": "Medvedev vence Paul e vai à semifinal em Xangai",
+   "eventos": [
+    {
+     "id": "A82.E1",
+     "titulo": "Medvedev vence Paul e vai à semifinal em Xangai",
+     "tipo": "fato",
+     "ids": [
+      147
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A83",
+   "titulo": "Falta de munição antimíssil nos EUA deve durar até 2030",
+   "eventos": [
+    {
+     "id": "A83.E1",
+     "titulo": "Falta de munição antimíssil nos EUA deve durar até 2030",
+     "tipo": "fato",
+     "ids": [
+      156
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A84",
+   "titulo": "Vistos negados a ginastas russos",
+   "eventos": [
+    {
+     "id": "A84.E1",
+     "titulo": "Vistos negados a ginastas russos",
+     "tipo": "fato",
+     "ids": [
+      158
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A85",
+   "titulo": "Aurus abre pré-venda do Senat reestilizado",
+   "eventos": [
+    {
+     "id": "A85.E1",
+     "titulo": "Aurus abre pré-venda do Senat reestilizado",
+     "tipo": "fato",
+     "ids": [
+      161
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A86",
+   "titulo": "Crise de combustível em Bali",
+   "eventos": [
+    {
+     "id": "A86.E1",
+     "titulo": "Crise de combustível em Bali",
+     "tipo": "fato",
+     "ids": [
+      169
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A87",
+   "titulo": "Lukashenko anuncia inspeção das forças de defesa territorial",
+   "eventos": [
+    {
+     "id": "A87.E1",
+     "titulo": "Lukashenko anuncia inspeção das forças de defesa territorial",
+     "tipo": "fato",
+     "ids": [
+      187
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A88",
+   "titulo": "População de gibões de Hainan cresce",
+   "eventos": [
+    {
+     "id": "A88.E1",
+     "titulo": "População de gibões de Hainan cresce",
+     "tipo": "fato",
+     "ids": [
+      192
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A89",
+   "titulo": "Navios russos encerram escala na Malásia",
+   "eventos": [
+    {
+     "id": "A89.E1",
+     "titulo": "Navios russos encerram escala na Malásia",
+     "tipo": "fato",
+     "ids": [
+      201
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A90",
+   "titulo": "Satélite universitário mede radiação espacial sobre o Ártico",
+   "eventos": [
+    {
+     "id": "A90.E1",
+     "titulo": "Satélite universitário mede radiação espacial sobre o Ártico",
+     "tipo": "fato",
+     "ids": [
+      207
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A91",
+   "titulo": "Derretimento de geleiras depende também do formato",
+   "eventos": [
+    {
+     "id": "A91.E1",
+     "titulo": "Derretimento de geleiras depende também do formato",
+     "tipo": "fato",
+     "ids": [
+      209
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A92",
+   "titulo": "Bolsa russa abre em alta",
+   "eventos": [
+    {
+     "id": "A92.E1",
+     "titulo": "Bolsa russa abre em alta",
+     "tipo": "fato",
+     "ids": [
+      214
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A93",
+   "titulo": "Candidata a secretária-geral defende reforma da ONU",
+   "eventos": [
+    {
+     "id": "A93.E1",
+     "titulo": "Candidata a secretária-geral defende reforma da ONU",
+     "tipo": "fato",
+     "ids": [
+      223
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A94",
+   "titulo": "Paquistão condena fala de Rajnath Singh",
+   "eventos": [
+    {
+     "id": "A94.E1",
+     "titulo": "Paquistão condena fala de Rajnath Singh",
+     "tipo": "fato",
+     "ids": [
+      225
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A95",
+   "titulo": "Do Iraque a Gaza: um longo rastro de destruição",
+   "eventos": [
+    {
+     "id": "A95.E1",
+     "titulo": "Do Iraque a Gaza: um longo rastro de destruição",
+     "tipo": "analise",
+     "ids": [
+      226
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A96",
+   "titulo": "Migrantes no leste da Alemanha após vitória da AfD",
+   "eventos": [
+    {
+     "id": "A96.E1",
+     "titulo": "Migrantes no leste da Alemanha após vitória da AfD",
+     "tipo": "analise",
+     "ids": [
+      229
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A97",
+   "titulo": "Trump diz que seu super PAC pagará anúncios oficiais",
+   "eventos": [
+    {
+     "id": "A97.E1",
+     "titulo": "Trump diz que seu super PAC pagará anúncios oficiais",
+     "tipo": "fato",
+     "ids": [
+      232
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A98",
+   "titulo": "EUA tentam cassar a cidadania de 40 pessoas",
+   "eventos": [
+    {
+     "id": "A98.E1",
+     "titulo": "EUA tentam cassar a cidadania de 40 pessoas",
+     "tipo": "fato",
+     "ids": [
+      233
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A99",
+   "titulo": "Mulher da Califórnia acusada de espionar para a China",
+   "eventos": [
+    {
+     "id": "A99.E1",
+     "titulo": "Mulher da Califórnia acusada de espionar para a China",
+     "tipo": "fato",
+     "ids": [
+      234
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A100",
+   "titulo": "China estuda novas restrições à exportação de tecnologia",
+   "eventos": [
+    {
+     "id": "A100.E1",
+     "titulo": "China estuda novas restrições à exportação de tecnologia",
+     "tipo": "fato",
+     "ids": [
+      235
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A101",
+   "titulo": "Enviado dos EUA se reúne com o general Burhan, do Sudão",
+   "eventos": [
+    {
+     "id": "A101.E1",
+     "titulo": "Enviado dos EUA se reúne com o general Burhan, do Sudão",
+     "tipo": "fato",
+     "ids": [
+      237
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A102",
+   "titulo": "Paquistão presidirá conselhos do FMI e do Banco Mundial",
+   "eventos": [
+    {
+     "id": "A102.E1",
+     "titulo": "Paquistão presidirá conselhos do FMI e do Banco Mundial",
+     "tipo": "fato",
+     "ids": [
+      241
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A103",
+   "titulo": "Nova York declara emergência por surto de sarampo",
+   "eventos": [
+    {
+     "id": "A103.E1",
+     "titulo": "Nova York declara emergência por surto de sarampo",
+     "tipo": "fato",
+     "ids": [
+      242
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A104",
+   "titulo": "TPI divulga mandados de prisão contra quatro líderes talibãs",
+   "eventos": [
+    {
+     "id": "A104.E1",
+     "titulo": "TPI divulga mandados de prisão contra quatro líderes talibãs",
+     "tipo": "fato",
+     "ids": [
+      243
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A105",
+   "titulo": "Funcionário de instituto de peste na Sibéria morre de pneumonia",
+   "eventos": [
+    {
+     "id": "A105.E1",
+     "titulo": "Funcionário de instituto de peste na Sibéria morre de pneumonia",
+     "tipo": "fato",
+     "ids": [
+      246
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A106",
+   "titulo": "Voo da British Airways declara emergência e retorna",
+   "eventos": [
+    {
+     "id": "A106.E1",
+     "titulo": "Voo da British Airways declara emergência e retorna",
+     "tipo": "fato",
+     "ids": [
+      247
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A107",
+   "titulo": "Fuzileiro dos EUA preso por morte de mulher em Okinawa",
+   "eventos": [
+    {
+     "id": "A107.E1",
+     "titulo": "Fuzileiro dos EUA preso por morte de mulher em Okinawa",
+     "tipo": "fato",
+     "ids": [
+      251
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A108",
+   "titulo": "Ex-príncipe Andrew contesta mandados de busca",
+   "eventos": [
+    {
+     "id": "A108.E1",
+     "titulo": "Ex-príncipe Andrew contesta mandados de busca",
+     "tipo": "fato",
+     "ids": [
+      255
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A109",
+   "titulo": "FBI extradita fraudador procurado da Índia",
+   "eventos": [
+    {
+     "id": "A109.E1",
+     "titulo": "FBI extradita fraudador procurado da Índia",
+     "tipo": "fato",
+     "ids": [
+      258
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A110",
+   "titulo": "Parlamento do Paquistão aprova emergência em Khyber Pakhtunkhwa",
+   "eventos": [
+    {
+     "id": "A110.E1",
+     "titulo": "Parlamento do Paquistão aprova emergência em Khyber Pakhtunkhwa",
+     "tipo": "fato",
+     "ids": [
+      259
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A111",
+   "titulo": "FMI libera US$ 345 milhões ao Sri Lanka",
+   "eventos": [
+    {
+     "id": "A111.E1",
+     "titulo": "FMI libera US$ 345 milhões ao Sri Lanka",
+     "tipo": "fato",
+     "ids": [
+      261
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A112",
+   "titulo": "Por que a cúpula CCG–UE foi adiada",
+   "eventos": [
+    {
+     "id": "A112.E1",
+     "titulo": "Por que a cúpula CCG–UE foi adiada",
+     "tipo": "analise",
+     "ids": [
+      262
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A113",
+   "titulo": "Takaichi chama a queda populacional de crise nacional",
+   "eventos": [
+    {
+     "id": "A113.E1",
+     "titulo": "Takaichi chama a queda populacional de crise nacional",
+     "tipo": "fato",
+     "ids": [
+      265
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A114",
+   "titulo": "Trump nomeia Jay Clayton para força-tarefa federal de IA",
+   "eventos": [
+    {
+     "id": "A114.E1",
+     "titulo": "Trump nomeia Jay Clayton para força-tarefa federal de IA",
+     "tipo": "fato",
+     "ids": [
+      269
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A115",
+   "titulo": "Netflix nomeia novo chefe de conteúdo",
+   "eventos": [
+    {
+     "id": "A115.E1",
+     "titulo": "Netflix nomeia novo chefe de conteúdo",
+     "tipo": "fato",
+     "ids": [
+      274
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A116",
+   "titulo": "Tiroteio em festa de rua na Geórgia (EUA) mata dois",
+   "eventos": [
+    {
+     "id": "A116.E1",
+     "titulo": "Tiroteio em festa de rua na Geórgia (EUA) mata dois",
+     "tipo": "fato",
+     "ids": [
+      276
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A117",
+   "titulo": "Ministro do Petróleo do Irã renuncia",
+   "eventos": [
+    {
+     "id": "A117.E1",
+     "titulo": "Ministro do Petróleo do Irã renuncia",
+     "tipo": "fato",
+     "ids": [
+      279
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A118",
+   "titulo": "Partido Verde britânico classifica o sionismo como racismo",
+   "eventos": [
+    {
+     "id": "A118.E1",
+     "titulo": "Partido Verde britânico classifica o sionismo como racismo",
+     "tipo": "fato",
+     "ids": [
+      280
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A119",
+   "titulo": "China comenta falta de consenso no G20",
+   "eventos": [
+    {
+     "id": "A119.E1",
+     "titulo": "China comenta falta de consenso no G20",
+     "tipo": "fato",
+     "ids": [
+      282
+     ]
+    }
+   ]
+  },
+  {
+   "id": "A120",
+   "titulo": "Coalizão pró-Ucrânia vence eleição na Letônia",
+   "eventos": [
+    {
+     "id": "A120.E1",
+     "titulo": "Coalizão pró-Ucrânia vence eleição na Letônia",
+     "tipo": "fato",
+     "ids": [
+      284
+     ]
+    }
+   ]
+  }
+ ],
+ "duvidas": [
+  {
+   "ids": [
+    6,
+    23
+   ],
+   "nota": "6 (Jerusalem Daily, Abu Falah/Turmus Ayya) entrou no ataque de sexta; 23 ficou à parte como análise, mas pode ser o mesmo ataque."
+  },
+  {
+   "ids": [
+    109,
+    139,
+    162,
+    132
+   ],
+   "nota": "Falas de Zelensky no mesmo dia: 109 (ao vivo de Bruxelas) e 139 entraram no evento de Bruxelas; 162 (Starlink) e 132 (Patriot) podem ser da mesma coletiva."
+  },
+  {
+   "ids": [
+    55,
+    115,
+    215,
+    114
+   ],
+   "nota": "Cúpula da UE e a ida de Zelensky a Bruxelas ficaram separadas; dá para ver como um evento só."
+  },
+  {
+   "ids": [
+    245,
+    253,
+    278
+   ],
+   "nota": "245 e 253 juntas pelos 'dois mortos' no mar Negro; 278 (Rússia diz ter atingido dois navios) pode ser o mesmo fato."
+  },
+  {
+   "ids": [
+    39,
+    254,
+    211
+   ],
+   "nota": "Os 644 drones derrubados (211) podem incluir o ataque à refinaria."
+  },
+  {
+   "ids": [
+    33,
+    67
+   ],
+   "nota": "DW (67) é mais ampla sobre o movimento estudantil; juntei por tratar dos protestos desta semana."
+  },
+  {
+   "ids": [
+    227,
+    228
+   ],
+   "nota": "Anúncio da ofensiva e início dos ataques juntos como um acontecimento."
+  },
+  {
+   "ids": [
+    249,
+    250
+   ],
+   "nota": "250 anuncia o pronunciamento; 249 traz a convocação da eleição. Juntos por serem a mesma resposta à derrota."
+  },
+  {
+   "ids": [
+    124,
+    248
+   ],
+   "nota": "Supus o mesmo discurso de Guterres sobre natureza e financiamento."
+  },
+  {
+   "ids": [
+    212,
+    163,
+    189,
+    190
+   ],
+   "nota": "Decreto de Putin e explicação de Peskov tratados como a mesma decisão (como sanção e notícia da sanção)."
+  },
+  {
+   "ids": [
+    137,
+    199
+   ],
+   "nota": "SOCAR (199) e Gazprom (137) falam do mesmo fato: o Azerbaijão quer voltar a comprar gás russo."
+  },
+  {
+   "ids": [
+    175,
+    195
+   ],
+   "nota": "Supus o mesmo falante iraniano (Tavakoli) na mesma ocasião."
+  },
+  {
+   "ids": [
+    133,
+    136,
+    141,
+    142,
+    155,
+    177,
+    151,
+    152,
+    153,
+    164,
+    178,
+    180,
+    182
+   ],
+   "nota": "Várias frases do mesmo falante no mesmo dia (Novak; Kobyakov) viraram uma declaração só. Idem Lavrov, Tsivilev, Jalali, Dmitriev e OTSC. Podem ser separadas por tema."
+  },
+  {
+   "ids": [
+    143,
+    146,
+    154,
+    135
+   ],
+   "nota": "Zakharova, provavelmente no mesmo briefing, mas temas diferentes: deixei separados."
+  },
+  {
+   "ids": [
+    32,
+    270
+   ],
+   "nota": "Ambos falam de mais ataques a navios no Golfo, mas com dados e análises diferentes."
+  },
+  {
+   "ids": [
+    99,
+    257
+   ],
+   "nota": "Mesma onda de incêndios na Indonésia; 99 é ampla, 257 é fato específico."
+  },
+  {
+   "ids": [
+    37,
+    268,
+    273
+   ],
+   "nota": "Reação de parlamentares (273) ficou separada do plano frustrado."
+  },
+  {
+   "ids": [
+    132,
+    184
+   ],
+   "nota": "Falta de Patriot: fala de Zelensky e reportagem do Washington Post ficaram separadas."
+  },
+  {
+   "ids": [
+    140,
+    148,
+    172,
+    185,
+    197
+   ],
+   "nota": "Talvez do mesmo fórum Rússia–Índia; falantes diferentes, deixei separados."
+  },
+  {
+   "ids": [
+    82,
+    87
+   ],
+   "nota": "Papa: volta ao trabalho (quinta, 15) separada das primeiras fotos (sexta, 16)."
+  },
+  {
+   "ids": [
+    183,
+    186,
+    200,
+    203,
+    204,
+    59
+   ],
+   "nota": "Falas de Lavrov podem ser da cúpula da CICA em Baku; ficaram em outro assunto."
+  }
+ ]
+}
