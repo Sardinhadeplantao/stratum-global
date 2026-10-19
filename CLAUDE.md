@@ -37,7 +37,9 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
 10. **Mostrar o que não se mede** (tela Método).
 11. **Custo zero**: biblioteca gratuita antes de LLM; nada pago obrigatório.
 12. **Segredos só nos Secrets do GitHub**, com uma exceção: o token `stratum_disparo`, que o dono cola no cofre (Vault)
-    do Supabase (decisão 0004); o código nunca o lê, grava ou imprime. Nunca em código, log, mensagem de erro ou conversa.
+    do Supabase (decisão 0004); o código nunca o lê, grava ou imprime.
+    Nunca em código, log, mensagem de erro, conversa ou captura de tela; segredo que aparecer num desses lugares
+    é trocado no mesmo dia.
     Erro de banco imprime só o tipo da exceção (a mensagem pode conter dados da conexão).
 13. **Só a branch `main` grava no banco de produção e manda avisos.** Branches rodam com banco temporário.
 
@@ -57,6 +59,7 @@ jobs/stratum/
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
+jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
