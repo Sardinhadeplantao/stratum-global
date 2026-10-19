@@ -19,6 +19,12 @@ export type Atencao = {
 export type PaisAtencao = { nome: string; citacoes: number; nivel: number; documentos: Documento[] };
 export type MaisCitado = { iso: string; nome: string; citacoes: number; proporcao: number };
 export type Origem = { pais: string | null; nome: string; documentos: number; proporcao: number };
+/** Agendador do Supabase (decisão 0004). O texto vem pronto do robô. */
+export type Agendador = {
+  situacao: "ok" | "aguardando" | "vence_logo" | "falhando" | "token_invalido" | "erro" | "sem_token" | "sem_banco";
+  texto: string; erro: string | null; ultima_chamada: string | null; resposta: number | null;
+  token_vence_em: string | null; dias_para_vencer: number | null;
+};
 export type Status = {
   versao_formato: number;
   versao_robo: string | null;
@@ -26,6 +32,7 @@ export type Status = {
   avisar_atraso_apos?: string | null;
   banco: "permanente" | "temporario" | "erro" | null;
   erro_banco: string | null;
+  agendador?: Agendador | null;
   ultima_rodada: { id: number; iniciada_em: string | null; terminada_em: string | null; situacao: string } | null;
   rodadas_recentes: { iniciada_em: string | null; situacao: string }[];
   totais: { documentos: number; documentos_24h: number; fontes: number; fontes_ok: number };
@@ -38,7 +45,7 @@ export type Status = {
 };
 
 const VAZIO: Status = {
-  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, banco: null, erro_banco: null, ultima_rodada: null,
+  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, banco: null, erro_banco: null, ultima_rodada: null,
   rodadas_recentes: [], totais: { documentos: 0, documentos_24h: 0, fontes: 0, fontes_ok: 0 }, fontes: [], ultimos_documentos: [],
   atencao: null, paises: {}, mais_citados: [], origem_fontes: [],
 };

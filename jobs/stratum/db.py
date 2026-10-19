@@ -71,6 +71,15 @@ documento = Table(
     Index("ix_documento_fonte", "fonte_id", "conhecido_em"),
 )
 
+resumo = Table(
+    "resumo", md,
+    Column("id", Id, primary_key=True, autoincrement=True),
+    Column("horario", DateTime, nullable=False, unique=True),  # 7:30, 12:00 ou 19:00 de Brasília, em UTC
+    Column("enviado_em", DateTime, nullable=False),
+    Column("situacao", String(16), nullable=False),            # enviado | sem_telegram
+    Column("texto", Text, nullable=False),                     # o que foi enviado (decisão 0005)
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 

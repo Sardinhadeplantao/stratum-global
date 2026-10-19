@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, avisos, config, db, export
+from stratum import VERSAO, agendador, avisos, config, db, export, resumo
 from stratum import fontes as catalogo
 from stratum.connectors import rss
 from stratum.domain.documento import hash_documento
@@ -23,6 +23,7 @@ class Resultado:
     situacao: str                       # ok | parcial | falhou
     novos: int = 0
     falhas: list[str] = field(default_factory=list)
+    motivos: dict[str, str] = field(default_factory=dict)   # fonte -> erro legível, para o resumo
 
 
 def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES) -> Resultado:
@@ -44,6 +45,7 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
         except Exception as exc:  # isola a falha: as outras fontes seguem
             resultado.falhas.append(f["id"])
             linha = dict(situacao="falhou", itens_lidos=0, itens_novos=0, erro=erro_legivel(exc))
+            resultado.motivos[f["nome"]] = linha["erro"]
         with engine.begin() as c:
             c.execute(db.coleta.insert().values(rodada_id=rid, fonte_id=f["id"], iniciada_em=inicio, terminada_em=agora(), **linha))
         print(f"{f['id']}: {linha['situacao']}, {linha['itens_lidos']} lidos, {linha['itens_novos']} novos"
@@ -95,21 +97,6 @@ def _gravar(engine, fonte_id: str, itens, rodada_id: int, conhecido_em) -> int:
     return len(linhas)
 
 
-def situacao_anterior(engine, rodada_id: int) -> str | None:
-    with engine.connect() as c:
-        return c.execute(select(db.rodada.c.situacao).where(db.rodada.c.id < rodada_id)
-                         .order_by(db.rodada.c.id.desc()).limit(1)).scalar()
-
-
-def avisar_mudanca(anterior: str | None, resultado: Resultado, enviar=avisos.enviar) -> bool:
-    """Avisa só quando a situação muda (evita uma mensagem a cada 15 minutos)."""
-    if resultado.situacao == "falhou" and anterior != "falhou":
-        return enviar("Stratum Global: todas as fontes falharam nesta rodada. Veja a tela Método do site.")
-    if resultado.situacao != "falhou" and anterior == "falhou":
-        return enviar("Stratum Global: a coleta voltou a funcionar.")
-    return False
-
-
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description="Uma rodada do robô do Stratum Global.")
     p.add_argument("--exportar", help="grava o status para o site neste caminho (JSON)")
@@ -129,9 +116,15 @@ def main(argv=None) -> int:
     try:
         resultado = rodar(engine, catalogo.FONTES, rss.nova_sessao(), cfg)
         print(f"Rodada {resultado.rodada_id}: {resultado.situacao}, {resultado.novos} documentos novos.")
-        avisar_mudanca(situacao_anterior(engine, resultado.rodada_id), resultado, lambda t: avisos.enviar(t, cfg))
+        estado = agendador.cuidar(engine, cfg.banco_permanente, cfg.repositorio, db.agora())
+        print(f"Agendador: {estado.situacao}" + (f" ({estado.erro})" if estado.erro else ""))
+        envio = resumo.talvez_enviar(
+            engine, db.agora(), [f"{nome} ({motivo})" for nome, motivo in resultado.motivos.items()],
+            None if estado.situacao in ("ok", "aguardando", "sem_banco") else estado.texto(),
+            cfg.repositorio, cfg.telegram_configurado, lambda t: avisos.enviar(t, cfg))
+        print(f"Resumo do Telegram: {envio}")
         if args.exportar:
-            export.escrever(engine, args.exportar)
+            export.escrever(engine, args.exportar, agendador=estado.para_status())
     except erros_sql.SQLAlchemyError as exc:  # o banco caiu no meio da rodada: o site diz isso, sem a mensagem crua
         print(f"O banco falhou no meio da rodada ({type(exc).__name__}).")
         if args.exportar:

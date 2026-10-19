@@ -12,6 +12,7 @@ class Config:
     telegram_token: str | None
     telegram_chat: str | None
     user_agent: str
+    repositorio: str | None = None     # dono/nome, que o GitHub Actions informa sozinho
 
     @property
     def banco_permanente(self) -> bool:
@@ -44,4 +45,5 @@ def ler() -> Config:
         telegram_token=_env("TELEGRAM_BOT_TOKEN"),
         telegram_chat=_env("TELEGRAM_CHAT_ID"),
         user_agent=_env("STRATUM_USER_AGENT") or USER_AGENT_PADRAO,
+        repositorio=_env("GITHUB_REPOSITORY"),
     )

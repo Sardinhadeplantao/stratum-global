@@ -95,17 +95,6 @@ def test_fonte_que_sai_da_lista_fica_inativa_e_mantem_os_documentos(engine, cfg,
     assert export.montar(engine)["totais"]["fontes"] == 1
 
 
-def test_aviso_so_na_mudanca_de_situacao():
-    enviados = []
-    falhou = robo.Resultado(rodada_id=2, situacao="falhou")
-    ok = robo.Resultado(rodada_id=3, situacao="ok")
-    robo.avisar_mudanca("ok", falhou, enviados.append)
-    robo.avisar_mudanca("falhou", falhou, enviados.append)   # continua falhando: não repete
-    robo.avisar_mudanca("falhou", ok, enviados.append)       # voltou: avisa
-    robo.avisar_mudanca("ok", ok, enviados.append)
-    assert len(enviados) == 2 and "falharam" in enviados[0] and "voltou" in enviados[1]
-
-
 def test_status_para_o_site(engine, cfg, feed_rss):
     relogio = Relogio()
     robo.rodar(engine, [fonte("a", URL_A), fonte("b", URL_B)], SessaoFalsa({URL_A: feed_rss}), cfg, agora=relogio)

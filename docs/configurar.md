@@ -48,7 +48,7 @@ No repositório: **Settings → Secrets and variables → Actions → New reposi
 | `TELEGRAM_BOT_TOKEN` | o token do passo 3.1 |
 | `TELEGRAM_CHAT_ID` | o número do passo 3.3 |
 
-## 5. Testar
+## 5. Testar o Telegram
 
 1. No repositório: **Actions → Robô (coleta e site) → Run workflow**.
 2. Marque **Mandar uma mensagem de teste no Telegram** e clique em **Run workflow**.
@@ -58,3 +58,36 @@ No repositório: **Settings → Secrets and variables → Actions → New reposi
 
 Se algo não funcionar, a tela Método diz o que falhou. Numa sessão do Claude, peça:
 "veja a última execução do robô do Stratum Global e me diga o que falhou".
+
+## 6. Ligar o agendador (o robô roda a cada 15 minutos e o resumo sai na hora)
+
+O agendamento do GitHub atrasa horas. Com este passo, o Supabase dispara o robô a cada 15 minutos (decisão 0004).
+O robô nunca vê esta chave: você a cola direto no cofre do Supabase.
+
+**Criar a chave no GitHub:**
+
+1. Clique na sua foto (canto superior direito) → **Settings**.
+2. No fim do menu da esquerda, abra **Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
+3. Preencha:
+   - **Token name:** `stratum-agendador`
+   - **Expiration:** o prazo mais longo oferecido. O resumo do Telegram avisa 14 dias antes de vencer.
+   - **Repository access:** **Only select repositories** → `stratum-global`.
+   - **Permissions → Repository permissions → Actions:** **Read and write**. Só essa.
+4. Clique em **Generate token** e copie o código, que começa com `github_pat_`.
+
+**Guardar no cofre do Supabase:**
+
+1. No painel do projeto, use a busca do topo (**Search… Ctrl K**) e digite **Vault**. Abra a página do cofre;
+   se ela pedir para ativar, ative.
+2. Clique para adicionar um segredo novo (**Add new secret**):
+   - **Name:** `stratum_disparo`, exatamente assim;
+   - **Secret:** o código copiado;
+   - **Description:** opcional.
+3. Salve. Na rodada seguinte, o robô liga o agendamento sozinho, e a tela **Método** passa a mostrar "Agendador: funcionando".
+
+Para trocar a chave quando ela vencer, gere outra e edite o segredo `stratum_disparo` no cofre.
+
+## 7. Resumos no Telegram
+
+O Telegram recebe só três mensagens por dia, às 7:30, ao meio-dia e às 19:00 (Brasília), com o que aconteceu
+desde o resumo anterior. Problemas do robô aparecem no resumo seguinte, nunca em mensagens fora desses horários.

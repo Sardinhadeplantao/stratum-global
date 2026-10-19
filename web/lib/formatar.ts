@@ -58,6 +58,14 @@ export function situacao(s: string | null | undefined): { texto: string; classe:
   return { texto: SITUACOES[s as Situacao], classe: `sit-${s}` };
 }
 
+/** Cor do ponto do agendador: verde funcionando, amarelo atenção, vermelho falha, cinza sem dado. */
+export function classeAgendador(s: string | null | undefined): string {
+  if (s === "ok" || s === "aguardando") return "sit-ok";
+  if (s === "vence_logo" || s === "sem_token") return "sit-parcial";
+  if (s === "falhando" || s === "token_invalido" || s === "erro") return "sit-falhou";
+  return "sem-dado";
+}
+
 const TIPOS: Record<string, string> = { oficial: "Oficial", imprensa: "Imprensa", dados: "Dados", social: "Rede social (pista)" };
 
 export function tipoFonte(t: string | null | undefined): string {
