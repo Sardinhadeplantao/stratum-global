@@ -99,6 +99,18 @@ historia_documento = Table(
     Index("ix_historia_documento_historia", "historia_id"),
 )
 
+# Tradução automática gratuita de um campo do documento (decisão 0010). O original fica como está; a tradução
+# entra uma vez, com o modelo que a fez, e nunca é reescrita.
+traducao = Table(
+    "traducao", md,
+    Column("documento_id", Id, ForeignKey("documento.id"), primary_key=True),
+    Column("campo", String(16), primary_key=True),       # titulo
+    Column("idioma", String(8), primary_key=True),       # pt
+    Column("texto", Text, nullable=False),
+    Column("modelo", String(64), nullable=False),        # argos-en_pb-1.9
+    Column("conhecido_em", DateTime, nullable=False),
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 
@@ -143,13 +155,14 @@ def versao_do_banco(engine) -> str | None:
         return MigrationContext.configure(c).get_current_revision()
 
 
-def inserir_ignorando_repetidos(conexao, tabela, linhas: list[dict], chave: str) -> None:
-    """Insere linhas; a que já existe (mesma `chave` única) é ignorada, nunca sobrescrita."""
+def inserir_ignorando_repetidos(conexao, tabela, linhas: list[dict], chave: str | list[str]) -> None:
+    """Insere linhas; a que já existe (mesma `chave` única, de uma ou mais colunas) é ignorada, nunca sobrescrita."""
     if not linhas:
         return
     dialeto = postgresql if conexao.dialect.name == "postgresql" else sqlite
     for i in range(0, len(linhas), 1000):
-        stmt = dialeto.insert(tabela).values(linhas[i:i + 1000]).on_conflict_do_nothing(index_elements=[chave])
+        stmt = dialeto.insert(tabela).values(linhas[i:i + 1000]).on_conflict_do_nothing(
+            index_elements=[chave] if isinstance(chave, str) else list(chave))
         conexao.execute(stmt)
 
 

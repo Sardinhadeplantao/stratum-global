@@ -229,3 +229,6 @@ td .erro { color: var(--falhou); font-size: 12px; max-width: 280px; overflow-wra
   .resumo { grid-template-columns: 1fr; gap: 0; }
   .resumo dd { margin-bottom: 8px; }
 }
+
+/* Título traduzido automaticamente (decisão 0010): marca discreta, original ao passar o mouse */
+.traduzido { color: var(--sem-dado-texto); font-size: 0.8em; cursor: help; }

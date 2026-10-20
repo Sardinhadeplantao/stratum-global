@@ -1,5 +1,6 @@
 import { datasDocumento, numero, plural } from "@/lib/formatar";
 import type { Status } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
 const PROXIMAS = [
   { fase: "Fase 1", texto: "Notícias agrupadas em eventos, com grau de confirmação e importância" },
@@ -41,7 +42,7 @@ export default function Cartoes({ status }: { status: Status }) {
           <ul className="lista-noticias">
             {destaque.documentos.slice(0, 3).map((d, i) => (
               <li key={i}>
-                {d.url ? <a href={d.url} target="_blank" rel="noreferrer">{d.titulo}</a> : d.titulo}
+                <Titulo {...d} />
                 <div className="discreto">{d.fonte_nome} · {datasDocumento(d.publicado_em, d.conhecido_em)}</div>
               </li>
             ))}

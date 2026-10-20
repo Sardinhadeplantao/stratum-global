@@ -1,6 +1,7 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
 import { classeAgendador, classeCopia, controleFonte, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
 export const metadata = { title: "Método · Stratum Global" };
 
@@ -219,7 +220,7 @@ export default function Metodo() {
           <ul className="documentos">
             {s.ultimos_documentos.map((d, i) => (
               <li key={i}>
-                {d.url ? <a href={d.url} target="_blank" rel="noreferrer">{d.titulo}</a> : d.titulo}
+                <Titulo {...d} />
                 <div className="discreto">
                   {d.fonte_nome} · {d.publicado_em ? `publicado ${dataHora(d.publicado_em)}` : "sem data da fonte"} · coletado {dataHora(d.conhecido_em)}
                   {d.paises && d.paises.length > 0 && <> · cita {d.paises.map((p) => p.nome).join(", ")}</>}

@@ -121,7 +121,8 @@ def test_vozes_sao_donos_diferentes(engine):
     status = export.montar(engine, agora=lambda: T0 + timedelta(hours=3))
     assert status["historias"][0]["vozes"] == 2
     # O painel do país recebe a história pronta (o site não calcula, regra 9)
-    assert status["paises"]["IRN"]["historias"] == [{"id": h["id"], "titulo": h["titulo"], "noticias": 3, "vozes": 2}]
+    assert status["paises"]["IRN"]["historias"] == [{"id": h["id"], "titulo": h["titulo"], "titulo_original": None,
+                                                     "noticias": 3, "vozes": 2}]
 
 
 def test_resumo_do_telegram_mostra_as_historias_com_mais_vozes(engine):

@@ -11,14 +11,15 @@ export type Fonte = {
 };
 export type PaisCitado = { iso: string; nome: string };
 export type Documento = {
-  titulo: string; url: string | null; fonte: string; fonte_nome: string; fonte_tipo?: string | null; fonte_pais?: string | null;
+  titulo: string; titulo_original?: string | null; url: string | null; fonte: string; fonte_nome: string;
+  fonte_tipo?: string | null; fonte_pais?: string | null;
   fonte_pais_nome?: string | null; publicado_em: string | null; conhecido_em: string | null; paises?: PaisCitado[];
 };
 export type Atencao = {
   regra: string; janela_horas: number; inicio: string; fim: string; niveis: number[]; documentos: number;
   documentos_com_pais: number; oficiais: number; paises_citados: number; ignorados: string[];
 };
-export type HistoriaResumo = { id: number; titulo: string; noticias: number; vozes: number };
+export type HistoriaResumo = { id: number; titulo: string; titulo_original?: string | null; noticias: number; vozes: number };
 export type PaisAtencao = { nome: string; citacoes: number; nivel: number; documentos: Documento[]; historias?: HistoriaResumo[] };
 export type MaisCitado = { iso: string; nome: string; citacoes: number; proporcao: number };
 export type Origem = { pais: string | null; nome: string; documentos: number; proporcao: number };
@@ -32,10 +33,11 @@ export type Agendador = {
 export type Copia = { situacao: "ok" | "atrasada" | "nenhuma" | "sem_dado"; texto: string; ultima: string | null };
 /** Histórias (decisão 0009): notícias da mesma história juntas por regra. Vozes = donos diferentes; é cobertura, não confirmação. */
 export type DocumentoHistoria = {
-  titulo: string; url: string | null; fonte: string; fonte_nome: string; publicado_em: string | null; conhecido_em: string | null;
+  titulo: string; titulo_original?: string | null; url: string | null; fonte: string; fonte_nome: string;
+  publicado_em: string | null; conhecido_em: string | null;
 };
 export type Historia = {
-  id: number; titulo: string; noticias: number; fontes: number; vozes: number; ultima: string | null;
+  id: number; titulo: string; titulo_original?: string | null; noticias: number; fontes: number; vozes: number; ultima: string | null;
   paises: PaisCitado[]; documentos: DocumentoHistoria[];
 };
 export type Status = {

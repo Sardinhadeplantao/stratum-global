@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import func, select
 
-from stratum import db
+from stratum import db, traducao
 from stratum.domain import historias as regra
 from stratum.domain import paises
 
@@ -63,6 +63,7 @@ def recentes(engine, agora: datetime, inicio: datetime | None = None) -> list[di
                    f.c.id.label("fonte"), f.c.nome.label("fonte_nome"), f.c.controlador)
             .join(d, d.c.id == h.c.documento_id).join(f, f.c.id == d.c.fonte_id)
             .where(h.c.historia_id.in_(ativas))).mappings().all()
+        em_portugues = traducao.titulos(c, [l["id"] for l in linhas])
     dic = paises.carregar()
     por_historia: dict = {}
     for l in linhas:
@@ -76,13 +77,15 @@ def recentes(engine, agora: datetime, inicio: datetime | None = None) -> list[di
         isos = sorted({iso for x in docs for iso in paises.citados(x["titulo"], dic)})
         saida.append({
             "id": hid,
-            "titulo": primeira["titulo"],
+            "titulo": em_portugues.get(primeira["id"]) or primeira["titulo"],
+            "titulo_original": primeira["titulo"] if primeira["id"] in em_portugues else None,
             "noticias": len(docs),
             "fontes": len({x["fonte"] for x in docs}),
             "vozes": len({x["controlador"] or x["fonte"] for x in docs}),
             "ultima": export._iso(docs[0]["quando"]),
             "paises": [{"iso": i, "nome": dic.nome(i) or i} for i in isos],
-            "documentos": [{"titulo": x["titulo"], "url": x["url"], "fonte": x["fonte"], "fonte_nome": x["fonte_nome"],
+            "documentos": [{"titulo": em_portugues.get(x["id"]) or x["titulo"],
+                            "titulo_original": x["titulo"] if x["id"] in em_portugues else None, "url": x["url"], "fonte": x["fonte"], "fonte_nome": x["fonte_nome"],
                             "publicado_em": export._iso(x["publicado_em"]), "conhecido_em": export._iso(x["conhecido_em"])}
                            for x in docs],
         })

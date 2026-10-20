@@ -1,6 +1,7 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
 import { dataHora, datasDocumento, plural } from "@/lib/formatar";
 import { lerStatus } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
 export const metadata = { title: "Histórias · Stratum Global" };
 
@@ -19,7 +20,7 @@ export default function Historias() {
         <p className="sem-dado-texto">Nenhuma história com mais de uma notícia nas últimas 24 horas.</p>
       ) : lista.map((h) => (
         <section key={h.id} id={`h${h.id}`}>
-          <h2>{h.titulo}</h2>
+          <h2 title={h.titulo_original ? `Original: ${h.titulo_original}` : undefined}>{h.titulo}</h2>
           <p className="discreto">
             {plural(h.noticias, "notícia", "notícias")} de {plural(h.fontes, "fonte", "fontes")} ·{" "}
             <b>{plural(h.vozes, "voz independente", "vozes independentes")}</b> · última em {dataHora(h.ultima)}
@@ -30,7 +31,7 @@ export default function Historias() {
             <ul className="regras">
               {h.documentos.map((d, i) => (
                 <li key={i}>
-                  {d.url ? <a href={d.url} target="_blank" rel="noreferrer">{d.titulo}</a> : d.titulo}{" "}
+                  <Titulo {...d} />{" "}
                   <span className="discreto">({d.fonte_nome} · {datasDocumento(d.publicado_em, d.conhecido_em)})</span>
                 </li>
               ))}

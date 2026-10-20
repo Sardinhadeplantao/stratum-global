@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { datasDocumento, tipoFonte } from "@/lib/formatar";
 import type { Documento } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
 /** As notícias mais recentes das fontes, com os países que cada uma cita (regra de dicionário do robô). */
 export default function Atualizacoes({ documentos }: { documentos: Documento[] }) {
@@ -19,8 +20,7 @@ export default function Atualizacoes({ documentos }: { documentos: Documento[] }
                 <span>{d.fonte_nome}</span>
                 <span className="discreto">{datasDocumento(d.publicado_em, d.conhecido_em)}</span>
               </div>
-              {d.url ? <a href={d.url} target="_blank" rel="noreferrer" className="feed-titulo">{d.titulo}</a>
-                : <span className="feed-titulo">{d.titulo}</span>}
+              <Titulo {...d} className="feed-titulo" />
               {d.paises && d.paises.length > 0 && (
                 <div className="feed-paises">
                   {d.paises.slice(0, 4).map((p) => <a key={p.iso} href={`#pais=${p.iso}`} className="chip">{p.nome}</a>)}

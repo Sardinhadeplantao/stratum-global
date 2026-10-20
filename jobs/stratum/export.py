@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from sqlalchemy import func, or_, select
 
-from stratum import VERSAO, db, historias
+from stratum import VERSAO, db, historias, traducao
 from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
@@ -82,6 +82,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
                              key=lambda d: (d["quando"], d["id"]), reverse=True)[:ULTIMOS_DOCUMENTOS]
         else:
             ultimos = janela[:ULTIMOS_DOCUMENTOS]
+        em_portugues = traducao.titulos(c, {d["id"] for d in janela} | {d["id"] for d in ultimos})
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}
@@ -91,8 +92,10 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
 
     def resumo_documento(d) -> dict:
         f = por_fonte.get(d["fonte_id"]) or {}
+        pt = em_portugues.get(d["id"])
         return {
-            "titulo": d["titulo"], "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
+            "titulo": pt or d["titulo"], "titulo_original": d["titulo"] if pt else None,  # decisão 0010
+            "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
             "fonte_tipo": f.get("tipo"), "fonte_pais": f.get("pais"), "fonte_pais_nome": dicionario.nome(f.get("pais")),
             "publicado_em": _iso(d["publicado_em"]), "conhecido_em": _iso(d["conhecido_em"]),
             "paises": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in citados(d)],
@@ -137,7 +140,8 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
     for h in lista_historias:  # já vêm na ordem: mais vozes primeiro
         for p in h["paises"]:
             historias_do_pais.setdefault(p["iso"], []).append(
-                {"id": h["id"], "titulo": h["titulo"], "noticias": h["noticias"], "vozes": h["vozes"]})
+                {"id": h["id"], "titulo": h["titulo"], "titulo_original": h["titulo_original"], "noticias": h["noticias"],
+                 "vozes": h["vozes"]})
     return {
         "versao_formato": VERSAO_FORMATO,
         "versao_robo": VERSAO,

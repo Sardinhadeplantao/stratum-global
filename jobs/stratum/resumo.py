@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import case, func, select
 
-from stratum import db, export, historias
+from stratum import db, export, historias, traducao
 from stratum.domain import paises
 
 FUSO = ZoneInfo("America/Sao_Paulo")
@@ -91,6 +91,7 @@ def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | No
             select(db.documento).where(db.documento.c.conhecido_em > antes_inicio,
                                        db.documento.c.conhecido_em <= agora)).mappings()]
         fontes = {f["id"]: f for f in c.execute(select(db.fonte)).mappings()}
+        em_portugues = traducao.titulos(c, [d["id"] for d in docs])
         # Falhas desde o último resumo, não só as desta rodada: uma queda no meio do período também aparece
         coletas = c.execute(select(db.coleta.c.fonte_id, func.count(),
                                    func.sum(case((db.coleta.c.situacao == "falhou", 1), else_=0)),
@@ -127,7 +128,7 @@ def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | No
                     continue
                 usados.add(d["id"])
                 fonte = (fontes.get(d["fonte_id"]) or {}).get("nome", d["fonte_id"])
-                destaques.append(f"• {dicionario.nome(iso) or iso}: {d['titulo']} ({fonte})" + (f"\n  {d['url']}" if d["url"] else ""))
+                destaques.append(f"• {dicionario.nome(iso) or iso}: {em_portugues.get(d['id'], d['titulo'])} ({fonte})" + (f"\n  {d['url']}" if d["url"] else ""))
             linhas += ["", "Destaques (a notícia mais recente com o país no título):", *destaques]
         com_vozes = [h for h in historias.recentes(engine, agora, inicio=inicio) if h["vozes"] >= 2][:HISTORIAS]
         if com_vozes:
