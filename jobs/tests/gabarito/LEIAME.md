@@ -18,6 +18,11 @@ Manchetes reais coletadas pelo robô, agrupadas em eventos e assuntos. Servem pa
   fronteira.
 - `anotador1_<conjunto>.json` e `anotador2_<conjunto>.json`: as duas anotações independentes.
 - `reconciliacao_<conjunto>.md`: a concordância entre as duas e a decisão de cada divergência.
+- `conferencia_dono.md`: 30 pares para o dono conferir; a resposta do gabarito está em `conferencia_dono_respostas.json`.
+
+Correção em 20/10: 139 manchetes de `teste_16out.jsonl` tinham acentos e travessões escritos como código
+(`n\u00e3o`), vindos do log. Só o texto foi corrigido; os rótulos não mudaram. O `teste_16out` já foi usado uma
+vez para medir uma regra (`jobs/estudos/eventos/LEIAME.md`) e agora pode servir de desenvolvimento.
 
 ## Como foi feito
 
