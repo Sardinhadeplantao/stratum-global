@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import case, func, select
 
-from stratum import db, export
+from stratum import db, export, historias
 from stratum.domain import paises
 
 FUSO = ZoneInfo("America/Sao_Paulo")
@@ -18,6 +18,7 @@ ATRASO_MAXIMO = timedelta(hours=3)
 PRIMEIRO_PERIODO = timedelta(hours=12)   # sem resumo anterior: as últimas 12 horas
 MAIS_CITADOS = 5
 DESTAQUES = 3
+HISTORIAS = 3                            # histórias com 2 ou mais vozes independentes (decisão 0009)
 LIMITE_TELEGRAM = 4000                   # o Telegram aceita até 4096 caracteres
 
 
@@ -128,6 +129,10 @@ def montar(engine, agora: datetime, horario: datetime, linha_agendador: str | No
                 fonte = (fontes.get(d["fonte_id"]) or {}).get("nome", d["fonte_id"])
                 destaques.append(f"• {dicionario.nome(iso) or iso}: {d['titulo']} ({fonte})" + (f"\n  {d['url']}" if d["url"] else ""))
             linhas += ["", "Destaques (a notícia mais recente com o país no título):", *destaques]
+        com_vozes = [h for h in historias.recentes(engine, agora, inicio=inicio) if h["vozes"] >= 2][:HISTORIAS]
+        if com_vozes:
+            linhas += ["", "Histórias com mais vozes independentes (donos diferentes; cobertura, não confirmação):"]
+            linhas += [f"• {h['titulo']} ({h['noticias']} notícias, {h['vozes']} vozes)" for h in com_vozes]
     problemas = []
     for fonte_id, total, falhou, erro in sorted(coletas, key=lambda x: x[0]):
         if falhou:

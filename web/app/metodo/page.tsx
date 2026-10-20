@@ -38,11 +38,32 @@ export default function Metodo() {
         <ul className="regras">
           <li><b>Toda informação tem fonte e duas datas:</b> quando a fonte publicou (se ela informa) e quando o sistema soube.</li>
           <li><b>Nada é apagado nem reescrito.</b> Correção vira registro novo.</li>
-          <li><b>Notícia vai ganhar grau de confirmação</b> na fase 1; por enquanto aparece solta, com a fonte. Rede social é só pista, nunca fato.</li>
+          <li><b>Notícias da mesma história aparecem juntas</b> (página Histórias), com quantos donos diferentes as publicaram.
+            Isso é cobertura, não confirmação: o grau de confirmação de cada fato ainda não existe. Rede social é só pista, nunca fato.</li>
           <li><b>Fontes entram por critério escrito,</b> não por parecerem interessantes.</li>
           <li><b>Regra decide; IA só lê, resume e traduz.</b> O sistema funciona sem IA.</li>
           <li><b>Preço é contexto:</b> nunca ordena eventos nem dispara aviso sozinho.</li>
           <li><b>O site não calcula:</b> mostra o que o robô gravou. Cinza quer dizer sem dado.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Como juntamos as histórias</h2>
+        <p>
+          Cada notícia vira uma lista do que ela cita: países, nomes próprios, números e palavras de ação (ataque,
+          protesto, sanção). Quando uma notícia nova tem bastante em comum com uma das últimas{" "}
+          {s.regra_historias?.janela_horas ?? 48} horas, ela entra na história daquela; senão, abre uma história nova.
+          O que é raro naquele dia vale mais que o que é comum. Nada é movido depois.
+        </p>
+        <ul className="regras">
+          <li><b>Regra {s.regra_historias?.versao ?? "—"}</b>, sem IA. Medida em dois dias de notícias anotados pelo Claude:
+            das notícias que ela junta, de 88% a 100% são mesmo da mesma história.</li>
+          <li><b>Ela junta pouco.</b> Prefere deixar separado a juntar errado, então uma história grande pode aparecer em
+            pedaços.</li>
+          <li><b>Mesma história não é mesmo fato.</b> &quot;Trump aprova a execução&quot; e &quot;Trump cancela a transmissão da execução&quot;
+            são a mesma história e fatos diferentes. Por isso ainda não há selo de &quot;confirmado&quot;.</li>
+          <li><b>Vozes independentes</b> são donos diferentes: dois veículos do mesmo Estado ou do mesmo grupo contam como uma
+            voz (veja &quot;Quem controla cada fonte&quot;).</li>
         </ul>
       </section>
 
