@@ -38,3 +38,15 @@ desenvolvimento, e a próxima medida precisa de um dia novo, anotado e guardado.
 `grau/proposta.md`: proposta da regra de grau de confirmação (`grau-0.1`), da ficha das 11 fontes (nível e dono),
 do modelo das tabelas novas e de 20 casos de referência (`test_casos.py`, rodam com `python -m pytest` dentro de
 `grau/`). Ainda não revisada; vira decisão (0008) e código depois de conferida.
+
+## Segunda tentativa (20/10)
+
+- Com os textos do teste corrigidos, os erros da regra de `entidades/` no dia 16/10 são quase todos acontecimentos
+  vizinhos da mesma história ("Trump aprova o fuzilamento" × "Trump cancela a transmissão do fuzilamento").
+- Subir o limiar não resolve: no dia 16/10 a precisão por evento fica entre 0,67 e 0,82 em qualquer limiar.
+- Contra o gabarito de **assunto** (a história maior), os pares que a regra junta estão certos em 94% a 100% das vezes,
+  nos dois dias. A regra é confiável para "mesma história", não para "mesmo fato".
+- `segunda/`: regra da fala atribuída ("... — Novak", mesma fonte). Descartada: os dois dias do gabarito tratam
+  entrevistas de jeitos diferentes (19/10 separa por tema, 16/10 junta tudo), e para confirmar o que importa é cada
+  afirmação, não a entrevista inteira.
+

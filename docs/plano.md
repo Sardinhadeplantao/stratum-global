@@ -39,7 +39,8 @@ Primeira volta:
 
 - Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois). A decisão 0001 previa apagar o detalhe das
   notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova mantém tudo ou muda a regra 2 por escrito.
-- O dono confere uma amostra de 30 pares do gabarito, para o acerto medido não depender só do Claude.
+- Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz
+  que o gabarito foi feito só pelo Claude.
 - Completar a ficha das fontes: termos de uso e volume esperado por dia. Fonte nova entra com a ficha, uma amostra
   real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
 - Lista de fontes completa: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das
