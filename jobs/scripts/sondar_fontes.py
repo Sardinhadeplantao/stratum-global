@@ -5,6 +5,11 @@ Para cada candidato, mostra se respondeu, quantos itens trouxe, a data mais rece
 Nada é gravado: é só para decidir o que entra em fontes.py (regra 5).
 
 Uso:  python scripts/sondar_fontes.py
+
+Resultado de 20/10/2026: funcionaram uk_fcdo, uk_fcdo_org, uk_ofsi (parado desde junho), ue_conselho, ue_comissao,
+ue_eurlex_jo (100 atos técnicos por dia), ru_kremlin e ru_mid. Falharam: ue_conselho_b, otan (404), cn_governo e
+cn_mre (não são feeds), in_pib, in_mea e jp_mofa (403) e br_itamaraty (404). Entraram em fontes.py: uk_fcdo,
+ue_conselho, ue_comissao e ru_mid.
 """
 import sys
 from pathlib import Path

@@ -28,7 +28,10 @@ Já entregue:
 - gabarito de eventos: 520 manchetes de dois dias agrupadas em eventos pelo Claude, em duas anotações independentes
   e reconciliadas, em `jobs/tests/gabarito/`;
 - cópia semanal do banco, com a restauração testada e a data da última cópia na tela Método (decisão 0007);
-- ficha de cada fonte (nível e quem controla, com a fonte da informação), na tela Método (decisão 0008).
+- ficha de cada fonte (nível e quem controla, com a fonte da informação), na tela Método (decisão 0008);
+- fontes oficiais de 3 blocos, além da ONU: EUA (sanções e controles de exportação), Europa (Relações Exteriores do
+  Reino Unido, Conselho e Comissão da UE) e Rússia (Relações Exteriores). China, Índia, Japão, Brasil e OTAN não têm
+  feed que o robô consiga ler (sonda de 20/10, `jobs/scripts/sondar_fontes.py`).
 
 Falta, em duas voltas. A primeira entrega o monitor usável; a segunda refina.
 
@@ -39,10 +42,9 @@ Primeira volta:
 - O dono confere uma amostra de 30 pares do gabarito, para o acerto medido não depender só do Claude.
 - Completar a ficha das fontes: termos de uso e volume esperado por dia. Fonte nova entra com a ficha, uma amostra
   real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
-- Lista de fontes completa: oficiais de pelo menos 3 blocos (diários oficiais, sanções, chancelarias, ONU, UE),
-  com os feeds do governo britânico (GOV.UK) de reserva e a China só se a coleta funcionar; GDELT para volume.
-  A imprensa das regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois
-  da decisão de retenção.
+- Lista de fontes completa: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das
+  regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de
+  retenção.
 - Antes das tabelas novas, uma decisão curta com o modelo dos objetos da fase 1: campos, de onde vêm e que regra os muda.
 - Caminho do documento até o evento:
   - idioma e tradução (Argos/Opus-MT), com o original a um clique;
