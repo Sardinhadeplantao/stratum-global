@@ -25,6 +25,8 @@ export type Agendador = {
   texto: string; erro: string | null; ultima_chamada: string | null; resposta: number | null;
   token_vence_em: string | null; dias_para_vencer: number | null;
 };
+/** Cópia semanal do banco (decisão 0007). O texto vem pronto do robô. */
+export type Copia = { situacao: "ok" | "atrasada" | "nenhuma" | "sem_dado"; texto: string; ultima: string | null };
 export type Status = {
   versao_formato: number;
   versao_robo: string | null;
@@ -33,6 +35,7 @@ export type Status = {
   banco: "permanente" | "temporario" | "erro" | null;
   erro_banco: string | null;
   agendador?: Agendador | null;
+  copia?: Copia | null;
   ultima_rodada: { id: number; iniciada_em: string | null; terminada_em: string | null; situacao: string } | null;
   rodadas_recentes: { iniciada_em: string | null; situacao: string }[];
   totais: { documentos: number; documentos_24h: number; fontes: number; fontes_ok: number };
@@ -45,7 +48,7 @@ export type Status = {
 };
 
 const VAZIO: Status = {
-  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, banco: null, erro_banco: null, ultima_rodada: null,
+  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, copia: null, banco: null, erro_banco: null, ultima_rodada: null,
   rodadas_recentes: [], totais: { documentos: 0, documentos_24h: 0, fontes: 0, fontes_ok: 0 }, fontes: [], ultimos_documentos: [],
   atencao: null, paises: {}, mais_citados: [], origem_fontes: [],
 };

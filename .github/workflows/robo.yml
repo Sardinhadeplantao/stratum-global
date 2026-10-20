@@ -33,6 +33,17 @@ jobs:
           pip install -r requirements.txt
           python -m pytest
 
+      - name: Data da última cópia do banco (decisão 0007)
+        if: github.ref == 'refs/heads/main'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          if ultima=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=copia-banco&per_page=100" \
+                --jq '[.artifacts[].created_at] | max // ""'); then
+            echo "STRATUM_ULTIMA_COPIA=$ultima" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Não foi possível conferir a data da última cópia do banco."
+          fi
+
       - name: Rodada do robô
         working-directory: jobs
         env:
@@ -89,7 +100,10 @@ jobs:
       - name: Manter o agendamento ativo (o GitHub desliga agendamentos após 60 dias sem atividade)
         if: github.ref == 'refs/heads/main'
         env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/robo.yml/enable" || echo "não foi possível renovar o agendamento"
+        run: |
+          for w in robo.yml copia.yml; do
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$w/enable" || echo "não foi possível renovar o agendamento de $w"
+          done
 
   deploy:
     if: github.ref == 'refs/heads/main' && needs.build.outputs.site_ligado == 'true'

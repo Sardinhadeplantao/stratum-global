@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, db, export, resumo
+from stratum import VERSAO, agendador, avisos, config, copia, db, export, resumo
 from stratum import fontes as catalogo
 from stratum.connectors import rss
 from stratum.domain.documento import hash_documento
@@ -116,12 +116,15 @@ def main(argv=None) -> int:
         print(f"Rodada {resultado.rodada_id}: {resultado.situacao}, {resultado.novos} documentos novos.")
         estado = agendador.cuidar(engine, cfg.banco_permanente, cfg.repositorio, db.agora())
         print(f"Agendador: {estado.situacao}" + (f" ({estado.erro})" if estado.erro else ""))
+        estado_copia = copia.situacao(cfg.ultima_copia, db.agora())
+        print(f"Cópia do banco: {estado_copia['situacao']}")
         envio = resumo.talvez_enviar(
             engine, db.agora(), None if estado.situacao in ("ok", "aguardando", "sem_banco") else estado.texto(),
-            cfg.repositorio, cfg.telegram_configurado, lambda t: avisos.enviar(t, cfg), cfg.banco_permanente)
+            cfg.repositorio, cfg.telegram_configurado, lambda t: avisos.enviar(t, cfg), cfg.banco_permanente,
+            copia=estado_copia)
         print(f"Resumo do Telegram: {envio}")
         if args.exportar:
-            export.escrever(engine, args.exportar, agendador=estado.para_status())
+            export.escrever(engine, args.exportar, agendador=estado.para_status(), copia=estado_copia)
     except erros_sql.SQLAlchemyError as exc:  # o banco caiu no meio da rodada: o site diz isso, sem a mensagem crua
         print(f"O banco falhou no meio da rodada ({type(exc).__name__}).")
         if args.exportar:

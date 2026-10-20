@@ -13,6 +13,8 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config as AlembicConfig
+from alembic.migration import MigrationContext
+from alembic.script import ScriptDirectory
 from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey, Index, Integer, MetaData, String, Table, Text,
                         create_engine)
 from sqlalchemy.dialects import postgresql, sqlite
@@ -98,13 +100,30 @@ def conectar(url: str | None):
     return create_engine(url, pool_pre_ping=True)
 
 
-def preparar(engine) -> None:
-    """Cria ou atualiza as tabelas aplicando as migrações pendentes. Rodar de novo não muda nada."""
+def _alembic() -> AlembicConfig:
     cfg = AlembicConfig()
     cfg.set_main_option("script_location", str(MIGRACOES))
+    return cfg
+
+
+def preparar(engine, ate: str = "head") -> None:
+    """Cria ou atualiza as tabelas aplicando as migrações pendentes. Rodar de novo não muda nada.
+    `ate`: a versão do esquema a alcançar (a restauração de uma cópia sobe só até a versão dela)."""
+    cfg = _alembic()
     with engine.begin() as conexao:
         cfg.attributes["connection"] = conexao
-        command.upgrade(cfg, "head")
+        command.upgrade(cfg, ate)
+
+
+def versoes_do_esquema() -> list[str]:
+    """As versões do esquema (migrações) que este código conhece, da mais antiga para a mais nova."""
+    return [s.revision for s in reversed(list(ScriptDirectory.from_config(_alembic()).walk_revisions()))]
+
+
+def versao_do_banco(engine) -> str | None:
+    """A versão do esquema em que o banco está; None se nunca foi preparado."""
+    with engine.connect() as c:
+        return MigrationContext.configure(c).get_current_revision()
 
 
 def inserir_ignorando_repetidos(conexao, tabela, linhas: list[dict], chave: str) -> None:
