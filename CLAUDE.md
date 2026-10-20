@@ -70,6 +70,9 @@ web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ## Como trabalhar
 
 - Uma tarefa por sessão, com um "pronto quando" claro (veja `docs/plano.md`).
+- **Economia, pedido do dono**: o limite de uso é dele. Cada coisa se faz uma vez, direto, sem várias cópias do
+  Claude em paralelo (workflows, agentes) nem leituras repetidas. Exceção só quando o dono pedir, ou uma revisão
+  curta, de um agente, quando o código mexe no banco ou em senhas.
 - Escreva ou ajuste o caso de referência antes do código. Se um caso de referência precisar mudar,
   a regra mudou: registre em `docs/decisoes/` antes.
 - Decisão de projeto nova = arquivo curto em `docs/decisoes/` com data, contexto, decisão e consequência.
