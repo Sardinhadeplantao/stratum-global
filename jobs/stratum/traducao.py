@@ -55,8 +55,18 @@ class Tradutor:
 
     def __call__(self, textos: list[str]) -> list[str]:
         entrada = [self.pedacos.encode(t, out_type=str) for t in textos]
-        saida = self.modelo.translate_batch(entrada, beam_size=2, max_batch_size=32, max_decoding_length=200)
-        return [self.pedacos.decode(r.hypotheses[0]).strip() for r in saida]
+        # Os mesmos parâmetros do Argos (beam 4, palavra desconhecida copiada do original)
+        saida = self.modelo.translate_batch(entrada, beam_size=4, replace_unknowns=True, length_penalty=0.2,
+                                            max_batch_size=32, max_decoding_length=200)
+        return [juntar(r.hypotheses[0], t) for r, t in zip(saida, textos)]
+
+
+def juntar(pedacos: list[str], original: str) -> str:
+    """Junta os pedaços como o Argos faz. Tira o ponto final que o modelo põe em manchete que não tinha ponto."""
+    texto = "".join(pedacos).replace("▁", " ").strip()
+    if texto.endswith(".") and not original.rstrip().endswith("."):
+        texto = texto[:-1].rstrip()
+    return texto
 
 
 def pendentes(engine, limite: int = POR_RODADA) -> list[dict]:

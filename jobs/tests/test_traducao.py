@@ -41,3 +41,10 @@ def test_sem_traducao_o_site_mostra_o_original(engine):
     _inserir(engine, [("bbc_mundo", "Floods hit Assam")])
     doc = export.montar(engine, agora=lambda: T0 + timedelta(hours=1))["ultimos_documentos"][0]
     assert (doc["titulo"], doc["titulo_original"]) == ("Floods hit Assam", None)
+
+
+def test_pedacos_do_modelo_viram_texto_com_espacos():
+    # Saída real do modelo na sonda de 20/10: os pedaços chegam com "▁" no lugar do espaço
+    pedacos = ["▁A", "▁Indonésia", "▁combate", "▁piores", "▁incêndios", "▁em", "▁11", "▁anos", "."]
+    assert traducao.juntar(pedacos, "Indonesia battles worst fires in 11 years") == "A Indonésia combate piores incêndios em 11 anos"
+    assert traducao.juntar(["▁EUA", "▁sobem", "▁tarifas", "."], "US raises tariffs.") == "EUA sobem tarifas."
