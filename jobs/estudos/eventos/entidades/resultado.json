@@ -1,0 +1,93 @@
+{
+ "conjunto": "dev_19out",
+ "config": {
+  "peso_pais": 0.5,
+  "peso_nome": 1.0,
+  "peso_numero": 1.0,
+  "peso_acao": 0.5,
+  "peso_palavra": 1.0,
+  "peso_resumo": 0.3,
+  "peso_resumo_resumo": 0.0,
+  "nome_prefixo": 5,
+  "palavra_prefixo": 0,
+  "limiar": 2.2,
+  "trava_pais": true,
+  "janela_horas": 48
+ },
+ "ordens": {
+  "crescente": {
+   "pares_juntados": 44,
+   "pares_certos": 43,
+   "pares_gabarito": 108,
+   "precisao_pares": 0.977,
+   "cobertura_pares": 0.398,
+   "f_pares": 0.566,
+   "bcubed_p": 0.996,
+   "bcubed_r": 0.842,
+   "bcubed_f": 0.912,
+   "bcubed_f_nada_juntado": 0.857,
+   "grupos": 212,
+   "eventos_multiplos": 33,
+   "eventos_com_par_juntado": 14,
+   "meta_atingida": false,
+   "cobertura_mesma_fonte": 0.148,
+   "cobertura_fontes_diferentes": 0.481,
+   "cobertura_entre_idiomas": 0.143,
+   "segundos": 0.305
+  },
+  "decrescente": {
+   "pares_juntados": 43,
+   "pares_certos": 42,
+   "pares_gabarito": 108,
+   "precisao_pares": 0.977,
+   "cobertura_pares": 0.389,
+   "f_pares": 0.556,
+   "bcubed_p": 0.996,
+   "bcubed_r": 0.839,
+   "bcubed_f": 0.911,
+   "bcubed_f_nada_juntado": 0.857,
+   "grupos": 212,
+   "eventos_multiplos": 33,
+   "eventos_com_par_juntado": 15,
+   "meta_atingida": false,
+   "cobertura_mesma_fonte": 0.185,
+   "cobertura_fontes_diferentes": 0.457,
+   "cobertura_entre_idiomas": 0.0,
+   "segundos": 0.26
+  },
+  "embaralhada": {
+   "pares_juntados": 43,
+   "pares_certos": 42,
+   "pares_gabarito": 108,
+   "precisao_pares": 0.977,
+   "cobertura_pares": 0.389,
+   "f_pares": 0.556,
+   "bcubed_p": 0.996,
+   "bcubed_r": 0.839,
+   "bcubed_f": 0.911,
+   "bcubed_f_nada_juntado": 0.857,
+   "grupos": 212,
+   "eventos_multiplos": 33,
+   "eventos_com_par_juntado": 15,
+   "meta_atingida": false,
+   "cobertura_mesma_fonte": 0.185,
+   "cobertura_fontes_diferentes": 0.457,
+   "cobertura_entre_idiomas": 0.0,
+   "segundos": 0.247
+  }
+ },
+ "pior_ordem": {
+  "precisao_pares": 0.977,
+  "cobertura_pares": 0.389,
+  "bcubed_f": 0.911,
+  "eventos_com_par_juntado": 14
+ },
+ "media": {
+  "precisao_pares": 0.977,
+  "cobertura_pares": 0.392,
+  "bcubed_f": 0.911,
+  "cobertura_mesma_fonte": 0.173,
+  "cobertura_fontes_diferentes": 0.465,
+  "cobertura_entre_idiomas": 0.048
+ }
+}

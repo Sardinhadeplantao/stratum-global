@@ -1,0 +1,2968 @@
+{
+ "A1.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "agencia:afp",
+   "estado:FRA",
+   "estado:GBR",
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "estado:GBR",
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 7,
+  "grupos_de_texto": 7,
+  "ids": [
+   43,
+   68,
+   74,
+   77,
+   148,
+   167,
+   212
+  ]
+ },
+ "A1.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   70,
+   73
+  ]
+ },
+ "A1.E3": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   72
+  ]
+ },
+ "A1.E4": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   75,
+   187
+  ]
+ },
+ "A1.E5": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   14,
+   71,
+   186
+  ]
+ },
+ "A1.E6": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   65,
+   149,
+   208
+  ]
+ },
+ "A1.E7": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT",
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "estado:QAT",
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   17,
+   58
+  ]
+ },
+ "A1.E8": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   78
+  ]
+ },
+ "A1.E9": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   154
+  ]
+ },
+ "A1.E10": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   155
+  ]
+ },
+ "A1.E11": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   170,
+   219
+  ]
+ },
+ "A1.E12": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   177
+  ]
+ },
+ "A1.E13": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   99,
+   131
+  ]
+ },
+ "A1.E14": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   94
+  ]
+ },
+ "A1.E15": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   118
+  ]
+ },
+ "A1.E16": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   31
+  ]
+ },
+ "A1.E17": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   141
+  ]
+ },
+ "A1.E18": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   6
+  ]
+ },
+ "A1.E19": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   40
+  ]
+ },
+ "A1.E20": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   61
+  ]
+ },
+ "A1.E21": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   69
+  ]
+ },
+ "A1.E22": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   81
+  ]
+ },
+ "A1.E23": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   84
+  ]
+ },
+ "A1.E24": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   92
+  ]
+ },
+ "A2.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   76,
+   216
+  ]
+ },
+ "A2.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   188
+  ]
+ },
+ "A3.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN",
+   "estado:FRA",
+   "estado:GBR",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:CHN",
+   "estado:FRA",
+   "estado:GBR",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 7,
+  "grupos_de_texto": 7,
+  "ids": [
+   10,
+   34,
+   51,
+   88,
+   200,
+   202,
+   221
+  ]
+ },
+ "A4.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:DEU",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:DEU",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   5,
+   54,
+   185
+  ]
+ },
+ "A5.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "agencia:afp",
+   "estado:FRA",
+   "estado:GBR",
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "estado:GBR",
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 4,
+  "grupos_de_texto": 4,
+  "ids": [
+   7,
+   28,
+   80,
+   192
+  ]
+ },
+ "A6.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   231
+  ]
+ },
+ "A6.E2": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:QAT",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   4,
+   193
+  ]
+ },
+ "A6.E3": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   229
+  ]
+ },
+ "A6.E4": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   178
+  ]
+ },
+ "A7.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:QAT",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   24,
+   66,
+   215
+  ]
+ },
+ "A7.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   147
+  ]
+ },
+ "A7.E3": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   160,
+   196
+  ]
+ },
+ "A7.E4": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   179
+  ]
+ },
+ "A7.E5": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   22
+  ]
+ },
+ "A7.E6": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:DEU"
+  ],
+  "publicadores": [
+   "estado:DEU"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   55
+  ]
+ },
+ "A7.E7": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   194
+  ]
+ },
+ "A8.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 4,
+  "grupos_de_texto": 4,
+  "ids": [
+   83,
+   91,
+   117,
+   138
+  ]
+ },
+ "A8.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   184
+  ]
+ },
+ "A8.E3": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT",
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:QAT",
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   11,
+   115,
+   190
+  ]
+ },
+ "A8.E4": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:folha",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 4,
+  "grupos_de_texto": 4,
+  "ids": [
+   64,
+   113,
+   125,
+   218
+  ]
+ },
+ "A8.E5": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   102,
+   110,
+   126
+  ]
+ },
+ "A8.E6": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   123,
+   135,
+   205
+  ]
+ },
+ "A8.E7": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR",
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:GBR",
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   29,
+   140
+  ]
+ },
+ "A8.E8": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   142,
+   144
+  ]
+ },
+ "A8.E9": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   89,
+   198
+  ]
+ },
+ "A8.E10": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   232
+  ]
+ },
+ "A8.E11": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   152
+  ]
+ },
+ "A8.E12": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   209
+  ]
+ },
+ "A8.E13": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   156
+  ]
+ },
+ "A8.E14": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   137
+  ]
+ },
+ "A8.E15": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   101
+  ]
+ },
+ "A8.E16": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   108,
+   114
+  ]
+ },
+ "A8.E17": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   116,
+   121
+  ]
+ },
+ "A8.E18": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   96,
+   98
+  ]
+ },
+ "A8.E19": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   128
+  ]
+ },
+ "A8.E20": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   161
+  ]
+ },
+ "A8.E21": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   127
+  ]
+ },
+ "A8.E22": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   151
+  ]
+ },
+ "A8.E23": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   41
+  ]
+ },
+ "A8.E24": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   112
+  ]
+ },
+ "A8.E25": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   145
+  ]
+ },
+ "A8.E26": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   175
+  ]
+ },
+ "A9.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   143,
+   234
+  ]
+ },
+ "A9.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   217
+  ]
+ },
+ "A9.E3": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   210
+  ]
+ },
+ "A9.E4": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   9
+  ]
+ },
+ "A10.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   95,
+   136,
+   157
+  ]
+ },
+ "A10.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   158,
+   166
+  ]
+ },
+ "A10.E3": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   169
+  ]
+ },
+ "A10.E4": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   176
+  ]
+ },
+ "A10.E5": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   159
+  ]
+ },
+ "A10.E6": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   163,
+   174
+  ]
+ },
+ "A10.E7": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   162
+  ]
+ },
+ "A10.E8": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   164
+  ]
+ },
+ "A10.E9": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   165
+  ]
+ },
+ "A11.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   3
+  ]
+ },
+ "A11.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   181
+  ]
+ },
+ "A11.E3": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   201
+  ]
+ },
+ "A11.E4": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   220
+  ]
+ },
+ "A11.E5": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   223
+  ]
+ },
+ "A12.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR",
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "estado:GBR",
+   "estado:RUS",
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   36,
+   146,
+   203
+  ]
+ },
+ "A13.E1": {
+  "grau": "corroborado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA",
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:FRA",
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 2,
+  "grupos_de_texto": 2,
+  "ids": [
+   30,
+   86
+  ]
+ },
+ "A14.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   25
+  ]
+ },
+ "A14.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   236
+  ]
+ },
+ "A15.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 3,
+  "grupos_de_texto": 3,
+  "ids": [
+   109,
+   111,
+   120
+  ]
+ },
+ "A16.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   48
+  ]
+ },
+ "A16.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   132
+  ]
+ },
+ "A17.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   46
+  ]
+ },
+ "A17.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   49
+  ]
+ },
+ "A18.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:DEU"
+  ],
+  "publicadores": [
+   "estado:DEU"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   56
+  ]
+ },
+ "A18.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "org:ONU"
+  ],
+  "publicadores": [
+   "org:ONU"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   90
+  ]
+ },
+ "A19.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   173
+  ]
+ },
+ "A19.E2": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   213
+  ]
+ },
+ "A20.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   104
+  ]
+ },
+ "A21.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   1
+  ]
+ },
+ "A22.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   2
+  ]
+ },
+ "A23.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   8
+  ]
+ },
+ "A24.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   12
+  ]
+ },
+ "A25.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   13
+  ]
+ },
+ "A26.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   15
+  ]
+ },
+ "A27.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   16
+  ]
+ },
+ "A28.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   18
+  ]
+ },
+ "A29.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   19
+  ]
+ },
+ "A30.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   20
+  ]
+ },
+ "A31.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   21
+  ]
+ },
+ "A32.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:QAT"
+  ],
+  "publicadores": [
+   "estado:QAT"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   23
+  ]
+ },
+ "A33.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   26
+  ]
+ },
+ "A34.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   27
+  ]
+ },
+ "A35.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   32
+  ]
+ },
+ "A36.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   33
+  ]
+ },
+ "A37.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   35
+  ]
+ },
+ "A38.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   37
+  ]
+ },
+ "A39.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   38
+  ]
+ },
+ "A40.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   39
+  ]
+ },
+ "A41.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:GBR"
+  ],
+  "publicadores": [
+   "estado:GBR"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   42
+  ]
+ },
+ "A42.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   44
+  ]
+ },
+ "A43.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   45
+  ]
+ },
+ "A44.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   47
+  ]
+ },
+ "A45.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   50
+  ]
+ },
+ "A46.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:CHN"
+  ],
+  "publicadores": [
+   "estado:CHN"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   52
+  ]
+ },
+ "A47.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:DEU"
+  ],
+  "publicadores": [
+   "estado:DEU"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   53
+  ]
+ },
+ "A48.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:DEU"
+  ],
+  "publicadores": [
+   "estado:DEU"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   57
+  ]
+ },
+ "A49.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   59
+  ]
+ },
+ "A50.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   60
+  ]
+ },
+ "A51.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   62
+  ]
+ },
+ "A52.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   63
+  ]
+ },
+ "A53.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:folha"
+  ],
+  "publicadores": [
+   "grupo:folha"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   67
+  ]
+ },
+ "A54.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   79
+  ]
+ },
+ "A55.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   82
+  ]
+ },
+ "A56.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   85
+  ]
+ },
+ "A57.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:FRA"
+  ],
+  "publicadores": [
+   "estado:FRA"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   87
+  ]
+ },
+ "A58.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   93
+  ]
+ },
+ "A59.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   97
+  ]
+ },
+ "A60.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   100
+  ]
+ },
+ "A61.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   103
+  ]
+ },
+ "A62.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   105
+  ]
+ },
+ "A63.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   106
+  ]
+ },
+ "A64.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   107
+  ]
+ },
+ "A65.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   119
+  ]
+ },
+ "A66.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   122
+  ]
+ },
+ "A67.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   124
+  ]
+ },
+ "A68.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   129
+  ]
+ },
+ "A69.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   130
+  ]
+ },
+ "A70.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   133
+  ]
+ },
+ "A71.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   134
+  ]
+ },
+ "A72.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   139
+  ]
+ },
+ "A73.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   150
+  ]
+ },
+ "A74.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   153
+  ]
+ },
+ "A75.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   168
+  ]
+ },
+ "A76.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   171
+  ]
+ },
+ "A77.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "estado:RUS"
+  ],
+  "publicadores": [
+   "estado:RUS"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   172
+  ]
+ },
+ "A78.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   180
+  ]
+ },
+ "A79.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   182
+  ]
+ },
+ "A80.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   183
+  ]
+ },
+ "A81.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   189
+  ]
+ },
+ "A82.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   191
+  ]
+ },
+ "A83.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   195
+  ]
+ },
+ "A84.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   197
+  ]
+ },
+ "A85.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   199
+  ]
+ },
+ "A86.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   204
+  ]
+ },
+ "A87.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   206
+  ]
+ },
+ "A88.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   207
+  ]
+ },
+ "A89.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   211
+  ]
+ },
+ "A90.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   214
+  ]
+ },
+ "A91.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   222
+  ]
+ },
+ "A92.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   224
+  ]
+ },
+ "A93.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   225
+  ]
+ },
+ "A94.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   226
+  ]
+ },
+ "A95.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   227
+  ]
+ },
+ "A96.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   228
+  ]
+ },
+ "A97.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   230
+  ]
+ },
+ "A98.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   233
+  ]
+ },
+ "A99.E1": {
+  "grau": "relatado",
+  "regra": "grau-0.1",
+  "vozes": [
+   "grupo:the_hindu"
+  ],
+  "publicadores": [
+   "grupo:the_hindu"
+  ],
+  "oficiais": [],
+  "documentos": 1,
+  "grupos_de_texto": 1,
+  "ids": [
+   235
+  ]
+ }
+}

@@ -1,0 +1,93 @@
+Assinatura de entidades, dev_19out (236 manchetes, 108 pares no gabarito)
+ordem         precisão  cobertura  pares  certos   B3 F  ev.c/par  mesma f.  f. dif.  idiomas   tempo
+crescente        0.977      0.398     44      43  0.912    14/33     0.148    0.481    0.143   0.30s
+decrescente      0.977      0.389     43      42  0.911    15/33     0.185    0.457    0.000   0.26s
+embaralhada      0.977      0.389     43      42  0.911    15/33     0.185    0.457    0.000   0.25s
+pior ordem: {'precisao_pares': 0.977, 'cobertura_pares': 0.389, 'bcubed_f': 0.911, 'eventos_com_par_juntado': 14}
+média:      {'precisao_pares': 0.977, 'cobertura_pares': 0.392, 'bcubed_f': 0.911, 'cobertura_mesma_fonte': 0.173, 'cobertura_fontes_diferentes': 0.465, 'cobertura_entre_idiomas': 0.048}
+meta da fase 1 (no teste: precisão >= 0,90, cobertura >= 0,60, metade dos eventos com par): NÃO atingida no dev
+
+ERROS DE JUNÇÃO (pares juntados que o gabarito separa), com o número de ordens em que aparecem:
+ [3/3]   nota 3.50  25 [A14.E1] Pope greeted by crowds in first major appearance since lung cancer surgery
+              236 [A14.E2] Vatican says Pope Leo to be released from the hospital on October 17, four days 
+              em comum: L:cancer L:lung L:surgery N:leo N:pope P:VAT
+
+PRÓXIMOS ERROS (pares errados de nota mais alta que ficaram abaixo do limiar):
+  nota 2.09  181 [A11.E2] Houthi rebels strike government military camp in southern Yemen, killing at leas
+              201 [A11.E3] Houthi media says Saudi strike kills 9 in northern Yemen
+              em comum: A:ataque A:morte L:strike N:houth P:YEM
+  nota 1.86  121 [A8.E17] Russia’s Battlegroup North destroys 37 Ukrainian UAV control posts, 347 drones i
+              156 [A8.E13] Over 40 Ukrainian drones taken down over Russian regions during day
+              em comum: A:drone L:day L:drones P:RUS P:UKR
+  nota 1.83  14 [A1.E5] France’s Macron declines minister’s resignation after violent protests
+              154 [A1.E9] France’s National Rally leader calls for Macron’s resignation amid riots
+              em comum: A:protesto A:renuncia L:resignation N:macro P:FRA
+  nota 1.83  154 [A1.E9] France’s National Rally leader calls for Macron’s resignation amid riots
+              186 [A1.E5] French President Macron refuses Interior Minister Laurent Nunez's resignation af
+              em comum: A:protesto A:renuncia L:resignation N:macro P:FRA
+  nota 1.81  169 [A10.E3] Russia, Saudi Arabia note importance of international navigation safety — Foreig
+              176 [A10.E4] Russia, Kuwait note importance of finding ways to ease tensions in Persian Gulf
+              em comum: L:importance L:note P:RUS P:SAU
+  nota 1.73  14 [A1.E5] France’s Macron declines minister’s resignation after violent protests
+              187 [A1.E4] Police ‘lost control’ during French protests, says Interior Minister
+              em comum: A:protesto A:renuncia L:control L:lost L:police L:protests L:resignation N:laure N:macro N:nunez P:FRA
+  nota 1.71  123 [A8.E6] Possible meeting between Putin, Trump, Xi at APEC summit sidelines being discuss
+              151 [A8.E22] No decision on Putin’s potential visit to G20 summit in Miami — Kremlin spokesma
+              em comum: A:encontro L:summit N:putin N:trump P:RUS P:USA
+  nota 1.69  26 [A33.E1] Alberta heads to polls to decide whether to hold vote on separation from Canada
+              147 [A7.E2] Trump refrains from saying whether he would work with another PM if Netanyahu lo
+              em comum: A:eleicao L:polls L:whether
+  nota 1.68  72 [A1.E3] French retailers reel after weekend of riots, looting
+              77 [A1.E1] French shops demolished after weekend riots across the country
+              em comum: A:protesto L:looting L:protests L:riots L:weekend L:widespread P:FRA
+  nota 1.68  46 [A17.E1] Montenegrin PM meets Chinese FM
+              49 [A17.E2] Montenegrin president meets Chinese FM
+              em comum: A:encontro L:meets L:met L:visiting N:wang N:yi P:CHN P:MNE
+  nota 1.66  96 [A8.E18] Russian troops liberate about 100 square km in Sumy, Kharkov Regions over week —
+              108 [A8.E16] More than 100 Ukrainian troops eliminated in Dobropolye mines — commander
+              em comum: L:noted L:troops P:RUS P:UKR Q:100
+  nota 1.65  132 [A16.E2] Russian PM to take part in SCO Council of Heads of Government meeting in Tajikis
+              159 [A10.E5] Next meeting of Russia-Gulf Cooperation Council Strategic Dialogue to be held in
+              em comum: A:encontro L:meeting N:counc P:RUS
+
+PERDAS (pares do gabarito não juntados), as de nota mais alta, perdidas nas 3 ordens:
+  nota 2.09  5 [A4.E1] Australian MP Helen Haines critically injured in ‘deliberate’ car ramming
+              185 [A4.E1] Australian lawmaker ‘critically’ hurt in attack, officials say
+              em comum: A:ataque A:ferido L:car L:critically L:office L:outside L:struck N:alban N:antho N:haine N:helen P:AUS
+  nota 2.04  91 [A8.E1] Data center in Kiev completely destroyed by Russian strike, cannot be restored
+              117 [A8.E1] Storage sites for cruise missiles, data center in Kiev hit in massive Russian at
+              em comum: A:ataque L:center L:data P:RUS P:UKR
+  nota 1.84  125 [A8.E4] US suspends new sanctions against Russia to give diplomacy chance — Rubio
+              218 [A8.E4] 60-day pause on Russia sanctions to analyse global impact: Rubio
+              em comum: A:sancao L:sanctions N:rubio P:RUS P:USA Q:60
+  nota 1.84  5 [A4.E1] Australian MP Helen Haines critically injured in ‘deliberate’ car ramming
+              54 [A4.E1] Australian MP seriously hurt in suspected car attack
+              em comum: A:ataque A:ferido L:car L:struck N:haine N:helen P:AUS
+  nota 1.81  113 [A8.E4] Trump removes sanctions on Russian diesel fuel for sake of US’ profit — Rubio
+              218 [A8.E4] 60-day pause on Russia sanctions to analyse global impact: Rubio
+              em comum: A:sancao L:global L:sanctions N:rubio P:RUS P:USA
+  nota 1.74  136 [A10.E1] Lavrov to outline Russia’s de-escalation efforts during visit to Iran
+              157 [A10.E1] Lavrov to visit Tehran, to be received by President Pezeshkian on October 19
+              em comum: A:encontro L:visit N:lavro P:IRN P:RUS
+  nota 1.73  113 [A8.E4] Trump removes sanctions on Russian diesel fuel for sake of US’ profit — Rubio
+              125 [A8.E4] US suspends new sanctions against Russia to give diplomacy chance — Rubio
+              em comum: A:sancao L:sanctions N:rubio P:RUS P:USA
+  nota 1.72  95 [A10.E1] Lavrov arrives in Iran to discuss regional de-escalation with Araghchi
+              136 [A10.E1] Lavrov to outline Russia’s de-escalation efforts during visit to Iran
+              em comum: A:encontro L:aimed L:attention L:comprehensive L:de-escalation L:practical L:significant L:strengthening N:lavro P:IRN P:RUS
+  nota 1.68  71 [A1.E5] 'Lame-duck president' Macron notes 'failures' after France unrest
+              186 [A1.E5] French President Macron refuses Interior Minister Laurent Nunez's resignation af
+              em comum: A:protesto A:renuncia L:protests L:resignation N:laure N:macro N:nunez P:FRA
+  nota 1.56  89 [A8.E9] Zelensky holds US talks as Trump accuses him of not wanting peace
+              198 [A8.E9] Zelenskyy speaks to U.S. envoys as Trump lashes out
+              em comum: A:paz L:envoys L:peace N:donal N:trump N:zelen P:UKR P:USA
+  nota 1.44  68 [A1.E1] França tem 1 morto, mais de mil policiais feridos e 2.400 presos após protestos
+              148 [A1.E1] Nearly 2,400 people detained during unrest in France — agency
+              em comum: A:ferido A:prisao A:protesto P:FRA Q:2400
+  nota 1.42  29 [A8.E7] Trump says suspension of Russia sanctions is to keep peace negotiations going
+              140 [A8.E7] Trump says he can tighten sanctions on Russia ‘any time’ he wants
+              em comum: A:sancao L:days L:sanctions N:trump P:RUS P:USA
+
+Pares perdidos (nas 3 ordens) por evento: [('A1.E1', 21), ('A8.E4', 6), ('A8.E1', 6), ('A1.E6', 3), ('A10.E1', 3), ('A8.E5', 3), ('A4.E1', 2), ('A8.E3', 2), ('A1.E5', 2), ('A15.E1', 2), ('A8.E6', 2), ('A1.E7', 1), ('A8.E7', 1), ('A1.E2', 1), ('A8.E9', 1), ('A1.E13', 1), ('A8.E16', 1), ('A8.E17', 1), ('A8.E8', 1), ('A10.E2', 1), ('A7.E3', 1), ('A10.E6', 1), ('A1.E11', 1)]
+
+Tempo com 2832 manchetes (dev repetido 12 vezes, pior caso: cópias idênticas): 6.4 s
