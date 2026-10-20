@@ -16,7 +16,7 @@ import json
 import sys
 from pathlib import Path
 
-GABARITO = Path("/home/user/apex-trading-streamlit/jobs/tests/gabarito")
+GABARITO = Path(__file__).resolve().parents[2] / "tests" / "gabarito"
 # Idioma de cada fonte do gabarito (fontes.py): só a Folha não é em inglês
 IDIOMA = {"folha_mundo": "pt"}
 

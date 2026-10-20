@@ -13,9 +13,27 @@ manchetes tiveram ao menos duas juntadas (a meta da fase 1 está em `docs/plano.
 | `entidades/`: países, nomes próprios e números em comum | 0,98 | 0,39 a 0,40 | 14 a 15 |
 | meta | 0,90 | 0,60 | metade |
 
-Os dois juntam quase sempre certo, mas encontram poucos pares. O terceiro jeito planejado, vetores de frase de um
-modelo multilíngue gratuito, não pôde ser medido nesta máquina (o site dos modelos é bloqueado aqui) e fica para
-um teste no GitHub Actions.
+Os dois juntam quase sempre certo, mas encontram poucos pares.
+
+`vetores/`: vetores de frase de três modelos multilíngues gratuitos (sentence-transformers), medidos no GitHub
+Actions em 20/10. Com precisão de pelo menos 0,93, o melhor encontrou só 14% dos pares (paraphrase-multilingual-mpnet,
+só o título). Descartado: pior que `entidades/` e pesado (instala o torch, mais de 1 minuto por rodada).
+
+## Medida única no conjunto de teste (20/10)
+
+A regra de `entidades/` foi congelada (`entidades/CONGELADO.txt`) e medida uma vez no conjunto de teste
+(`entidades/teste.json`):
+
+| Ordem de chegada | Precisão dos pares | Cobertura dos pares | Eventos com par (de 30) |
+|---|---|---|---|
+| crescente | 0,72 | 0,18 | 14 |
+| decrescente | 0,73 | 0,19 | 13 |
+| embaralhada | 0,79 | 0,16 | 14 |
+
+**Não atinge a meta** (0,90, 0,60 e 15). A regra estava ajustada demais ao dia de desenvolvimento (19/10). A primeira
+medida deu ainda pior, porque 139 das 284 manchetes do teste tinham acentos escritos como código (`n\u00e3o`); só os
+textos foram corrigidos, sem tocar na regra nem nos rótulos. O conjunto de teste agora está gasto: pode virar
+desenvolvimento, e a próxima medida precisa de um dia novo, anotado e guardado.
 
 `grau/proposta.md`: proposta da regra de grau de confirmação (`grau-0.1`), da ficha das 11 fontes (nível e dono),
 do modelo das tabelas novas e de 20 casos de referência (`test_casos.py`, rodam com `python -m pytest` dentro de

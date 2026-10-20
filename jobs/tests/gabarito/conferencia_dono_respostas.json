@@ -1,0 +1,242 @@
+{
+ "1": {
+  "conjunto": "dev_19out",
+  "ids": [
+   73,
+   69
+  ],
+  "gabarito": "não"
+ },
+ "2": {
+  "conjunto": "teste_16out",
+  "ids": [
+   133,
+   177
+  ],
+  "gabarito": "sim"
+ },
+ "3": {
+  "conjunto": "dev_19out",
+  "ids": [
+   167,
+   212
+  ],
+  "gabarito": "sim"
+ },
+ "4": {
+  "conjunto": "dev_19out",
+  "ids": [
+   74,
+   148
+  ],
+  "gabarito": "sim"
+ },
+ "5": {
+  "conjunto": "dev_19out",
+  "ids": [
+   96,
+   41
+  ],
+  "gabarito": "não"
+ },
+ "6": {
+  "conjunto": "dev_19out",
+  "ids": [
+   24,
+   215
+  ],
+  "gabarito": "sim"
+ },
+ "7": {
+  "conjunto": "teste_16out",
+  "ids": [
+   163,
+   212
+  ],
+  "gabarito": "sim"
+ },
+ "8": {
+  "conjunto": "dev_19out",
+  "ids": [
+   72,
+   170
+  ],
+  "gabarito": "não"
+ },
+ "9": {
+  "conjunto": "dev_19out",
+  "ids": [
+   11,
+   115
+  ],
+  "gabarito": "sim"
+ },
+ "10": {
+  "conjunto": "teste_16out",
+  "ids": [
+   138,
+   181
+  ],
+  "gabarito": "sim"
+ },
+ "11": {
+  "conjunto": "dev_19out",
+  "ids": [
+   115,
+   140
+  ],
+  "gabarito": "não"
+ },
+ "12": {
+  "conjunto": "dev_19out",
+  "ids": [
+   36,
+   146
+  ],
+  "gabarito": "sim"
+ },
+ "13": {
+  "conjunto": "teste_16out",
+  "ids": [
+   133,
+   141
+  ],
+  "gabarito": "sim"
+ },
+ "14": {
+  "conjunto": "teste_16out",
+  "ids": [
+   80,
+   114
+  ],
+  "gabarito": "sim"
+ },
+ "15": {
+  "conjunto": "dev_19out",
+  "ids": [
+   94,
+   118
+  ],
+  "gabarito": "não"
+ },
+ "16": {
+  "conjunto": "dev_19out",
+  "ids": [
+   68,
+   77
+  ],
+  "gabarito": "sim"
+ },
+ "17": {
+  "conjunto": "teste_16out",
+  "ids": [
+   249,
+   250
+  ],
+  "gabarito": "sim"
+ },
+ "18": {
+  "conjunto": "dev_19out",
+  "ids": [
+   10,
+   51
+  ],
+  "gabarito": "sim"
+ },
+ "19": {
+  "conjunto": "teste_16out",
+  "ids": [
+   113,
+   252
+  ],
+  "gabarito": "não"
+ },
+ "20": {
+  "conjunto": "teste_16out",
+  "ids": [
+   10,
+   48
+  ],
+  "gabarito": "sim"
+ },
+ "21": {
+  "conjunto": "teste_16out",
+  "ids": [
+   135,
+   175
+  ],
+  "gabarito": "não"
+ },
+ "22": {
+  "conjunto": "teste_16out",
+  "ids": [
+   39,
+   254
+  ],
+  "gabarito": "sim"
+ },
+ "23": {
+  "conjunto": "dev_19out",
+  "ids": [
+   144,
+   108
+  ],
+  "gabarito": "não"
+ },
+ "24": {
+  "conjunto": "dev_19out",
+  "ids": [
+   95,
+   136
+  ],
+  "gabarito": "sim"
+ },
+ "25": {
+  "conjunto": "dev_19out",
+  "ids": [
+   202,
+   221
+  ],
+  "gabarito": "sim"
+ },
+ "26": {
+  "conjunto": "dev_19out",
+  "ids": [
+   43,
+   155
+  ],
+  "gabarito": "não"
+ },
+ "27": {
+  "conjunto": "dev_19out",
+  "ids": [
+   43,
+   74
+  ],
+  "gabarito": "sim"
+ },
+ "28": {
+  "conjunto": "dev_19out",
+  "ids": [
+   98,
+   41
+  ],
+  "gabarito": "não"
+ },
+ "29": {
+  "conjunto": "teste_16out",
+  "ids": [
+   61,
+   93
+  ],
+  "gabarito": "sim"
+ },
+ "30": {
+  "conjunto": "teste_16out",
+  "ids": [
+   109,
+   114
+  ],
+  "gabarito": "sim"
+ }
+}
