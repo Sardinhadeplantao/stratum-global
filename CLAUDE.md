@@ -67,7 +67,7 @@ jobs/stratum/
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
-                 sondar_fontes.py (testa fonte candidata no GitHub Actions, workflow sondar.yml)
+                 sondar_fontes.py e sondar_traducao.py (testam fonte candidata e tradução no Actions, workflow sondar.yml)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
 
