@@ -20,7 +20,11 @@ def falso(textos):
 
 def test_traduz_so_o_que_nao_esta_em_portugues_e_uma_vez_so(engine):
     _inserir(engine, [("bbc_mundo", "Floods hit Assam"), ("folha_mundo", "Chuvas atingem Assam")])
+    antes = export.montar(engine, agora=lambda: T0 + timedelta(hours=1))["traducao"]
+    assert (antes["traduzidos"], antes["na_fila"]) == (0, 1)  # a fila aparece no Método (só a manchete em inglês)
     assert traducao.atualizar(engine, T0 + timedelta(hours=1), falso)["traduzidos"] == 1
+    depois = export.montar(engine, agora=lambda: T0 + timedelta(hours=1))["traducao"]
+    assert (depois["traduzidos"], depois["na_fila"], depois["modelo"]) == (1, 0, traducao.MODELO)
     assert traducao.atualizar(engine, T0 + timedelta(hours=2), falso)["traduzidos"] == 0
     with engine.connect() as c:
         linhas = c.execute(db.traducao.select()).mappings().all()

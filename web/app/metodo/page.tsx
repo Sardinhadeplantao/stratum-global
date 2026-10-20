@@ -35,6 +35,15 @@ export default function Metodo() {
       <p className="lead">Posso confiar? Esta página mostra como o Stratum Global funciona, o que ele mede e o que ainda não mede.</p>
 
       <section>
+        <h2>Regra de ouro</h2>
+        <p>
+          O Stratum Global não prevê o futuro: mostra o que está acontecendo, com fonte, e as forças que podem moldar o
+          que vem depois. Ele <b>não</b> prevê guerra, eleição ou preço, <b>não</b> recomenda compra ou venda e{" "}
+          <b>não</b> apresenta opinião como dado.
+        </p>
+      </section>
+
+      <section>
         <h2>Regras</h2>
         <ul className="regras">
           <li><b>Toda informação tem fonte e duas datas:</b> quando a fonte publicou (se ela informa) e quando o sistema soube.</li>
@@ -46,6 +55,12 @@ export default function Metodo() {
           <li><b>Preço é contexto:</b> nunca ordena eventos nem dispara aviso sozinho.</li>
           <li><b>O site não calcula:</b> mostra o que o robô gravou. Cinza quer dizer sem dado.</li>
         </ul>
+        <h3>Versões em vigor</h3>
+        <dl className="resumo">
+          <dt>Citação de países</dt><dd>{a?.regra ?? "sem dado"} (regra de dicionário, sem IA)</dd>
+          <dt>Histórias</dt><dd>{s.regra_historias?.versao ?? "sem dado"} (regra de palavras em comum, sem IA)</dd>
+          <dt>Tradução dos títulos</dt><dd>{s.traducao?.modelo ?? "sem dado"} (tradução automática gratuita; só traduz, não decide)</dd>
+        </dl>
       </section>
 
       <section>
@@ -65,6 +80,27 @@ export default function Metodo() {
             são a mesma história e fatos diferentes. Por isso ainda não há selo de &quot;confirmado&quot;.</li>
           <li><b>Vozes independentes</b> são donos diferentes: dois veículos do mesmo Estado ou do mesmo grupo contam como uma
             voz (veja &quot;Quem controla cada fonte&quot;).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Títulos em português</h2>
+        <p>
+          Manchetes de fontes em outras línguas aparecem traduzidas por um programa gratuito (Argos), que roda junto com
+          o robô, sem IA paga. O título original nunca muda: a contagem de países e as histórias usam o original, e todo
+          título traduzido leva a marca &quot;(tradução automática)&quot;, com o original ao passar o mouse (na página
+          Histórias, escrito embaixo).
+        </p>
+        <ul className="regras">
+          <li><b>Tradução automática erra.</b> Exemplos vistos: &quot;mine&quot; (mina) virou &quot;meu&quot;; &quot;massive&quot; sumiu de
+            &quot;massive police deployment&quot;. Na dúvida, vale o original.</li>
+          {s.traducao ? (
+            <li><b>{plural(s.traducao.traduzidos, "título traduzido", "títulos traduzidos")}</b>
+              {s.traducao.na_fila > 0
+                ? <>; {plural(s.traducao.na_fila, "espera", "esperam")} a vez (até {numero(s.traducao.por_rodada)} por rodada,
+                    das mais novas para as mais antigas). Enquanto isso, aparecem em inglês.</>
+                : "; nenhum na fila."}</li>
+          ) : <li className="sem-dado-texto">Sem dado nesta atualização.</li>}
         </ul>
       </section>
 
@@ -232,9 +268,26 @@ export default function Metodo() {
       </section>
 
       <section>
+        <h2>Palavras desta tela</h2>
+        <dl className="resumo">
+          <dt>História</dt><dd>Notícias sobre o mesmo assunto, juntas por regra. Não quer dizer que todas contam o mesmo fato.</dd>
+          <dt>Voz independente</dt><dd>Um dono diferente (Estado, grupo de mídia ou organização). Mais vozes é mais
+            cobertura, não prova.</dd>
+          <dt>Fonte oficial</dt><dd>Governo ou organismo internacional falando do próprio ato (sanção, nota, decisão).</dd>
+          <dt>Citação</dt><dd>Uma notícia que traz o nome, o gentílico, a capital ou a sigla de um país no título ou no resumo.</dd>
+          <dt>Publicado e coletado</dt><dd>Quando a fonte publicou e quando o Stratum Global soube. As duas datas aparecem
+            sempre.</dd>
+          <dt>Sem dado (cinza)</dt><dd>Não foi medido nesta atualização. É diferente de zero.</dd>
+          <dt>Tradução automática</dt><dd>Título traduzido por programa; o original vale mais.</dd>
+        </dl>
+      </section>
+
+      <section>
         <h2>O que ainda não é medido</h2>
         <ul className="regras">
-          <li>Eventos (notícias agrupadas, grau de confirmação, importância): fase 1.</li>
+          <li>Grau de confirmação de cada fato (pista, relatado, corroborado, oficial, contestado) e importância: próxima
+            etapa da fase 1, depois das histórias.</li>
+          <li>Redes sociais (X e outras): ainda não são lidas. Quando entrarem, serão pista, nunca fato.</li>
           <li>Mercados (moedas, juros, bolsas por país, commodities): fase 2.</li>
           <li>Comércio, navios nos estreitos, sanções e conflito como séries: fase 4.</li>
           <li>Cadeias, exposição e hipóteses: fase 5.</li>

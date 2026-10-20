@@ -37,7 +37,9 @@ Já entregue:
   (decisão 0009);
 - títulos em português por tradução automática gratuita, marcada como tal, com o original sempre à vista (decisão 0010);
 - página inicial em torno das histórias do dia: a coluna ao lado do globo mostra as histórias com mais vozes; as
-  notícias uma a uma ficam num cartão embaixo.
+  notícias uma a uma ficam num cartão embaixo;
+- Método com a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor, a fila da tradução e um
+  glossário curto.
 
 Falta:
 
@@ -50,7 +52,6 @@ Falta:
   faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de retenção.
 - Um dia novo anotado para medir a regra `historias-0.2` num dia que ela nunca viu (meta: pelo menos 90% dos pares
   juntados são da mesma história).
-- Método: a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor e um glossário curto.
 - Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz
   que o gabarito foi feito só pelo Claude.
 

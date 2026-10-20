@@ -11,14 +11,14 @@ from datetime import datetime
 from pathlib import Path
 
 import requests
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from stratum import db
 
 MODELO = "argos-en_pb-1.9"
 MODELO_URL = "https://argos-net.com/v1/translate-en_pb-1_9.argosmodel"
 IDIOMA = "pt"
-POR_RODADA = 800               # a primeira rodada traduz o acervo em partes, sem estourar o tempo da rodada
+POR_RODADA = 3000              # o acervo entra em poucas rodadas (cerca de 1 minuto cada); depois, só as novas
 
 
 def _pasta() -> Path:
@@ -89,16 +89,27 @@ def juntar(pedacos: list[str], original: str) -> str:
     return texto
 
 
+def _sem_traducao(colunas):
+    d, f, t = db.documento, db.fonte, db.traducao
+    return (select(*colunas).select_from(d.join(f, f.c.id == d.c.fonte_id))
+            .outerjoin(t, (t.c.documento_id == d.c.id) & (t.c.campo == "titulo") & (t.c.idioma == IDIOMA))
+            .where(t.c.documento_id.is_(None), f.c.idioma.is_not(None), f.c.idioma != IDIOMA))
+
+
 def pendentes(engine, limite: int = POR_RODADA) -> list[dict]:
     """Títulos ainda sem tradução, dos mais recentes para os mais antigos (o que aparece no site vem primeiro)."""
-    d, f, t = db.documento, db.fonte, db.traducao
+    d = db.documento
     with engine.connect() as c:
         return [dict(r) for r in c.execute(
-            select(d.c.id, d.c.titulo)
-            .join(f, f.c.id == d.c.fonte_id)
-            .outerjoin(t, (t.c.documento_id == d.c.id) & (t.c.campo == "titulo") & (t.c.idioma == IDIOMA))
-            .where(t.c.documento_id.is_(None), f.c.idioma.is_not(None), f.c.idioma != IDIOMA)
-            .order_by(d.c.conhecido_em.desc(), d.c.id.desc()).limit(limite)).mappings()]
+            _sem_traducao([d.c.id, d.c.titulo]).order_by(d.c.conhecido_em.desc(), d.c.id.desc()).limit(limite)).mappings()]
+
+
+def situacao(conexao) -> dict:
+    """Quantos títulos já têm tradução e quantos esperam a vez, para a tela Método (o site não conta, regra 9)."""
+    t = db.traducao
+    feitos = conexao.execute(select(func.count()).select_from(t).where(t.c.campo == "titulo", t.c.idioma == IDIOMA)).scalar()
+    fila = conexao.execute(select(func.count()).select_from(_sem_traducao([db.documento.c.id]).subquery())).scalar()
+    return {"modelo": MODELO, "traduzidos": feitos, "na_fila": fila, "por_rodada": POR_RODADA}
 
 
 def atualizar(engine, agora: datetime, traduzir=None) -> dict:
