@@ -34,7 +34,7 @@ import unicodedata
 from collections import Counter, defaultdict, deque
 from datetime import datetime, timedelta
 
-sys.path.insert(0, "/home/user/apex-trading-streamlit/jobs")
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parents[3]))  # a pasta jobs/
 from stratum.domain import paises  # noqa: E402
 
 CONFIG = {
