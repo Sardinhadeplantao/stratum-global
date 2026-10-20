@@ -163,8 +163,10 @@ def _copia_editada(engine, pasta, editar_manifesto=None, editar_linha=None, tira
 
 
 def test_copia_de_antes_de_uma_migracao_continua_restauravel(engine, tmp_path):
-    # Uma cópia feita pelo código da versão 0001 do esquema (antes da tabela resumo existir)
-    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo"])
+    # Uma cópia feita pelo código da versão 0001 do esquema: sem a tabela resumo (0002) e sem a ficha da fonte (0003)
+    ficha = {"nivel", "controle", "controlador", "controlador_nome", "controlador_fonte"}
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo"],
+                   editar_linha=("fonte", lambda r: {k: v for k, v in r.items() if k not in ficha}))
     destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
     contagens = copia.restaurar(tmp_path / "velha", destino)
     assert contagens["documento"] == 2500 and "resumo" not in contagens

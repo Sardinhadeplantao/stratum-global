@@ -6,6 +6,8 @@ export type Coleta = { em: string | null; situacao: string; itens_lidos: number;
 export type Fonte = {
   id: string; nome: string; tipo: string; pais: string | null; pais_nome?: string | null; idioma: string | null; url: string;
   criterio: string | null; ativa: boolean; ultima_coleta: Coleta | null; documentos: number; documentos_24h: number;
+  /** Ficha da fonte (decisão 0008) */
+  nivel?: number | null; controle?: string | null; controlador_nome?: string | null; controlador_fontes?: string[];
 };
 export type PaisCitado = { iso: string; nome: string };
 export type Documento = {

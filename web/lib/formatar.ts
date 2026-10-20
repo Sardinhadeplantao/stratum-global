@@ -72,6 +72,13 @@ export function classeCopia(s: string | null | undefined): string {
   return "sem-dado";  // não conferida nesta rodada: cinza
 }
 
+const CONTROLES: Record<string, string> = { privado: "Privado", publico: "Público", estatal: "Estatal", multilateral: "Multilateral" };
+
+/** Tipo de controle da fonte (decisão 0008); sem ficha, travessão. */
+export function controleFonte(c: string | null | undefined): string {
+  return c ? CONTROLES[c] ?? c : "—";
+}
+
 const TIPOS: Record<string, string> = { oficial: "Oficial", imprensa: "Imprensa", dados: "Dados", social: "Rede social (pista)" };
 
 export function tipoFonte(t: string | null | undefined): string {

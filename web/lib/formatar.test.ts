@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, dataHora, datasDocumento, diaHora, faixas, hora, plural, situacao, tipoFonte } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, diaHora, faixas, hora, plural, situacao, tipoFonte } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -30,6 +30,12 @@ test("cor da cópia do banco: só verde em dia; não conferida é cinza", () => 
   assert.equal(classeCopia("nenhuma"), "sit-falhou");
   assert.equal(classeCopia("sem_dado"), "sem-dado");
   assert.equal(classeCopia(undefined), "sem-dado");
+});
+
+test("controle da fonte", () => {
+  assert.equal(controleFonte("estatal"), "Estatal");
+  assert.equal(controleFonte("publico"), "Público");
+  assert.equal(controleFonte(null), "—");
 });
 
 test("situação desconhecida aparece como sem dado (cinza)", () => {

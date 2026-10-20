@@ -27,7 +27,8 @@ Já entregue:
   `docs/decisoes/0003-regra-paises-0.2.md`;
 - gabarito de eventos: 520 manchetes de dois dias agrupadas em eventos pelo Claude, em duas anotações independentes
   e reconciliadas, em `jobs/tests/gabarito/`;
-- cópia semanal do banco, com a restauração testada e a data da última cópia na tela Método (decisão 0007).
+- cópia semanal do banco, com a restauração testada e a data da última cópia na tela Método (decisão 0007);
+- ficha de cada fonte (nível e quem controla, com a fonte da informação), na tela Método (decisão 0008).
 
 Falta, em duas voltas. A primeira entrega o monitor usável; a segunda refina.
 
@@ -36,12 +37,8 @@ Primeira volta:
 - Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois). A decisão 0001 previa apagar o detalhe das
   notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova mantém tudo ou muda a regra 2 por escrito.
 - O dono confere uma amostra de 30 pares do gabarito, para o acerto medido não depender só do Claude.
-- Ficha de cada fonte:
-  - nível: 1 governo, 2 organismo multilateral, 3 empresa, 4 imprensa, 5 rede social;
-  - controlador: privado, público ou estatal; qual grupo ou Estado, documentado com fonte;
-  - termos de uso e volume esperado por dia.
-
-  Fonte nova entra com uma amostra real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
+- Completar a ficha das fontes: termos de uso e volume esperado por dia. Fonte nova entra com a ficha, uma amostra
+  real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
 - Lista de fontes completa: oficiais de pelo menos 3 blocos (diários oficiais, sanções, chancelarias, ONU, UE),
   com os feeds do governo britânico (GOV.UK) de reserva e a China só se a coleta funcionar; GDELT para volume.
   A imprensa das regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois

@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 
 export const metadata = { title: "Método · Stratum Global" };
@@ -158,6 +158,31 @@ export default function Metodo() {
             </table>
           </div>
         )}
+        {s.fontes.some((f) => f.ativa && f.controle) && (<>
+          <h3>Quem controla cada fonte</h3>
+          <p className="discreto">
+            Duas notícias só se confirmam se vierem de donos diferentes: dois veículos do mesmo Estado ou do mesmo grupo
+            contam como uma voz só. Público = dinheiro do Estado, com independência editorial escrita em lei ou carta;
+            estatal = dirigido pelo governo ou partido.
+          </p>
+          <div className="tabela-rolagem">
+            <table>
+              <thead><tr><th>Fonte</th><th>Controle</th><th>Quem controla</th><th>Onde está escrito</th></tr></thead>
+              <tbody>
+                {s.fontes.filter((f) => f.ativa).map((f) => (
+                  <tr key={f.id}>
+                    <td>{f.nome}</td>
+                    <td>{controleFonte(f.controle)}</td>
+                    <td>{f.controlador_nome ?? "—"}</td>
+                    <td>{(f.controlador_fontes ?? []).map((u, i) => (
+                      <span key={u}>{i > 0 && " · "}<a href={u} target="_blank" rel="noreferrer">{new URL(u).hostname.replace(/^www\./, "")}</a></span>
+                    ))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>)}
         {criterios.length > 0 && (<>
           <h3>Por que cada fonte está na lista</h3>
           <ul className="regras">

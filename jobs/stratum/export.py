@@ -121,6 +121,8 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         lista_fontes.append({
             "id": f["id"], "nome": f["nome"], "tipo": f["tipo"], "pais": f["pais"], "pais_nome": dicionario.nome(f["pais"]),
             "idioma": f["idioma"], "url": f["url"], "criterio": f["criterio"], "ativa": f["ativa"],
+            "nivel": f["nivel"], "controle": f["controle"], "controlador_nome": f["controlador_nome"],
+            "controlador_fontes": [u.strip() for u in (f["controlador_fonte"] or "").split(";") if u.strip()],
             "ultima_coleta": None if col is None else {
                 "em": _iso(col["iniciada_em"]), "situacao": col["situacao"], "itens_lidos": col["itens_lidos"],
                 "itens_novos": col["itens_novos"], "erro": col["erro"]},
