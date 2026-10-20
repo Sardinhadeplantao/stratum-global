@@ -3,13 +3,14 @@
 Uso:  python -m stratum.robo [--exportar CAMINHO/status.json]
 """
 import argparse
+import os
 import sys
 from dataclasses import dataclass, field
 
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, resumo
+from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, resumo, traducao
 from stratum import fontes as catalogo
 from stratum.connectors import rss
 from stratum.domain.documento import hash_documento
@@ -121,6 +122,16 @@ def main(argv=None) -> int:
             raise
         except Exception as exc:  # um defeito na regra não derruba a rodada: as notícias já estão gravadas
             print(f"Histórias: não foi possível ligar as notícias ({type(exc).__name__}).")
+        if os.environ.get("STRATUM_TRADUCAO"):  # ligado só no workflow; nos testes, o modelo não é baixado
+            try:
+                t = traducao.atualizar(engine, db.agora())
+                print(f"Tradução: {t['traduzidos']} títulos traduzidos.")
+                for original, traduzido in t["exemplos"]:
+                    print(f"  {original}  →  {traduzido}")
+            except erros_sql.SQLAlchemyError:
+                raise
+            except Exception as exc:  # sem tradução, o site mostra o título original
+                print(f"Tradução: não foi possível traduzir ({type(exc).__name__}).")
         estado = agendador.cuidar(engine, cfg.banco_permanente, cfg.repositorio, db.agora())
         print(f"Agendador: {estado.situacao}" + (f" ({estado.erro})" if estado.erro else ""))
         estado_copia = copia.situacao(cfg.ultima_copia, db.agora())

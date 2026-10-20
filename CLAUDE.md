@@ -61,12 +61,13 @@ jobs/stratum/
   copia.py       cópia semanal do banco e restauração
   historias.py   liga cada notícia nova à sua história e lista as histórias recentes (decisão 0009)
   domain/historias.py   regra das histórias (assinatura de entidades, sem IA)
+  traducao.py    títulos em português por tradução gratuita (Argos, decisão 0010); só lê, não decide
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
-                 sondar_fontes.py (testa fonte candidata no GitHub Actions, workflow sondar.yml)
+                 sondar_fontes.py e sondar_traducao.py (testam fonte candidata e tradução no Actions, workflow sondar.yml)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
 

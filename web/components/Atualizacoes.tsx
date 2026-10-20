@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { datasDocumento, tipoFonte } from "@/lib/formatar";
 import type { Documento } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
-/** As notícias mais recentes das fontes, com os países que cada uma cita (regra de dicionário do robô). */
+/** As notícias mais recentes das fontes, uma a uma, com os países que cada uma cita (regra de dicionário do robô). */
 export default function Atualizacoes({ documentos }: { documentos: Documento[] }) {
   return (
-    <section className="atualizacoes bloco" aria-labelledby="titulo-atualizacoes">
+    <section className="cartao bloco ultimas" aria-labelledby="titulo-atualizacoes">
       <div className="bloco-topo">
-        <h2 id="titulo-atualizacoes" className="rotulo">Últimas atualizações</h2>
+        <h2 id="titulo-atualizacoes" className="rotulo">Últimas notícias, uma a uma</h2>
         <Link href="/metodo/#documentos" className="ver-todas">Mais notícias</Link>
       </div>
       {documentos.length === 0 ? <p className="sem-dado-texto">Sem dado nesta atualização.</p> : (
@@ -19,8 +20,7 @@ export default function Atualizacoes({ documentos }: { documentos: Documento[] }
                 <span>{d.fonte_nome}</span>
                 <span className="discreto">{datasDocumento(d.publicado_em, d.conhecido_em)}</span>
               </div>
-              {d.url ? <a href={d.url} target="_blank" rel="noreferrer" className="feed-titulo">{d.titulo}</a>
-                : <span className="feed-titulo">{d.titulo}</span>}
+              <Titulo {...d} className="feed-titulo" />
               {d.paises && d.paises.length > 0 && (
                 <div className="feed-paises">
                   {d.paises.slice(0, 4).map((p) => <a key={p.iso} href={`#pais=${p.iso}`} className="chip">{p.nome}</a>)}

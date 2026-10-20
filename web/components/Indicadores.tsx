@@ -7,6 +7,7 @@ type Indicador = { rotulo: string; valor: string; detalhe: string; semDado?: boo
 export default function Indicadores({ status }: { status: Status }) {
   const a = status.atencao;
   const rodada = status.ultima_rodada;
+  const h = status.contagem_historias;
   const lista: Indicador[] = [
     { rotulo: `Notícias em ${a?.janela_horas ?? 24} h`, valor: a ? numero(a.documentos) : "—",
       detalhe: "publicadas pelas fontes acompanhadas", semDado: !a },
@@ -18,7 +19,8 @@ export default function Indicadores({ status }: { status: Status }) {
       detalhe: rodada ? `última rodada em ${diaHora(rodada.iniciada_em)}`
         : status.banco === "erro" ? "o banco não abriu nesta rodada" : "o robô ainda não rodou",
       classe: situacao(rodada?.situacao).classe, semDado: !rodada },
-    { rotulo: "Mercados", valor: "—", detalhe: "moedas, juros e bolsas entram na fase 2", semDado: true },
+    { rotulo: "Histórias em 24 h", valor: h ? numero(h.total) : "—",
+      detalhe: h ? `${numero(h.varias_vozes)} com 2 ou mais vozes independentes` : "sem dado", semDado: !h },
   ];
   return (
     <section className="indicadores" aria-label="Indicadores">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { continente, datasDocumento, plural } from "@/lib/formatar";
 import type { PaisAtencao } from "@/lib/status";
+import Titulo from "@/components/Titulo";
 
 /** Propriedades de cada país em public/geo/paises.geojson (gerado por jobs/scripts/preparar_paises.py). */
 export type Pais = {
@@ -43,7 +44,7 @@ export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar
           <ul className="lista-noticias">
             {atencao.documentos.map((d, i) => (
               <li key={i}>
-                {d.url ? <a href={d.url} target="_blank" rel="noreferrer">{d.titulo}</a> : d.titulo}
+                <Titulo {...d} />
                 <div className="discreto">{d.fonte_nome} · {datasDocumento(d.publicado_em, d.conhecido_em)}</div>
               </li>
             ))}
@@ -61,7 +62,7 @@ export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar
           <ul className="lista-noticias">
             {atencao.historias.map((h) => (
               <li key={h.id}>
-                <Link href={`/historias/#h${h.id}`}>{h.titulo}</Link>
+                <Link href={`/historias/#h${h.id}`} title={h.titulo_original ? `Original: ${h.titulo_original}` : undefined}>{h.titulo}</Link>
                 <div className="discreto">
                   {plural(h.noticias, "notícia", "notícias")} · {plural(h.vozes, "voz independente", "vozes independentes")}
                 </div>

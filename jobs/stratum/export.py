@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from sqlalchemy import func, or_, select
 
-from stratum import VERSAO, db, historias
+from stratum import VERSAO, db, historias, traducao
 from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
@@ -82,6 +82,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
                              key=lambda d: (d["quando"], d["id"]), reverse=True)[:ULTIMOS_DOCUMENTOS]
         else:
             ultimos = janela[:ULTIMOS_DOCUMENTOS]
+        em_portugues = traducao.titulos(c, {d["id"] for d in janela} | {d["id"] for d in ultimos})
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}
@@ -91,8 +92,10 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
 
     def resumo_documento(d) -> dict:
         f = por_fonte.get(d["fonte_id"]) or {}
+        pt = em_portugues.get(d["id"])
         return {
-            "titulo": d["titulo"], "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
+            "titulo": pt or d["titulo"], "titulo_original": d["titulo"] if pt else None,  # decisão 0010
+            "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
             "fonte_tipo": f.get("tipo"), "fonte_pais": f.get("pais"), "fonte_pais_nome": dicionario.nome(f.get("pais")),
             "publicado_em": _iso(d["publicado_em"]), "conhecido_em": _iso(d["conhecido_em"]),
             "paises": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in citados(d)],
@@ -132,12 +135,14 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "documentos_24h": dia_por_fonte.get(f["id"], 0),
         })
 
-    lista_historias = historias.recentes(engine, momento)
+    todas_historias = historias.recentes(engine, momento, limite=None)
+    lista_historias = todas_historias[:historias.MAX_HISTORIAS]
     historias_do_pais: dict[str, list] = {}
-    for h in lista_historias:  # já vêm na ordem: mais vozes primeiro
+    for h in todas_historias:  # já vêm na ordem: mais vozes primeiro
         for p in h["paises"]:
             historias_do_pais.setdefault(p["iso"], []).append(
-                {"id": h["id"], "titulo": h["titulo"], "noticias": h["noticias"], "vozes": h["vozes"]})
+                {"id": h["id"], "titulo": h["titulo"], "titulo_original": h["titulo_original"], "noticias": h["noticias"],
+                 "vozes": h["vozes"]})
     return {
         "versao_formato": VERSAO_FORMATO,
         "versao_robo": VERSAO,
@@ -151,6 +156,8 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         "agendador": agendador,
         "copia": copia,
         "historias": lista_historias,
+        "contagem_historias": {"total": len(todas_historias),
+                               "varias_vozes": sum(1 for h in todas_historias if h["vozes"] >= 2)},
         "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
                             "janela_horas": regra_historias.CONFIG["janela_horas"]},
         "rodadas_recentes": [{"iniciada_em": _iso(r["iniciada_em"]), "situacao": r["situacao"]} for r in recentes],
@@ -226,7 +233,8 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "regra_historias": None,
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None,
+        "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],
         "atencao": None, "paises": {}, "mais_citados": [], "origem_fontes": [],
