@@ -83,6 +83,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         else:
             ultimos = janela[:ULTIMOS_DOCUMENTOS]
         em_portugues = traducao.titulos(c, {d["id"] for d in janela} | {d["id"] for d in ultimos})
+        estado_traducao = traducao.situacao(c)
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}
@@ -156,6 +157,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         "agendador": agendador,
         "copia": copia,
         "historias": lista_historias,
+        "traducao": estado_traducao,
         "contagem_historias": {"total": len(todas_historias),
                                "varias_vozes": sum(1 for h in todas_historias if h["vozes"] >= 2)},
         "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
@@ -233,7 +235,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None,
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None,
         "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],

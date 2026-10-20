@@ -32,3 +32,10 @@ originais, o que deixava o sistema com cara de lista crua. O plano já previa tr
 - A maioria sai legível. Erros vistos: "mine" virou "meu" (era mina), "Russian stocks up" perdeu o sentido. Por isso
   a marca "(tradução automática)" e o original continuam sempre à vista; na página Histórias o original aparece escrito
   embaixo do título (no celular não há "passar o mouse").
+
+## Ajuste de 20/10, depois da primeira rodada na produção
+
+A primeira rodada traduziu 800 títulos, dos mais novos para os mais antigos. Os títulos das histórias são os da
+primeira notícia de cada uma, quase sempre mais antiga, e ficaram em inglês. O limite passa a 3.000 por rodada (cerca
+de 1 minuto), para o acervo terminar em poucas rodadas; depois, cada rodada só traduz as notícias novas. A tela Método
+mostra quantos títulos já foram traduzidos e quantos esperam a vez.
