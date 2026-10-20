@@ -32,6 +32,12 @@ fonte = Table(
     Column("url", Text, nullable=False),                # endereço lido pelo robô
     Column("criterio", Text),                           # por que a fonte está na lista
     Column("ativa", Boolean, nullable=False),
+    # Ficha da fonte (decisão 0008)
+    Column("nivel", Integer),                           # 1 governo, 2 multilateral, 3 empresa, 4 imprensa, 5 rede social
+    Column("controle", String(16)),                     # privado | publico | estatal | multilateral
+    Column("controlador", String(64)),                  # mesmo controlador = uma voz só
+    Column("controlador_nome", Text),
+    Column("controlador_fonte", Text),                  # onde está escrito quem controla (endereços separados por " ; ")
 )
 
 rodada = Table(
@@ -141,7 +147,8 @@ def gravar_fontes(conexao, fontes: list[dict]) -> None:
     Fonte que saiu da lista fica no banco como inativa: os documentos dela continuam com a origem."""
     dialeto = postgresql if conexao.dialect.name == "postgresql" else sqlite
     for f in fontes:
-        linha = {k: f.get(k) for k in ("id", "nome", "tipo", "pais", "idioma", "url", "criterio")} | {"ativa": f.get("ativa", True)}
+        linha = {k: f.get(k) for k in ("id", "nome", "tipo", "pais", "idioma", "url", "criterio", "nivel", "controle",
+                                       "controlador", "controlador_nome", "controlador_fonte")} | {"ativa": f.get("ativa", True)}
         stmt = dialeto.insert(fonte).values(linha)
         conexao.execute(stmt.on_conflict_do_update(index_elements=["id"], set_={k: stmt.excluded[k] for k in linha if k != "id"}))
     conexao.execute(fonte.update().where(fonte.c.id.not_in([f["id"] for f in fontes])).values(ativa=False))
