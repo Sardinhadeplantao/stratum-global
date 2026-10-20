@@ -59,6 +59,8 @@ jobs/stratum/
   resumo.py      resumo das 7:30, 12:00 e 19:00
   agendador.py   Supabase dispara o robô a cada 15 minutos
   copia.py       cópia semanal do banco e restauração
+  historias.py   liga cada notícia nova à sua história e lista as histórias recentes (decisão 0009)
+  domain/historias.py   regra das histórias (assinatura de entidades, sem IA)
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)

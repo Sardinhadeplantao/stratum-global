@@ -29,7 +29,8 @@ def test_copia_so_as_tabelas_do_projeto():
     # O cofre (vault), o pg_cron e o pg_net não são tabelas do projeto e nunca entram na cópia pública.
     # Tabela nova faz este teste falhar de propósito: antes de acrescentá-la aqui, confira que ela não tem dado
     # pessoal ou de conexão, porque a cópia é pública (decisão 0007)
-    assert {t.name for t in copia.tabelas()} == {"fonte", "rodada", "coleta", "documento", "resumo"}
+    assert {t.name for t in copia.tabelas()} == {"fonte", "rodada", "coleta", "documento", "resumo",
+                                                  "historia_documento"}  # só ids, datas e a versão da regra
     assert not {"secrets", "decrypted_secrets", "job", "job_run_details", "_http_response"} & set(db.md.tables)
 
 
@@ -165,7 +166,7 @@ def _copia_editada(engine, pasta, editar_manifesto=None, editar_linha=None, tira
 def test_copia_de_antes_de_uma_migracao_continua_restauravel(engine, tmp_path):
     # Uma cópia feita pelo código da versão 0001 do esquema: sem a tabela resumo (0002) e sem a ficha da fonte (0003)
     ficha = {"nivel", "controle", "controlador", "controlador_nome", "controlador_fonte"}
-    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo"],
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo", "historia_documento"],
                    editar_linha=("fonte", lambda r: {k: v for k, v in r.items() if k not in ficha}))
     destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
     contagens = copia.restaurar(tmp_path / "velha", destino)

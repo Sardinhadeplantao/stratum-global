@@ -28,6 +28,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Link href="/" className="marca"><Marca /><span>Stratum Global</span></Link>
           <nav className="topo-nav" aria-label="Seções">
             <Link href="/">Mapa</Link>
+            <Link href="/historias/">Histórias</Link>
             <Link href="/metodo/">Método</Link>
           </nav>
           <Relogio />

@@ -88,6 +88,17 @@ resumo = Table(
     Column("texto", Text, nullable=False),                     # o que foi enviado (decisão 0005)
 )
 
+# Cada notícia entra numa história uma vez só, e a ligação nunca muda (decisão 0009). A história recebe o id da
+# primeira notícia dela; a regra que fez a ligação fica gravada.
+historia_documento = Table(
+    "historia_documento", md,
+    Column("documento_id", Id, ForeignKey("documento.id"), primary_key=True),
+    Column("historia_id", Id, ForeignKey("documento.id"), nullable=False),
+    Column("conhecido_em", DateTime, nullable=False),   # quando o robô fez a ligação
+    Column("regra", String(32), nullable=False),        # versão da regra (historias-0.1)
+    Index("ix_historia_documento_historia", "historia_id"),
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 

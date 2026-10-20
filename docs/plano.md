@@ -31,76 +31,50 @@ Já entregue:
 - ficha de cada fonte (nível e quem controla, com a fonte da informação), na tela Método (decisão 0008);
 - fontes oficiais de 3 blocos, além da ONU: EUA (sanções e controles de exportação), Europa (Relações Exteriores do
   Reino Unido, Conselho e Comissão da UE) e Rússia (Relações Exteriores). China, Índia, Japão, Brasil e OTAN não têm
-  feed que o robô consiga ler (sonda de 20/10, `jobs/scripts/sondar_fontes.py`).
+  feed que o robô consiga ler (sonda de 20/10, `jobs/scripts/sondar_fontes.py`);
+- histórias: notícias da mesma história juntas por regra (`historias-0.1`), com quantas vozes independentes (donos
+  diferentes) cobrem cada uma, na página Histórias e no resumo do Telegram (decisão 0009).
 
-Falta, em duas voltas. A primeira entrega o monitor usável; a segunda refina.
+Falta:
 
-Primeira volta:
-
-- Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois). A decisão 0001 previa apagar o detalhe das
-  notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova mantém tudo ou muda a regra 2 por escrito.
-- Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz
-  que o gabarito foi feito só pelo Claude.
+- Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois).
+  A decisão 0001 previa apagar o detalhe das notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova
+  mantém tudo ou muda a regra 2 por escrito.
 - Completar a ficha das fontes: termos de uso e volume esperado por dia. Fonte nova entra com a ficha, uma amostra
   real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
-- Lista de fontes completa: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das
-  regiões que faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de
-  retenção.
-- Antes das tabelas novas, uma decisão curta com o modelo dos objetos da fase 1: campos, de onde vêm e que regra os muda.
-- Caminho do documento até o evento:
-  - idioma e tradução (Argos/Opus-MT), com o original a um clique;
-  - quase-duplicatas (MinHash);
-  - nomes com código (GLiNER + Wikidata): órgãos do Estado, como PLA e IDF, contam o país;
-  - lugar (GeoNames);
-  - agrupamento em eventos.
+- Lista de fontes: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das regiões que
+  faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de retenção.
+- Histórias na página do país e no globo; um dia novo anotado para medir a regra `historias-0.1` num dia que ela
+  nunca viu (meta: pelo menos 90% dos pares juntados são da mesma história).
+- Método: a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor e um glossário curto.
+- Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz
+  que o gabarito foi feito só pelo Claude.
 
-  Cada registro derivado guarda a versão da regra que o produziu. Os documentos já guardados passam pelo caminho
-  novo, com a data em que a regra rodou.
-- Grau de confirmação, por regra escrita e com casos de referência antes do código:
+Depois das histórias (o selo por fato, decisão 0009):
+
+- Juntar por fato, não só por história. A regra de entidades não separa fatos vizinhos da mesma história (72% a 79%
+  de acerto num dia novo, `jobs/estudos/eventos/LEIAME.md`). Caminhos: mais dias anotados e uma regra nova, ou uma IA
+  gratuita que leia os pares, o que pede mudar a regra 7 por escrito.
+- Com isso, o grau de confirmação de cada fato:
   - pista: só rede social (regra 4);
   - relatado: uma fonte de imprensa, ou várias do mesmo controlador;
-  - corroborado: veículos de controladores diferentes. Texto quase igual, ou que credita a mesma agência
-    (AFP, Reuters, AP), conta como uma fonte só;
+  - corroborado: veículos de controladores diferentes; texto que credita a mesma agência (AFP, Reuters, AP) conta
+    como uma fonte só;
   - oficial: documento do próprio órgão (governo ou organismo multilateral) sobre o próprio ato;
   - contestado: a regra do que conta como contradição é escrita nos casos de referência.
 
-  Mudança de grau vira registro novo e aparece no resumo. O Método diz o limite: não detectamos dois veículos que
-  reescrevem a mesma agência sem dar o crédito.
-- Fato × declaração: "Trump diz X", confirmado, quer dizer que ele disse, não que X é verdade. Primeiro esse rótulo
-  entra no gabarito; depois vem a regra.
-- Telas (uma tela, uma pergunta; cada coisa num lugar só):
-  - lista "Hoje" com os eventos das últimas 24 horas;
-  - globo com eventos;
-  - página do evento: duas datas, fontes por bloco, grau e a regra que o deu;
-  - página do país, com a linha do tempo dos eventos.
-
-  Contagens prontas no status.json (regra 9). Uma página só, que lê um arquivo por evento, para a montagem do site
-  não crescer sem fim.
-- Resumo do Telegram com eventos no lugar de notícias soltas, só nos 3 horários (decisão 0005). Briefing extrativo.
-- Método: a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor e um glossário curto.
-
-Segunda volta:
-
-- Importância (alta, média, baixa) por fórmula publicada no Método: grau, ato oficial novo, países envolvidos e
-  novidade. Nunca preço (regra 8), nunca IA (regra 7). Antes, 5 ou 6 casos de referência.
-- Acerto do agrupamento publicado no Método, ao lado do "nada juntado", dizendo que o gabarito foi feito pelo Claude
-  e quantos pares o dono conferiu.
-- Tipo de evento (lista curta, com "outro"), depois de anotado no gabarito.
-- Reações: quem mais se manifestou sobre o mesmo assunto.
-- Todo número da tela leva aos documentos que o produziram.
-- Cobertura por bloco e o funil do dia no Método (notícias → eventos → importância alta).
+  Mudança de grau vira registro novo e aparece no resumo. Proposta já escrita em `jobs/estudos/eventos/grau/`.
+- Fato × declaração ("Trump diz X", confirmado, quer dizer que ele disse); importância por fórmula publicada; tipo
+  de evento; reações; todo número leva aos documentos; cobertura por bloco no Método.
 
 **Pronto quando:**
 
 - você acompanha o mundo por uma semana só pelo Stratum Global;
-- no gabarito de teste (284 manchetes de 16/10, que não é usado para ajustar a regra), contando pares (par = duas
-  manchetes do mesmo evento):
-  - pelo menos 90% dos pares que o agrupamento junta estão certos;
-  - ele encontra pelo menos 60% dos pares certos;
-  - em pelo menos metade dos 30 eventos que têm 2 ou mais manchetes, ele junta ao menos duas delas
-    (sem isso, acertar só os 5 maiores eventos já bateria a meta);
+- num dia novo anotado, pelo menos 90% dos pares que a regra de histórias junta são da mesma história;
 - a rodada inteira (testes, coleta e montagem do site) termina em até 10 minutos no log do GitHub, abaixo do limite
   de 14 do workflow.
+
+A meta por fato da decisão 0006 (90% de precisão e 60% de cobertura por evento) passa para a etapa do selo por fato.
 
 ## Fase 2. Mercados (3 a 4 semanas)
 

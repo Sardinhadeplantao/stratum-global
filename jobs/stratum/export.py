@@ -6,7 +6,8 @@ from datetime import timedelta
 
 from sqlalchemy import func, or_, select
 
-from stratum import VERSAO, db
+from stratum import VERSAO, db, historias
+from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
 VERSAO_FORMATO = 2
@@ -142,6 +143,9 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "situacao": ultima["situacao"]},
         "agendador": agendador,
         "copia": copia,
+        "historias": historias.recentes(engine, momento),
+        "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
+                            "janela_horas": regra_historias.CONFIG["janela_horas"]},
         "rodadas_recentes": [{"iniciada_em": _iso(r["iniciada_em"]), "situacao": r["situacao"]} for r in recentes],
         "totais": {
             "documentos": sum(total_por_fonte.values()),
@@ -214,7 +218,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None,
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],
         "atencao": None, "paises": {}, "mais_citados": [], "origem_fontes": [],

@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, copia, db, export, resumo
+from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, resumo
 from stratum import fontes as catalogo
 from stratum.connectors import rss
 from stratum.domain.documento import hash_documento
@@ -114,6 +114,13 @@ def main(argv=None) -> int:
     try:
         resultado = rodar(engine, catalogo.FONTES, rss.nova_sessao(), cfg)
         print(f"Rodada {resultado.rodada_id}: {resultado.situacao}, {resultado.novos} documentos novos.")
+        try:
+            h = historias.atualizar(engine, db.agora())
+            print(f"Histórias: {h['documentos']} notícias ligadas, {h['historias_novas']} histórias novas.")
+        except erros_sql.SQLAlchemyError:
+            raise
+        except Exception as exc:  # um defeito na regra não derruba a rodada: as notícias já estão gravadas
+            print(f"Histórias: não foi possível ligar as notícias ({type(exc).__name__}).")
         estado = agendador.cuidar(engine, cfg.banco_permanente, cfg.repositorio, db.agora())
         print(f"Agendador: {estado.situacao}" + (f" ({estado.erro})" if estado.erro else ""))
         estado_copia = copia.situacao(cfg.ultima_copia, db.agora())
