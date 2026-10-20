@@ -34,7 +34,7 @@ jobs:
           pip install -r requirements.txt
           python -m stratum.copia --saida ../copia
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6   # Node 24; a v4 ainda usa o Node 20, que o GitHub está desligando
         with:
           name: copia-banco
           path: copia/
