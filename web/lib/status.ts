@@ -18,7 +18,8 @@ export type Atencao = {
   regra: string; janela_horas: number; inicio: string; fim: string; niveis: number[]; documentos: number;
   documentos_com_pais: number; oficiais: number; paises_citados: number; ignorados: string[];
 };
-export type PaisAtencao = { nome: string; citacoes: number; nivel: number; documentos: Documento[] };
+export type HistoriaResumo = { id: number; titulo: string; noticias: number; vozes: number };
+export type PaisAtencao = { nome: string; citacoes: number; nivel: number; documentos: Documento[]; historias?: HistoriaResumo[] };
 export type MaisCitado = { iso: string; nome: string; citacoes: number; proporcao: number };
 export type Origem = { pais: string | null; nome: string; documentos: number; proporcao: number };
 /** Agendador do Supabase (decisão 0004). O texto vem pronto do robô. */
