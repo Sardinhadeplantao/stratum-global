@@ -32,9 +32,12 @@ Já entregue:
 - fontes oficiais de 3 blocos, além da ONU: EUA (sanções e controles de exportação), Europa (Relações Exteriores do
   Reino Unido, Conselho e Comissão da UE) e Rússia (Relações Exteriores). China, Índia, Japão, Brasil e OTAN não têm
   feed que o robô consiga ler (sonda de 20/10, `jobs/scripts/sondar_fontes.py`);
-- histórias: notícias da mesma história juntas por regra (`historias-0.1`), com quantas vozes independentes (donos
+- histórias: notícias da mesma história juntas por regra (`historias-0.2`), com quantas vozes independentes (donos
   diferentes) cobrem cada uma, na página Histórias, no painel de cada país do globo e no resumo do Telegram
-  (decisão 0009).
+  (decisão 0009);
+- títulos em português por tradução automática gratuita, marcada como tal, com o original sempre à vista (decisão 0010);
+- página inicial em torno das histórias do dia: a coluna ao lado do globo mostra as histórias com mais vozes; as
+  notícias uma a uma ficam num cartão embaixo.
 
 Falta:
 
@@ -45,7 +48,7 @@ Falta:
   real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
 - Lista de fontes: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das regiões que
   faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de retenção.
-- Um dia novo anotado para medir a regra `historias-0.1` num dia que ela nunca viu (meta: pelo menos 90% dos pares
+- Um dia novo anotado para medir a regra `historias-0.2` num dia que ela nunca viu (meta: pelo menos 90% dos pares
   juntados são da mesma história).
 - Método: a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor e um glossário curto.
 - Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz

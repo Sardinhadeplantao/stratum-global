@@ -1,7 +1,7 @@
-import Atualizacoes from "@/components/Atualizacoes";
 import AvisoAtraso from "@/components/AvisoAtraso";
 import Cartoes from "@/components/Cartoes";
 import Globo from "@/components/Globo";
+import HistoriasDoDia from "@/components/HistoriasDoDia";
 import Indicadores from "@/components/Indicadores";
 import Lateral from "@/components/Lateral";
 import { NIVEIS_PADRAO } from "@/lib/constantes";
@@ -18,7 +18,7 @@ export default function Inicio() {
         <Globo paises={status.paises} niveis={a?.niveis ?? NIVEIS_PADRAO} janelaHoras={a?.janela_horas ?? 24} semDado={!a} />
       </section>
       <Indicadores status={status} />
-      <Atualizacoes documentos={status.ultimos_documentos.slice(0, 14)} />
+      <HistoriasDoDia historias={(status.historias ?? []).slice(0, 10)} />
       <Cartoes status={status} />
     </main>
   </>);

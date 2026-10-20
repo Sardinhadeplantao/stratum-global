@@ -120,6 +120,7 @@ def test_vozes_sao_donos_diferentes(engine):
     assert {p["iso"] for p in h["paises"]} == {"RUS", "IRN"}
     status = export.montar(engine, agora=lambda: T0 + timedelta(hours=3))
     assert status["historias"][0]["vozes"] == 2
+    assert status["contagem_historias"] == {"total": 1, "varias_vozes": 1}  # a página inicial recebe a contagem pronta
     # O painel do país recebe a história pronta (o site não calcula, regra 9)
     assert status["paises"]["IRN"]["historias"] == [{"id": h["id"], "titulo": h["titulo"], "titulo_original": None,
                                                      "noticias": 3, "vozes": 2}]

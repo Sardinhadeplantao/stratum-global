@@ -49,14 +49,14 @@ h1, h2, h3 { line-height: 1.2; }
   display: grid; gap: 12px; padding: 12px;
   grid-template-columns: 228px minmax(0, 1fr) 340px;
   grid-template-areas:
-    "lateral mapa atualizacoes"
-    "lateral indicadores atualizacoes"
+    "lateral mapa historias"
+    "lateral indicadores historias"
     "lateral cartoes cartoes";
 }
 .lateral { grid-area: lateral; }
 .mapa-bloco { grid-area: mapa; position: relative; height: clamp(420px, 64vh, 680px); overflow: hidden; }
 .indicadores { grid-area: indicadores; }
-.atualizacoes { grid-area: atualizacoes; }
+.coluna-historias { grid-area: historias; }
 .cartoes { grid-area: cartoes; }
 
 /* Lateral */
@@ -137,10 +137,14 @@ h1, h2, h3 { line-height: 1.2; }
 .indicador strong { font-size: 26px; font-weight: 650; line-height: 1.15; color: var(--texto); }
 .sem-dado-bloco strong { color: var(--sem-dado-texto); }
 
-/* Últimas atualizações */
-.atualizacoes { padding: 14px; display: flex; flex-direction: column; min-height: 0; max-height: calc(clamp(420px, 64vh, 680px) + 12px + 104px); }
+/* Histórias do dia (coluna da direita) e últimas notícias (cartão) */
+.coluna-historias { padding: 14px; display: flex; flex-direction: column; min-height: 0; max-height: calc(clamp(420px, 64vh, 680px) + 12px + 104px); }
 .bloco-topo { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
 .ver-todas { font-size: 12px; }
+.nota-bloco { margin: 0 0 4px; font-size: 12px; }
+.ultimas { grid-column: span 2; }
+.ultimas .feed { max-height: 380px; }
+.original { margin: -6px 0 6px; font-size: 13px; }
 .feed { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; min-height: 0; }
 .feed li { padding: 10px 0; border-bottom: 1px solid var(--borda); display: flex; flex-direction: column; gap: 4px; }
 .feed li:last-child { border-bottom: 0; }
@@ -163,9 +167,6 @@ h1, h2, h3 { line-height: 1.2; }
 .barra i { display: block; height: 100%; background: #3f9bd2; border-radius: 999px; }
 .barra-neutra i { background: #6d7f9e; }
 .numero { font-variant-numeric: tabular-nums; color: var(--texto-2); }
-.destaque-pais { font-size: 20px; font-weight: 650; color: var(--texto); }
-.proximas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--texto-2); }
-.proximas li { display: flex; gap: 8px; align-items: baseline; }
 
 /* Indicadores de situação: cor só para estado medido; cinza para falta de dado */
 .ponto { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--sem-dado); flex: none; }
@@ -204,7 +205,7 @@ td .erro { color: var(--falhou); font-size: 12px; max-width: 280px; overflow-wra
 @media (max-width: 1180px) {
   .painel-geral {
     grid-template-columns: minmax(0, 1fr) 320px;
-    grid-template-areas: "mapa atualizacoes" "indicadores atualizacoes" "cartoes cartoes";
+    grid-template-areas: "mapa historias" "indicadores historias" "cartoes cartoes";
   }
   .lateral { display: none; }
   .indicadores { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -216,7 +217,7 @@ td .erro { color: var(--falhou); font-size: 12px; max-width: 280px; overflow-wra
   .topo { gap: 14px; padding: 0 12px; }
   .marca span { font-size: 13px; letter-spacing: .1em; }
   .relogio { display: none; }
-  .painel-geral { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mapa" "indicadores" "atualizacoes" "cartoes"; padding: 8px; gap: 8px; }
+  .painel-geral { grid-template-columns: minmax(0, 1fr); grid-template-areas: "mapa" "historias" "indicadores" "cartoes"; padding: 8px; gap: 8px; }
   .mapa-bloco { height: 62vh; }
   .globo-titulo { display: none; }
   .globo-busca { left: 8px; right: 48px; width: auto; top: 8px; }
@@ -224,7 +225,8 @@ td .erro { color: var(--falhou); font-size: 12px; max-width: 280px; overflow-wra
   .painel { top: auto; left: 8px; right: 8px; bottom: 8px; width: auto; max-height: 62%; }
   .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .indicador strong { font-size: 22px; }
-  .atualizacoes { max-height: none; }
+  .coluna-historias { max-height: none; }
+  .ultimas { grid-column: auto; }
   .cartoes { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .resumo { grid-template-columns: 1fr; gap: 0; }
   .resumo dd { margin-bottom: 8px; }

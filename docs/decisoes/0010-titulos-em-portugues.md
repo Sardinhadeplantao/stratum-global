@@ -23,3 +23,12 @@ originais, o que deixava o sistema com cara de lista crua. O plano já previa tr
 - Tradução automática erra: nome próprio, ironia e manchete curta podem sair estranhos. Por isso o original fica a um
   gesto de distância e a marca de tradução fica visível.
 - Cada rodada instala o CTranslate2 (uns 40 MB, guardado no cache do pip) e traduz poucas dezenas de títulos.
+
+## Medido na sonda de 20/10 (`jobs/scripts/sondar_traducao.py`)
+
+- O modelo baixa em 1 a 2 segundos e traduz 143 manchetes em 2 a 3 segundos: 800 por rodada cabem com folga.
+- Os mesmos parâmetros do Argos (beam 4). Cada parte da manchete (separada por dois-pontos ou travessão) é traduzida
+  sozinha: inteira, o modelo largava a última parte, que costuma dizer quem afirma ("...: Iran's Guards").
+- A maioria sai legível. Erros vistos: "mine" virou "meu" (era mina), "Russian stocks up" perdeu o sentido. Por isso
+  a marca "(tradução automática)" e o original continuam sempre à vista; na página Histórias o original aparece escrito
+  embaixo do título (no celular não há "passar o mouse").

@@ -3,7 +3,7 @@ import Camadas from "./Camadas";
 
 const SECOES: { nome: string; href?: string; fase?: string }[] = [
   { nome: "Mapa global", href: "/" },
-  { nome: "Eventos", fase: "fase 1" },
+  { nome: "Histórias", href: "/historias/" },
   { nome: "Mercados", fase: "fase 2" },
   { nome: "Calendário geopolítico", fase: "fase 4" },
   { nome: "Cadeias industriais", fase: "fase 5" },

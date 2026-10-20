@@ -21,6 +21,7 @@ export default function Historias() {
       ) : lista.map((h) => (
         <section key={h.id} id={`h${h.id}`}>
           <h2 title={h.titulo_original ? `Original: ${h.titulo_original}` : undefined}>{h.titulo}</h2>
+          {h.titulo_original && <p className="discreto original">Original: {h.titulo_original} (tradução automática)</p>}
           <p className="discreto">
             {plural(h.noticias, "notícia", "notícias")} de {plural(h.fontes, "fonte", "fontes")} ·{" "}
             <b>{plural(h.vozes, "voz independente", "vozes independentes")}</b> · última em {dataHora(h.ultima)}

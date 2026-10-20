@@ -46,7 +46,7 @@ def atualizar(engine, agora: datetime) -> dict:
     return {"documentos": len(ligacoes), "historias_novas": novas}
 
 
-def recentes(engine, agora: datetime, inicio: datetime | None = None) -> list[dict]:
+def recentes(engine, agora: datetime, inicio: datetime | None = None, limite: int | None = MAX_HISTORIAS) -> list[dict]:
     """Histórias com 2 ou mais notícias e alguma notícia desde `inicio` (padrão: últimas 24 horas).
 
     Vozes = donos diferentes (decisão 0008): dois veículos do mesmo Estado ou grupo contam como uma voz. É cobertura,
@@ -90,4 +90,4 @@ def recentes(engine, agora: datetime, inicio: datetime | None = None) -> list[di
                            for x in docs],
         })
     saida.sort(key=lambda x: (x["vozes"], x["noticias"], x["ultima"] or ""), reverse=True)
-    return saida[:MAX_HISTORIAS]
+    return saida[:limite]
