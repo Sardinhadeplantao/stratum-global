@@ -5,6 +5,7 @@ países e as histórias usam o título original. Cada tradução é gravada uma 
 reescrita (regra 2). Se o modelo não baixar ou falhar, o site e o resumo mostram o título original.
 """
 import os
+import re
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -54,11 +55,30 @@ class Tradutor:
         self.pedacos = sentencepiece.SentencePieceProcessor(model_file=str(raiz / "sentencepiece.model"))
 
     def __call__(self, textos: list[str]) -> list[str]:
-        entrada = [self.pedacos.encode(t, out_type=str) for t in textos]
+        return por_trechos(textos, self._trechos)
+
+    def _trechos(self, trechos: list[str]) -> list[str]:
+        entrada = [self.pedacos.encode(t, out_type=str) for t in trechos]
         # Os mesmos parâmetros do Argos (beam 4, palavra desconhecida copiada do original)
         saida = self.modelo.translate_batch(entrada, beam_size=4, replace_unknowns=True, length_penalty=0.2,
                                             max_batch_size=32, max_decoding_length=200)
-        return [juntar(r.hypotheses[0], t) for r, t in zip(saida, textos)]
+        return [juntar(r.hypotheses[0], t) for r, t in zip(saida, trechos)]
+
+
+# Dois-pontos, barra ou travessão separam partes da manchete ("Navio pega fogo: Guarda do Irã")
+_SEPARADOR = re.compile(r"(:\s+|\s+[|\u2013\u2014-]\s+)")
+
+
+def por_trechos(textos: list[str], traduzir) -> list[str]:
+    """Traduz cada parte da manchete separadamente e junta com o mesmo separador. Inteira, o modelo às vezes larga a
+    última parte, que costuma dizer quem afirma (sonda de 20/10: "...in Hormuz: Iran's Guards" perdeu "Iran's Guards")."""
+    partes = [_SEPARADOR.split(t) for t in textos]
+    trechos = [p for ps in partes for p in ps[::2] if p.strip()]
+    traduzidos = iter(traduzir(trechos)) if trechos else iter(())
+    saida = []
+    for ps in partes:
+        saida.append("".join(next(traduzidos) if k % 2 == 0 and p.strip() else p for k, p in enumerate(ps)))
+    return saida
 
 
 def juntar(pedacos: list[str], original: str) -> str:

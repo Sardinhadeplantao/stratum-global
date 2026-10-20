@@ -48,3 +48,17 @@ def test_pedacos_do_modelo_viram_texto_com_espacos():
     pedacos = ["▁A", "▁Indonésia", "▁combate", "▁piores", "▁incêndios", "▁em", "▁11", "▁anos", "."]
     assert traducao.juntar(pedacos, "Indonesia battles worst fires in 11 years") == "A Indonésia combate piores incêndios em 11 anos"
     assert traducao.juntar(["▁EUA", "▁sobem", "▁tarifas", "."], "US raises tariffs.") == "EUA sobem tarifas."
+
+
+def test_cada_parte_da_manchete_e_traduzida_separada():
+    # Inteira, o modelo largava a parte depois dos dois-pontos (quem afirma)
+    vistos = []
+
+    def traduzir(trechos):
+        vistos.extend(trechos)
+        return [f"<{t}>" for t in trechos]
+    saida = traducao.por_trechos(["Oil tanker on fire in Hormuz: Iran's Guards", "Floods hit Assam - officials", "Sem separador"],
+                                 traduzir)
+    assert saida == ["<Oil tanker on fire in Hormuz>: <Iran's Guards>", "<Floods hit Assam> - <officials>", "<Sem separador>"]
+    assert vistos == ["Oil tanker on fire in Hormuz", "Iran's Guards", "Floods hit Assam", "officials", "Sem separador"]
+    assert traducao.por_trechos(["US-China talks"], traduzir) == ["<US-China talks>"]  # hífen dentro da palavra fica
