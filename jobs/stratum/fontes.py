@@ -17,6 +17,8 @@ _FR = "https://www.federalregister.gov/api/v1/documents.rss?order=newest&conditi
 _CRITERIO_IMPRENSA = "Veículo com feed público, publicando do próprio país; a lista cobre blocos diferentes para comparar versões."
 _CRITERIO_CHANCELARIA = ("Chancelaria (ou o órgão equivalente de um bloco) com feed público: posição oficial sobre política "
                          "externa e sanções; a lista cobre blocos diferentes. Testada pela sonda (scripts/sondar_fontes.py).")
+_CRITERIO_MOEDAS = ("Moedas do G20, de fonte oficial gratuita e sem chave: o câmbio reage primeiro a choque político "
+                    "e mostra quem está sob pressão.")
 _GOVUK = "https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D="
 
 FONTES: list[dict] = [
@@ -60,6 +62,20 @@ FONTES: list[dict] = [
          nivel=1, controle="estatal", controlador="estado:RUS",
          controlador_nome="Governo da Federação Russa (Ministério das Relações Exteriores)",
          controlador_fonte="https://mid.ru/en/about/"),
+    # Dados (decisão 0011): lidos no ritmo de cada fonte (a_cada_horas); a série fica parada depois de validade_dias
+    dict(id="bce_cambio", nome="BCE: taxas de referência do euro", tipo="dados", pais=None, idioma="en", conector="bce",
+         url="https://data-api.ecb.europa.eu/service/data/EXR/", a_cada_horas=3, validade_dias=5,
+         criterio=_CRITERIO_MOEDAS + " O BCE publica a cada dia útil, por volta das 16h de Frankfurt.",
+         nivel=2, controle="multilateral", controlador="org:BCE",
+         controlador_nome="Banco Central Europeu, instituição da União Europeia independente por tratado",
+         controlador_fonte="https://www.ecb.europa.eu/ecb/orga/independence/html/index.en.html ; https://data.ecb.europa.eu/data/datasets/EXR"),
+    dict(id="fred_cambio", nome="FRED: câmbio do Fed (H.10) e índice do dólar", tipo="dados", pais="USA", idioma="en",
+         conector="fred", url="https://fred.stlouisfed.org/graph/fredgraph.csv", a_cada_horas=12, validade_dias=12,
+         criterio=_CRITERIO_MOEDAS + " O Fed publica a tabela H.10 às segundas, com a semana anterior; o índice amplo "
+                                     "mede o dólar contra as moedas dos parceiros comerciais dos EUA.",
+         nivel=1, controle="publico", controlador="estado:USA",
+         controlador_nome="Federal Reserve (Conselho do Fed, autor da H.10; republicada pelo Banco do Fed de St. Louis)",
+         controlador_fonte="https://www.federalreserve.gov/releases/h10/ ; https://fred.stlouisfed.org/legal/"),
     # Imprensa, um veículo por bloco
     dict(id="bbc_mundo", nome="BBC News: World", tipo="imprensa", pais="GBR", idioma="en", conector="rss",
          url="https://feeds.bbci.co.uk/news/world/rss.xml", criterio=_CRITERIO_IMPRENSA,
@@ -101,6 +117,41 @@ FONTES: list[dict] = [
          nivel=4, controle="privado", controlador="grupo:folha",
          controlador_nome="Empresa Folha da Manhã S.A. (Grupo Folha), 100% da família Frias de Oliveira",
          controlador_fonte="https://www.poder360.com.br/brasil/post-engana-ao-dizer-que-lula-e-acionista-da-folha-de-s-paulo/ ; https://www.aosfatos.org/noticias/lula-nao-e-o-dono-do-jornal-folha-de-spaulo/"),
+]
+
+
+
+def _moeda(fonte: str, codigo: str, nome: str, unidade: str, pais: str | None) -> dict:
+    return dict(id=f"{fonte.split('_')[0]}_{codigo.lower()}", fonte=fonte, codigo=codigo, nome=nome, unidade=unidade,
+                pais=pais, frequencia="diaria", medida="variacao_pct")
+
+
+# Séries (decisão 0011). O nome segue a fonte, sem conta: "Euro em reais" sobe quando o euro fica mais caro.
+SERIES: list[dict] = [
+    _moeda("bce_cambio", "USD", "Euro em dólares", "US$ por €", "USA"),
+    _moeda("bce_cambio", "JPY", "Euro em ienes", "¥ por €", "JPN"),
+    _moeda("bce_cambio", "GBP", "Euro em libras", "£ por €", "GBR"),
+    _moeda("bce_cambio", "CNY", "Euro em yuans", "CN¥ por €", "CHN"),
+    _moeda("bce_cambio", "BRL", "Euro em reais", "R$ por €", "BRA"),
+    _moeda("bce_cambio", "INR", "Euro em rupias indianas", "₹ por €", "IND"),
+    _moeda("bce_cambio", "IDR", "Euro em rupias indonésias", "Rp por €", "IDN"),
+    _moeda("bce_cambio", "KRW", "Euro em wons", "₩ por €", "KOR"),
+    _moeda("bce_cambio", "MXN", "Euro em pesos mexicanos", "MX$ por €", "MEX"),
+    _moeda("bce_cambio", "TRY", "Euro em liras turcas", "₺ por €", "TUR"),
+    _moeda("bce_cambio", "ZAR", "Euro em rands", "R por €", "ZAF"),
+    _moeda("bce_cambio", "AUD", "Euro em dólares australianos", "A$ por €", "AUS"),
+    _moeda("bce_cambio", "CAD", "Euro em dólares canadenses", "C$ por €", "CAN"),
+    _moeda("fred_cambio", "DTWEXBGS", "Índice amplo do dólar", "índice (jan/2006 = 100)", "USA"),
+    _moeda("fred_cambio", "DEXBZUS", "Dólar em reais", "R$ por US$", "BRA"),
+    _moeda("fred_cambio", "DEXCHUS", "Dólar em yuans", "CN¥ por US$", "CHN"),
+    _moeda("fred_cambio", "DEXJPUS", "Dólar em ienes", "¥ por US$", "JPN"),
+    _moeda("fred_cambio", "DEXUSUK", "Libra em dólares", "US$ por £", "GBR"),
+    _moeda("fred_cambio", "DEXINUS", "Dólar em rupias indianas", "₹ por US$", "IND"),
+    _moeda("fred_cambio", "DEXKOUS", "Dólar em wons", "₩ por US$", "KOR"),
+    _moeda("fred_cambio", "DEXMXUS", "Dólar em pesos mexicanos", "MX$ por US$", "MEX"),
+    _moeda("fred_cambio", "DEXCAUS", "Dólar em dólares canadenses", "C$ por US$", "CAN"),
+    _moeda("fred_cambio", "DEXUSAL", "Dólar australiano em dólares americanos", "US$ por A$", "AUS"),
+    _moeda("fred_cambio", "DEXSFUS", "Dólar em rands", "R por US$", "ZAF"),
 ]
 
 

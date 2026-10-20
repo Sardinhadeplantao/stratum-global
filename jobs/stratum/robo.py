@@ -1,4 +1,5 @@
 """Robô: uma rodada lê cada fonte, grava só o que é novo e registra tudo. Uma fonte falhar não para as outras.
+Fonte de dados (séries, decisão 0011) é lida no ritmo dela: entre uma leitura boa e a próxima, espera `a_cada_horas`.
 
 Uso:  python -m stratum.robo [--exportar CAMINHO/status.json]
 """
@@ -6,16 +7,18 @@ import argparse
 import os
 import sys
 from dataclasses import dataclass, field
+from datetime import timedelta
 
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, resumo, traducao
+from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, mercados, resumo, traducao
 from stratum import fontes as catalogo
-from stratum.connectors import rss
+from stratum.connectors import rss, series as conectores_series
 from stratum.domain.documento import hash_documento
 
 CONECTORES = {"rss": rss.ler}
+CONECTORES_SERIES = conectores_series.CONECTORES
 
 
 @dataclass
@@ -26,20 +29,31 @@ class Resultado:
     falhas: list[str] = field(default_factory=list)
 
 
-def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES) -> Resultado:
+def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES,
+          series: list[dict] | None = None, conectores_series=CONECTORES_SERIES) -> Resultado:
     banco = "permanente" if cfg.banco_permanente else "temporario"
+    ids = {f["id"] for f in fontes}
+    series = [s for s in (catalogo.SERIES if series is None else series) if s["fonte"] in ids]
     with engine.begin() as c:
         db.gravar_fontes(c, fontes)
+        db.gravar_series(c, series)
         rid = c.execute(db.rodada.insert().values(iniciada_em=agora(), situacao="rodando", banco=banco, versao=VERSAO)
                         ).inserted_primary_key[0]
 
     resultado = Resultado(rodada_id=rid, situacao="rodando")
-    ativas = catalogo.ativas(fontes)
+    ativas = [f for f in catalogo.ativas(fontes) if not _cedo_demais(engine, f, agora())]
     for f in ativas:
         inicio = agora()
         try:
-            itens = conectores[f["conector"]](f, session, cfg.user_agent)
-            novos = _gravar(engine, f["id"], itens, rid, agora())
+            if f["conector"] in conectores_series:
+                da_fonte = [s for s in series if s["fonte"] == f["id"] and s.get("ativa", True)]
+                with engine.connect() as c:
+                    primeira = mercados.desde(c, da_fonte)
+                itens = conectores_series[f["conector"]](f, da_fonte, session, cfg.user_agent, primeira)
+                novos = mercados.gravar(engine, da_fonte, itens, rid, agora())
+            else:
+                itens = conectores[f["conector"]](f, session, cfg.user_agent)
+                novos = _gravar(engine, f["id"], itens, rid, agora())
             linha = dict(situacao="ok", itens_lidos=len(itens), itens_novos=novos, erro=None)
             resultado.novos += novos
         except Exception as exc:  # isola a falha: as outras fontes seguem
@@ -59,6 +73,19 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
     return resultado
 
 
+def _cedo_demais(engine, f: dict, agora) -> bool:
+    """Fonte com ritmo próprio (a_cada_horas) lida com sucesso há pouco tempo: fica para uma rodada seguinte."""
+    if not f.get("a_cada_horas"):
+        return False
+    with engine.connect() as c:
+        ultima = c.execute(select(db.coleta.c.iniciada_em).where(db.coleta.c.fonte_id == f["id"], db.coleta.c.situacao == "ok")
+                           .order_by(db.coleta.c.id.desc()).limit(1)).scalar()
+    if ultima is not None and agora - ultima < timedelta(hours=f["a_cada_horas"]):
+        print(f"{f['id']}: lida às {ultima:%H:%M} UTC; a próxima leitura é depois de {f['a_cada_horas']}h", flush=True)
+        return True
+    return False
+
+
 def erro_legivel(exc: Exception) -> str:
     """Mensagem curta para a tela Método. O nome técnico fica entre parênteses para quem for consertar."""
     nome = type(exc).__name__
@@ -71,6 +98,8 @@ def erro_legivel(exc: Exception) -> str:
     texto = str(exc)
     if texto.startswith("HTTP "):
         return f"O site recusou o pedido ({texto})."
+    if isinstance(exc, ValueError) and texto.startswith(("formato inesperado", "valor ilegível")):
+        return f"O arquivo da fonte mudou de formato ({texto[:160]})."
     if isinstance(exc, ValueError) and "feed" in texto:
         return f"O endereço não devolveu um feed válido ({texto})."
     return f"{nome}: {texto[:160]}"

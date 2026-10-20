@@ -15,10 +15,10 @@ import gzip
 import json
 import sys
 import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from sqlalchemy import DateTime, func, select, text
+from sqlalchemy import Date, DateTime, func, select, text
 
 from stratum import VERSAO, config, db
 
@@ -61,7 +61,7 @@ def exportar(engine, pasta) -> dict:
                 consulta = select(t).order_by(*t.primary_key.columns).execution_options(yield_per=LOTE)
                 with gzip.open(pasta / f"{t.name}.jsonl.gz", "wt", encoding="utf-8") as f:
                     for linha in c.execute(consulta).mappings():
-                        registro = {k: (v.isoformat() if isinstance(v, datetime) else v) for k, v in linha.items()}
+                        registro = {k: (v.isoformat() if isinstance(v, date) else v) for k, v in linha.items()}  # datetime é date
                         f.write(json.dumps(registro, ensure_ascii=False) + "\n")
                         n += 1
                 manifesto["tabelas"][t.name] = {"linhas": n}
@@ -104,6 +104,7 @@ def restaurar(pasta, engine) -> dict[str, int]:
         for t in da_copia:
             colunas = set(t.c.keys())
             datas = [col.name for col in t.columns if isinstance(col.type, DateTime)]
+            dias = [col.name for col in t.columns if isinstance(col.type, Date)]
             lote, n = [], 0
             with gzip.open(pasta / f"{t.name}.jsonl.gz", "rt", encoding="utf-8") as f:
                 for linha in f:
@@ -114,6 +115,9 @@ def restaurar(pasta, engine) -> dict[str, int]:
                     for k in datas:
                         if registro.get(k) is not None:
                             registro[k] = datetime.fromisoformat(registro[k])
+                    for k in dias:
+                        if registro.get(k) is not None:
+                            registro[k] = date.fromisoformat(registro[k])
                     lote.append(registro)
                     n += 1
                     if len(lote) == LOTE:

@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, controleFonte, dataHora, faixas, numero, plural, situacao, tipoFonte } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, leituraSerie, numero, plural, situacao, textoMudanca, tipoFonte, valor, variacao } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 import Titulo from "@/components/Titulo";
 
@@ -28,6 +28,8 @@ export default function Metodo() {
   const semBanco = s.banco === "erro";
   const SEM_BANCO = "Sem dado nesta atualização: o banco não abriu.";
   const criterios = agruparCriterios(s.fontes.filter((f) => f.ativa));
+  const m = s.mercados;
+  const nomeFonte = Object.fromEntries(s.fontes.map((f) => [f.id, f.nome]));
   return (<>
     <AvisoAtraso ate={s.avisar_atraso_apos} gerado={s.gerado_em} />
     <main className="pagina">
@@ -60,6 +62,7 @@ export default function Metodo() {
           <dt>Citação de países</dt><dd>{a?.regra ?? "sem dado"} (regra de dicionário, sem IA)</dd>
           <dt>Histórias</dt><dd>{s.regra_historias?.versao ?? "sem dado"} (regra de palavras em comum, sem IA)</dd>
           <dt>Tradução dos títulos</dt><dd>{s.traducao?.modelo ?? "sem dado"} (tradução automática gratuita; só traduz, não decide)</dd>
+          <dt>Régua dos mercados</dt><dd>{m?.regua.versao ?? "sem dado"} (percentil contra o próprio histórico, sem IA)</dd>
         </dl>
       </section>
 
@@ -142,6 +145,67 @@ export default function Metodo() {
         )}
       </section>
 
+      <section id="regua">
+        <h2>Mercados: a régua única</h2>
+        <p>
+          Cada série é comparada só com o próprio passado. O robô pega a variação de hoje (desde a cotação anterior) e vê
+          em que posição ela fica entre as variações dos {m?.regua.janela_anos ?? 5} anos anteriores: é o percentil.
+          Percentil 97 quer dizer que 97% das variações desses anos foram menores. Os parâmetros são os mesmos para todas
+          as séries e foram fixados antes do primeiro dado (decisão 0011).
+        </p>
+        {m ? (
+          <dl className="resumo">
+            <dt>Versão</dt><dd>{m.regua.versao}</dd>
+            <dt>Medida</dt><dd>Variação em % desde a cotação anterior (fim de semana e feriado não contam)</dd>
+            <dt>Histórico</dt><dd>As variações dos {m.regua.janela_anos} anos anteriores, sem o próprio dia e sem nada depois dele</dd>
+            <dt>Fora do normal</dt><dd>Percentil até {m.regua.extremo} (queda) ou a partir de {100 - m.regua.extremo} (alta)</dd>
+            <dt>Mínimo</dt><dd>{numero(m.regua.minimo.diaria)} cotações no histórico; abaixo disso, &quot;histórico curto&quot;, sem leitura</dd>
+            <dt>Mudança</dt><dd>{m.regua.persistencia} dias seguidos fora do normal do mesmo lado; ou a agitação (das últimas{" "}
+              {m.regua.ritmo_pontos} variações) no percentil {m.regua.ritmo_extremo} ou mais. Cada mudança diz quantas vezes
+              já aconteceu nos 5 anos anteriores.</dd>
+            <dt>Validade</dt><dd>{Object.entries(m.validade_dias).map(([f, d]) => `${nomeFonte[f] ?? f}: ${d} dias`).join(" · ")}.
+              Passou disso, a série fica parada (cinza)</dd>
+            <dt>Revisão</dt><dd>Valor corrigido pela fonte entra como registro novo; o antigo fica</dd>
+          </dl>
+        ) : <p className="sem-dado-texto">Sem dado nesta atualização.</p>}
+        <ul className="regras">
+          <li><b>Preço é contexto.</b> A régua não manda aviso, não ordena notícias e não prevê nada. Alta e queda fora do
+            normal têm a mesma cor: a cor não diz se é bom ou ruim.</li>
+          <li><b>O nome diz o sentido:</b> &quot;Euro em reais&quot; sobe quando o euro fica mais caro. Cada valor aparece como a
+            fonte publicou, sem conta.</li>
+          <li><b>A lista é ordenada pela distância do normal</b> (em desvios medianos), nunca pelo preço ou pelo nome.</li>
+        </ul>
+        {m && m.series.length > 0 && (
+          <div className="tabela-rolagem">
+            <table>
+              <thead>
+                <tr><th>Série</th><th>Dia</th><th className="numero">Valor</th><th className="numero">Variação</th>
+                  <th className="numero">Percentil</th><th className="numero">Faixa normal</th><th>Leitura</th></tr>
+              </thead>
+              <tbody>
+                {m.series.map((x) => {
+                  const l = leituraSerie(x.situacao, x.extremo);
+                  return (
+                    <tr key={x.id}>
+                      <td>{x.nome}<div className="discreto">{x.unidade} · {x.fonte_nome}</div></td>
+                      <td>{dia(x.data)}</td>
+                      <td className="numero">{valor(x.valor)}</td>
+                      <td className="numero">{variacao(x.variacao)}</td>
+                      <td className="numero">{x.percentil === null ? "—" : x.percentil.toLocaleString("pt-BR")}</td>
+                      <td className="numero">{x.faixa ? `${variacao(x.faixa[0])} a ${variacao(x.faixa[1])}` : "—"}</td>
+                      <td>
+                        <span className={`ponto ${l.classe}`} aria-hidden /> {l.texto}
+                        {x.mudancas.map((mu, i) => <div key={i} className="discreto">{textoMudanca(mu)}</div>)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <section>
         <h2>Saúde do robô</h2>
         {s.erro_banco && <p className="alerta">{s.erro_banco}</p>}
@@ -207,8 +271,8 @@ export default function Metodo() {
                       <td>{dataHora(c?.em)}</td>
                       <td><span className={`ponto ${x.classe}`} aria-hidden /> {x.texto}{c?.erro && <div className="erro">{c.erro}</div>}</td>
                       <td>{c ? numero(c.itens_novos) : "—"}</td>
-                      <td>{numero(f.documentos_24h)}</td>
-                      <td>{numero(f.documentos)}</td>
+                      <td>{f.tipo === "dados" ? "—" : numero(f.documentos_24h)}</td>
+                      <td>{f.tipo === "dados" ? `${numero(f.observacoes ?? 0)} cotações` : numero(f.documentos)}</td>
                     </tr>
                   );
                 })}
@@ -279,6 +343,8 @@ export default function Metodo() {
             sempre.</dd>
           <dt>Sem dado (cinza)</dt><dd>Não foi medido nesta atualização. É diferente de zero.</dd>
           <dt>Tradução automática</dt><dd>Título traduzido por programa; o original vale mais.</dd>
+          <dt>Percentil</dt><dd>A posição de um número entre os do próprio passado, de 0 a 100.</dd>
+          <dt>Fora do normal</dt><dd>Variação entre as 5% maiores ou as 5% menores dos 5 anos anteriores daquela série.</dd>
         </dl>
       </section>
 
@@ -288,7 +354,8 @@ export default function Metodo() {
           <li>Grau de confirmação de cada fato (pista, relatado, corroborado, oficial, contestado) e importância: próxima
             etapa da fase 1, depois das histórias.</li>
           <li>Redes sociais (X e outras): ainda não são lidas. Quando entrarem, serão pista, nunca fato.</li>
-          <li>Mercados (moedas, juros, bolsas por país, commodities): fase 2.</li>
+          <li>Mercados: as moedas já entram (régua acima). Juros, bolsas por país, commodities e cripto, e a tela Mercados
+            com os eventos do mesmo período (coincidência no tempo, não causa), vêm nas próximas etapas da fase 2.</li>
           <li>Comércio, navios nos estreitos, sanções e conflito como séries: fase 4.</li>
           <li>Cadeias, exposição e hipóteses: fase 5.</li>
         </ul>

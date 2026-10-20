@@ -23,8 +23,22 @@ def test_toda_fonte_tem_criterio_e_ids_unicos():
     ids = [f["id"] for f in fontes.FONTES]
     assert len(ids) == len(set(ids))
     for f in fontes.FONTES:
-        assert f["criterio"] and f["tipo"] in {"oficial", "imprensa", "dados", "social"} and f["conector"] == "rss"
-        assert f["url"].startswith("https://")
+        assert f["criterio"] and f["tipo"] in {"oficial", "imprensa", "dados", "social"}
+        assert (f["conector"] == "rss") == (f["tipo"] != "dados") and f["url"].startswith("https://")
+
+
+def test_toda_serie_tem_fonte_de_dados_e_medida_da_regua():
+    # Decisão 0011: a série herda o critério da fonte; a fonte de dados diz o ritmo e a validade
+    from stratum import robo
+    from stratum.domain import regua
+    por_id = {f["id"]: f for f in fontes.FONTES}
+    ids = [s["id"] for s in fontes.SERIES]
+    assert len(ids) == len(set(ids)) == 24
+    for s in fontes.SERIES:
+        f = por_id[s["fonte"]]
+        assert f["tipo"] == "dados" and f["conector"] in robo.CONECTORES_SERIES
+        assert f["a_cada_horas"] > 0 and f["validade_dias"] > 0
+        assert s["medida"] in regua.MEDIDAS and s["frequencia"] in regua.MINIMO and s["nome"] and s["unidade"]
 
 
 def test_toda_fonte_tem_ficha_com_fonte_da_informacao():

@@ -6,7 +6,7 @@ from datetime import timedelta
 
 from sqlalchemy import func, or_, select
 
-from stratum import VERSAO, db, historias, traducao
+from stratum import VERSAO, db, fontes as catalogo, historias, mercados, traducao
 from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
@@ -84,6 +84,10 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             ultimos = janela[:ULTIMOS_DOCUMENTOS]
         em_portugues = traducao.titulos(c, {d["id"] for d in janela} | {d["id"] for d in ultimos})
         estado_traducao = traducao.situacao(c)
+        obs_por_fonte = dict(c.execute(select(db.serie.c.fonte_id, func.count()).select_from(
+            db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
+        validade = {f["id"]: f["validade_dias"] for f in catalogo.FONTES if f.get("validade_dias")}
+        estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, validade)
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}
@@ -134,6 +138,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
                 "itens_novos": col["itens_novos"], "erro": col["erro"]},
             "documentos": total_por_fonte.get(f["id"], 0),
             "documentos_24h": dia_por_fonte.get(f["id"], 0),
+            "observacoes": obs_por_fonte.get(f["id"], 0),  # fonte de dados (decisão 0011)
         })
 
     todas_historias = historias.recentes(engine, momento, limite=None)
@@ -158,6 +163,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         "copia": copia,
         "historias": lista_historias,
         "traducao": estado_traducao,
+        "mercados": estado_mercados,
         "contagem_historias": {"total": len(todas_historias),
                                "varias_vozes": sum(1 for h in todas_historias if h["vozes"] >= 2)},
         "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
@@ -235,7 +241,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None,
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None,
         "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],

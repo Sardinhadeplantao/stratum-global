@@ -173,6 +173,9 @@ h1, h2, h3 { line-height: 1.2; }
 .quadrado { display: inline-block; width: 14px; height: 14px; border-radius: 3px; background: var(--sem-dado); }
 .sit-ok { background: var(--ok); }
 .sit-parcial { background: var(--parcial); }
+.sit-normal { background: var(--texto-3); }
+.sit-fora { background: var(--ouro); }  /* fora do normal, alta ou queda: a cor não diz se é bom ou ruim */
+.numero { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sit-falhou { background: var(--falhou); }
 .sit-rodando { background: var(--destaque); }
 .sem-dado { background: var(--sem-dado); }

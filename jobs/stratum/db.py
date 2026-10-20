@@ -15,8 +15,8 @@ from alembic import command
 from alembic.config import Config as AlembicConfig
 from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy import (BigInteger, Boolean, Column, DateTime, ForeignKey, Index, Integer, MetaData, String, Table, Text,
-                        create_engine)
+from sqlalchemy import (BigInteger, Boolean, Column, Date, DateTime, Float, ForeignKey, Index, Integer, MetaData, String, Table,
+                        Text, create_engine)
 from sqlalchemy.dialects import postgresql, sqlite
 
 md = MetaData()
@@ -111,6 +111,33 @@ traducao = Table(
     Column("conhecido_em", DateTime, nullable=False),
 )
 
+# Séries de dados (decisão 0011). A lista vive no código (`fontes.SERIES`), como as fontes.
+serie = Table(
+    "serie", md,
+    Column("id", String(64), primary_key=True),
+    Column("fonte_id", String(64), ForeignKey("fonte.id"), nullable=False),
+    Column("codigo", String(64), nullable=False),       # o código na fonte (USD, DEXBZUS)
+    Column("nome", Text, nullable=False),
+    Column("unidade", Text, nullable=False),
+    Column("pais", String(3)),                          # país ligado à série (ISO 3166 alfa-3)
+    Column("frequencia", String(16), nullable=False),   # diaria | mensal
+    Column("medida", String(32), nullable=False),       # variacao_pct (domain/regua.py)
+    Column("ativa", Boolean, nullable=False),
+)
+
+# Cada valor entra uma vez. Se a fonte revisar um valor já publicado, o novo entra como registro novo e o antigo fica:
+# a leitura de um momento usa só o que o sistema sabia nele.
+observacao = Table(
+    "observacao", md,
+    Column("id", Id, primary_key=True, autoincrement=True),
+    Column("serie_id", String(64), ForeignKey("serie.id"), nullable=False),
+    Column("data", Date, nullable=False),               # quando aconteceu (o dia da cotação)
+    Column("valor", Float, nullable=False),
+    Column("rodada_id", Id, ForeignKey("rodada.id")),
+    Column("conhecido_em", DateTime, nullable=False),   # quando o robô soube
+    Index("ix_observacao_serie", "serie_id", "data", "conhecido_em"),
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 
@@ -176,3 +203,14 @@ def gravar_fontes(conexao, fontes: list[dict]) -> None:
         stmt = dialeto.insert(fonte).values(linha)
         conexao.execute(stmt.on_conflict_do_update(index_elements=["id"], set_={k: stmt.excluded[k] for k in linha if k != "id"}))
     conexao.execute(fonte.update().where(fonte.c.id.not_in([f["id"] for f in fontes])).values(ativa=False))
+
+
+def gravar_series(conexao, series: list[dict]) -> None:
+    """Como as fontes: o banco recebe a lista atual; série que saiu fica como inativa, com as observações."""
+    dialeto = postgresql if conexao.dialect.name == "postgresql" else sqlite
+    for s in series:
+        linha = {k: s.get(k) for k in ("id", "codigo", "nome", "unidade", "pais", "frequencia", "medida")} | {
+            "fonte_id": s["fonte"], "ativa": s.get("ativa", True)}
+        stmt = dialeto.insert(serie).values(linha)
+        conexao.execute(stmt.on_conflict_do_update(index_elements=["id"], set_={k: stmt.excluded[k] for k in linha if k != "id"}))
+    conexao.execute(serie.update().where(serie.c.id.not_in([s["id"] for s in series])).values(ativa=False))

@@ -83,9 +83,20 @@ A meta por fato da decisão 0006 (90% de precisão e 60% de cobertura por evento
 
 ## Fase 2. Mercados (3 a 4 semanas)
 
-- Séries por lista: moedas (BCE, FRED), juros de 10 anos, bolsa por país, commodities (Banco Mundial, EIA), cripto.
-- A régua única (percentil contra o próprio histórico) e a reação medida a cada evento.
-  Os parâmetros da régua e do detector de mudança são fixados antes do primeiro dado (proposta em `docs/ideias.md`).
+Já entregue:
+
+- a régua única (`regua-1.0`) e o detector de mudança, com os parâmetros fixados antes do primeiro dado
+  (decisão 0011): percentil da variação contra os 5 anos anteriores, fora do normal até 5 ou a partir de 95, mínimo
+  de 250 cotações, extremo que persiste por 2 dias, quebra de ritmo e taxa-base;
+- moedas do G20 contra o euro (BCE, 13) e contra o dólar (FRED/H.10, 10, e o índice amplo do dólar), lidas no ritmo de
+  cada fonte, com revisão gravada como registro novo; a leitura de cada uma aparece na tela Método.
+
+Falta:
+
+- Conferir a primeira rodada real e trocar as amostras dos testes por trechos reais (`jobs/scripts/sondar_series.py`).
+- Séries por lista: juros de 10 anos (série diária oficial: Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Japão),
+  bolsa por país, commodities (Banco Mundial, EIA), cripto. Cada tipo usa a medida já escrita na decisão 0011.
+- A reação medida a cada evento.
 - Tela Mercados: o que se mexeu fora do normal e os eventos no mesmo período ("coincidência no tempo, não causa").
 
 **Pronto quando:** todo evento importante mostra se algum ativo ligado se mexeu fora do normal.

@@ -50,8 +50,8 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
 ```
 jobs/stratum/
   domain/        regras puras (sem banco, rede ou IA)
-  connectors/    um conector por tipo de fonte; devolvem itens, não gravam
-  fontes.py      a lista de fontes (única)
+  connectors/    um conector por tipo de fonte; devolvem itens, não gravam (series.py: BCE e FRED)
+  fontes.py      a lista de fontes (única) e a lista de séries (SERIES)
   db.py          esquema; mudou? crie migração nova em migracoes/versions/
   robo.py        uma rodada: coletar, gravar, registrar, avisar
   export.py      status.json para o site
@@ -63,11 +63,14 @@ jobs/stratum/
   domain/historias.py   regra das histórias (assinatura de entidades, sem IA)
   traducao.py    títulos em português por tradução gratuita (Argos, decisão 0010); só lê, não decide
   domain/paises.py      regra de citação de países (dicionário, sem IA)
+  domain/regua.py       a régua única das séries (percentil contra o próprio histórico, decisão 0011)
+  mercados.py    grava as cotações (revisão = registro novo) e monta a leitura de cada série para o site
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
-                 sondar_fontes.py e sondar_traducao.py (testam fonte candidata e tradução no Actions, workflow sondar.yml)
+                 sondar_fontes.py, sondar_series.py e sondar_traducao.py (testam fonte candidata, séries e tradução no
+                 Actions, workflow sondar.yml)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
 
