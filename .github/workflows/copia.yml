@@ -3,18 +3,25 @@ name: Cópia do banco
 # Uma vez por semana, copia as tabelas do projeto e testa a restauração (decisão 0007).
 # O Supabase gratuito não faz cópia de segurança. A cópia fica guardada aqui, como artefato, por 90 dias;
 # como o banco só recebe inserções, a cópia mais nova sempre tem tudo.
+# Para recuperar o banco num Supabase novo e vazio: rodar à mão com o número da rodada da cópia
+# (passo a passo em docs/configurar.md, item 8). A senha nunca sai dos Secrets.
 on:
   schedule:
     - cron: "41 9 * * 0"   # domingo, 6:41 em Brasília
   workflow_dispatch:
+    inputs:
+      restaurar_da_rodada:
+        description: "Só para recuperar o banco: o número da rodada (run id) cuja cópia vai para um banco VAZIO. Deixe em branco para fazer uma cópia."
+        type: string
+        default: ""
 
-permissions: { contents: read }
+permissions: { contents: read, actions: write }
 concurrency: { group: copia-do-banco, cancel-in-progress: false }
 
 jobs:
   copia:
     # Só a main conhece a senha do banco de produção (regra 13)
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !inputs.restaurar_da_rodada
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -41,3 +48,41 @@ jobs:
           retention-days: 90
           if-no-files-found: error
           compression-level: 0   # os arquivos já vêm comprimidos
+
+  restaurar:
+    if: github.ref == 'refs/heads/main' && inputs.restaurar_da_rodada
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
+
+      # O robô não pode gravar no banco novo antes nem durante a restauração: ela só aceita banco vazio
+      - name: Desligar o robô enquanto o banco é restaurado
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh workflow disable robo.yml --repo "$GITHUB_REPOSITORY"
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: copia-banco
+          path: copia
+          run-id: ${{ inputs.restaurar_da_rodada }}
+          github-token: ${{ github.token }}
+
+      - name: Restaurar a cópia no banco vazio
+        working-directory: jobs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
+        run: |
+          pip install -r requirements.txt
+          python -m stratum.copia --restaurar ../copia
+
+      # Só religa se a restauração deu certo; se falhou, o robô fica desligado até alguém olhar
+      - name: Religar o robô
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh workflow enable robo.yml --repo "$GITHUB_REPOSITORY"

@@ -28,13 +28,18 @@ precisa para o teste retroativo. A análise dos PDFs do sistema antigo pôs a c�
   Método mostra a data. Se a cópia tiver mais de 8 dias, ou se nunca houve uma, isso entra no resumo do Telegram
   (decisão 0005). O robô também mantém o agendamento da cópia ligado, como já faz com o dele (o GitHub desliga
   agendamentos depois de 60 dias sem atividade no repositório).
-- **Restaurar** é um comando: `python -m stratum.copia --restaurar PASTA`, com o banco novo configurado. Ele só
-  aceita banco vazio; nunca sobrescreve nada.
+- **Restaurar** roda no próprio GitHub, para a senha nunca sair dos Secrets: o mesmo workflow, rodado à mão com o
+  número da rodada da cópia (passo a passo em `docs/configurar.md`, item 8). Ele desliga o robô, restaura e religa.
+  - Só aceita banco vazio; nunca sobrescreve nada. Por isso o robô é desligado antes de trocar o banco.
+  - O banco novo sobe só até a versão do esquema da cópia, recebe os registros e depois sobe até a versão do código.
+    Assim, uma cópia de antes de uma migração continua restaurável.
+  - Cópia de uma versão do esquema que o código não conhece é recusada, assim como coluna desconhecida ou arquivo
+    com menos linhas que o manifesto: nada se perde em silêncio, e nada fica pela metade.
 
 ## Consequências
 
-- O manifesto de cada semana mede o tamanho do banco e quanto ele cresceu: é o número que a decisão de retenção da
-  fase 1 precisa.
+- O manifesto de cada semana mede o tamanho do banco e de cada tabela; comparando as semanas, sai o crescimento.
+  São os números que a decisão de retenção da fase 1 precisa.
 - Se o GitHub sumir junto com o Supabase, a cópia some também. O risco foi aceito: os dois são de empresas
   diferentes, e o dono pode baixar uma cópia quando quiser (Actions → Cópia do banco → copia-banco).
 - Custo zero: o Actions é gratuito em repositório público, e a cópia comprimida é pequena perto do limite de

@@ -26,8 +26,10 @@ def _encher(engine):
 
 
 def test_copia_so_as_tabelas_do_projeto():
-    # O cofre (vault), o pg_cron e o pg_net não são tabelas do projeto e nunca entram na cópia pública
-    assert {t.name for t in copia.tabelas()} == set(db.md.tables)
+    # O cofre (vault), o pg_cron e o pg_net não são tabelas do projeto e nunca entram na cópia pública.
+    # Tabela nova faz este teste falhar de propósito: antes de acrescentá-la aqui, confira que ela não tem dado
+    # pessoal ou de conexão, porque a cópia é pública (decisão 0007)
+    assert {t.name for t in copia.tabelas()} == {"fonte", "rodada", "coleta", "documento", "resumo"}
     assert not {"secrets", "decrypted_secrets", "job", "job_run_details", "_http_response"} & set(db.md.tables)
 
 
@@ -138,3 +140,68 @@ def test_rodada_sem_conferir_a_copia_nao_avisa(engine):
     agora = datetime(2026, 10, 19, 22, 5)
     texto = resumo.montar(engine, agora, resumo.horario_devido(agora), None, None, copia=copia.situacao(None, agora))
     assert "Cópia do banco" not in texto
+
+
+def _copia_editada(engine, pasta, editar_manifesto=None, editar_linha=None, tirar=()):
+    """Uma cópia de verdade, alterada para simular outra versão do esquema ou um arquivo estragado."""
+    _encher(engine)
+    copia.exportar(engine, pasta)
+    manifesto = json.loads((pasta / "manifesto.json").read_text(encoding="utf-8"))
+    for nome in tirar:
+        (pasta / f"{nome}.jsonl.gz").unlink()
+        del manifesto["tabelas"][nome]
+    if editar_manifesto:
+        editar_manifesto(manifesto)
+    (pasta / "manifesto.json").write_text(json.dumps(manifesto), encoding="utf-8")
+    if editar_linha:
+        nome, funcao = editar_linha
+        with gzip.open(pasta / f"{nome}.jsonl.gz", "rt", encoding="utf-8") as f:
+            linhas = [json.loads(l) for l in f]
+        with gzip.open(pasta / f"{nome}.jsonl.gz", "wt", encoding="utf-8") as f:
+            for registro in linhas:
+                f.write(json.dumps(funcao(registro)) + "\n")
+
+
+def test_copia_de_antes_de_uma_migracao_continua_restauravel(engine, tmp_path):
+    # Uma cópia feita pelo código da versão 0001 do esquema (antes da tabela resumo existir)
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo"])
+    destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
+    contagens = copia.restaurar(tmp_path / "velha", destino)
+    assert contagens["documento"] == 2500 and "resumo" not in contagens
+    assert db.versao_do_banco(destino) == db.versoes_do_esquema()[-1]  # depois sobe até a versão do código
+
+
+def test_copia_de_versao_desconhecida_e_recusada(engine, tmp_path):
+    # Restaurar com um código mais velho que a cópia perderia colunas em silêncio
+    _copia_editada(engine, tmp_path / "nova", lambda m: m.update(migracao="0099"))
+    destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
+    with pytest.raises(ValueError, match="não conhece"):
+        copia.restaurar(tmp_path / "nova", destino)
+    assert db.versao_do_banco(destino) is None  # o banco novo continua intocado
+
+
+def test_coluna_desconhecida_e_recusada(engine, tmp_path):
+    _copia_editada(engine, tmp_path / "c", editar_linha=("documento", lambda r: r | {"evento_id": 42}))
+    destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
+    with pytest.raises(ValueError, match="evento_id"):
+        copia.restaurar(tmp_path / "c", destino)
+
+
+def test_copia_incompleta_nao_deixa_nada_pela_metade(engine, tmp_path):
+    def menos_uma(m):
+        m["tabelas"]["documento"]["linhas"] += 1
+    _copia_editada(engine, tmp_path / "c", menos_uma)
+    destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
+    with pytest.raises(ValueError, match="2501 linhas"):
+        copia.restaurar(tmp_path / "c", destino)
+    with destino.connect() as c:
+        assert c.execute(db.documento.select()).first() is None
+        assert c.execute(db.fonte.select()).first() is None
+
+
+def test_banco_preparado_em_outra_versao_e_recusado(engine, tmp_path):
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo"])
+    destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
+    db.preparar(destino)  # por exemplo, o robô já rodou no banco novo
+    with pytest.raises(ValueError, match="já foi preparado"):
+        copia.restaurar(tmp_path / "velha", destino)

@@ -76,21 +76,41 @@ def exportar(engine, pasta) -> dict:
 
 
 def restaurar(pasta, engine) -> dict[str, int]:
-    """Cria as tabelas pelas migrações e insere as linhas da cópia. Só num banco vazio: nada é sobrescrito (regra 2).
-    Devolve quantas linhas entraram em cada tabela."""
+    """Recria o banco a partir de uma cópia. Só num banco vazio: nada é sobrescrito (regra 2).
+
+    As tabelas sobem pelas migrações só até a versão do esquema da cópia, os registros entram e só então o banco sobe
+    até a versão do código. Assim, uma cópia feita antes de uma migração continua restaurável. Cópia de uma versão
+    que o código não conhece é recusada, para nenhuma coluna se perder em silêncio. Devolve as linhas por tabela."""
     pasta = Path(pasta)
-    db.preparar(engine)
+    manifesto = json.loads((pasta / "manifesto.json").read_text(encoding="utf-8"))
+    versao = manifesto.get("migracao")
+    if versao not in db.versoes_do_esquema():
+        raise ValueError(f"a cópia é da versão {versao} do esquema, que este código não conhece; "
+                         f"restaure com o código da versão {manifesto.get('versao_robo')} do robô ou mais nova")
+    por_nome = {t.name: t for t in tabelas()}
+    desconhecidas = sorted(set(manifesto["tabelas"]) - set(por_nome))
+    if desconhecidas:
+        raise ValueError(f"a cópia tem tabelas que este código não conhece ({', '.join(desconhecidas)})")
+    no_banco = db.versao_do_banco(engine)
+    if no_banco not in (None, versao):
+        raise ValueError(f"o banco de destino já foi preparado na versão {no_banco} do esquema; use um banco novo")
+    db.preparar(engine, ate=versao)
     contagens = {}
+    da_copia = [t for t in tabelas() if t.name in manifesto["tabelas"]]  # pais antes dos filhos
     with engine.begin() as c:
-        ocupadas = [t.name for t in tabelas() if c.execute(select(func.count()).select_from(t)).scalar()]
+        ocupadas = [t.name for t in da_copia if c.execute(select(func.count()).select_from(t)).scalar()]
         if ocupadas:
             raise ValueError(f"o banco de destino não está vazio ({', '.join(ocupadas)})")
-        for t in tabelas():
+        for t in da_copia:
+            colunas = set(t.c.keys())
             datas = [col.name for col in t.columns if isinstance(col.type, DateTime)]
             lote, n = [], 0
             with gzip.open(pasta / f"{t.name}.jsonl.gz", "rt", encoding="utf-8") as f:
                 for linha in f:
                     registro = json.loads(linha)
+                    if extras := set(registro) - colunas:
+                        raise ValueError(f"{t.name}: a cópia tem colunas que este código não conhece "
+                                         f"({', '.join(sorted(extras))})")
                     for k in datas:
                         if registro.get(k) is not None:
                             registro[k] = datetime.fromisoformat(registro[k])
@@ -101,11 +121,15 @@ def restaurar(pasta, engine) -> dict[str, int]:
                         lote = []
             if lote:
                 c.execute(t.insert(), lote)
+            if n != manifesto["tabelas"][t.name]["linhas"]:  # desfaz tudo: a transação não termina
+                raise ValueError(f"{t.name}: a cópia diz {manifesto['tabelas'][t.name]['linhas']} linhas, "
+                                 f"o arquivo tem {n}")
             contagens[t.name] = n
             if c.dialect.name == "postgresql" and "id" in t.c and t.c.id.autoincrement is True:
                 # Os ids vieram da cópia: o contador do PostgreSQL precisa continuar depois do maior
                 c.execute(text(f"select setval(pg_get_serial_sequence('{t.name}', 'id'), "
                                f"coalesce((select max(id) from {t.name}), 0) + 1, false)"))
+    db.preparar(engine)  # agora sim, até a versão do código
     return contagens
 
 
