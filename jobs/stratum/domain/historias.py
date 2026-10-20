@@ -39,7 +39,7 @@ from datetime import datetime, timedelta
 
 from stratum.domain import paises
 
-REGRA = "historias-0.1"
+REGRA = "historias-0.2"   # 0.2 (20/10): a notícia nova também precisa combinar com a primeira da história
 
 CONFIG = {
     # peso de cada tipo de traço (o nome próprio é a referência, 1)
@@ -55,6 +55,7 @@ CONFIG = {
     "limiar": 1.6,             # nota mínima para entrar numa história (ajustado em 19/10, conferido em 16/10)
     "trava_pais": True,        # países no título das duas e nenhum em comum: não junta
     "janela_horas": 48,        # só compara com manchetes das últimas 48 h (quando há data)
+    "limiar_fundador": 1.2,    # a notícia nova também precisa desta nota com a primeira notícia da história
 }
 
 # ---------------------------------------------------------------- listas gerais (nenhum nome tirado das manchetes)
@@ -371,6 +372,13 @@ class Agrupador:
                                                                      and self.chegada[e] < self.chegada[melhor])):
                     melhor, melhor_nota = e, s
             escolhida = None if melhor is None else self.historia_de[melhor]
+            if escolhida is not None and self.cfg["limiar_fundador"] > 0 and escolhida != melhor:
+                # Contra a corrente (A parece com B, B com C, mas C não tem nada com A): a notícia nova também
+                # precisa combinar com a primeira notícia da história. Fundadora fora da janela: história fechada.
+                fundadora = self.sigs.get(escolhida) if escolhida in self.chegada else None
+                if fundadora is None or escolhida not in {i for _, i in self.na_janela} or \
+                        nota(sig, fundadora, self.df, n, self.cfg, self.pesos) < self.cfg["limiar_fundador"]:
+                    escolhida = None
         for f in sig:
             self.indice[f].add(i)
         self.na_janela.append((agora, i))

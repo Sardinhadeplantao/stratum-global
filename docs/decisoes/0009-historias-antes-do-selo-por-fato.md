@@ -19,6 +19,10 @@ em quatro diria que algo foi confirmado quando não foi. O dono escolheu, em 20/
 
 - **Histórias**: cada notícia nova entra na história da notícia mais parecida das últimas 48 horas, ou abre uma
   história nova (regra `historias-0.1`, limiar 1,6, em `domain/historias.py`). Sem IA (regra 7).
+  - `historias-0.2` (20/10, no mesmo dia): em produção apareceram correntes, como uma história de chuva em Istambul
+    que puxou 18 notícias de 9 países (A parece com B, B com C, e C não tem nada com A). A notícia nova passa a
+    precisar também de nota 1,2 com a primeira notícia da história, e a primeira tem de estar na janela. No dia
+    19/10 o acerto sobe de 95% para 97%; no dia 16/10 fica em 88%. As ligações feitas pela 0.1 ficam como estão.
 - **Gravação**: tabela `historia_documento`, só de inserção. Cada notícia ganha uma ligação, que nunca muda
   (regra 2), com a data em que o robô a fez e a versão da regra. A história recebe o id da primeira notícia dela.
   Rede social não entra (regra 4).
