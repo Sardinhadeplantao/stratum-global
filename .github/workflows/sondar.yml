@@ -1,0 +1,23 @@
+name: Sondar fontes
+
+# Testa endereços candidatos a fonte do jeito que o robô lê (jobs/scripts/sondar_fontes.py). Não grava nada.
+on:
+  push:
+    branches: ["claude/**"]
+    paths: ["jobs/scripts/sondar_fontes.py"]
+  workflow_dispatch:
+
+permissions: { contents: read }
+
+jobs:
+  sondar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
+      - working-directory: jobs
+        run: |
+          pip install -r requirements.txt
+          python scripts/sondar_fontes.py

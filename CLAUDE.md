@@ -63,7 +63,8 @@ jobs/stratum/
   dados/nomes_paises.json  termos de cada país, gerado por scripts/preparar_nomes_paises.py
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
-jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário)
+jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
+                 sondar_fontes.py (testa fonte candidata no GitHub Actions, workflow sondar.yml)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
 

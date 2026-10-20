@@ -15,6 +15,9 @@ Ficha de cada fonte (decisão 0008):
 
 _FR = "https://www.federalregister.gov/api/v1/documents.rss?order=newest&conditions%5Bagencies%5D%5B%5D="
 _CRITERIO_IMPRENSA = "Veículo com feed público, publicando do próprio país; a lista cobre blocos diferentes para comparar versões."
+_CRITERIO_CHANCELARIA = ("Chancelaria (ou o órgão equivalente de um bloco) com feed público: posição oficial sobre política "
+                         "externa e sanções; a lista cobre blocos diferentes. Testada pela sonda (scripts/sondar_fontes.py).")
+_GOVUK = "https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D="
 
 FONTES: list[dict] = [
     # Oficiais
@@ -36,6 +39,27 @@ FONTES: list[dict] = [
          nivel=1, controle="estatal", controlador="estado:USA",
          controlador_nome="Governo federal dos EUA (OFAC, Departamento do Tesouro; publicado pelo Office of the Federal Register/NARA)",
          controlador_fonte="https://www.federalregister.gov/agencies/foreign-assets-control-office"),
+    dict(id="uk_fcdo", nome="GOV.UK: Relações Exteriores (FCDO, Reino Unido)", tipo="oficial", pais="GBR", idioma="en",
+         conector="rss", url=_GOVUK + "foreign-commonwealth-development-office", criterio=_CRITERIO_CHANCELARIA,
+         nivel=1, controle="estatal", controlador="estado:GBR",
+         controlador_nome="Governo do Reino Unido (Foreign, Commonwealth & Development Office)",
+         controlador_fonte="https://www.gov.uk/government/organisations/foreign-commonwealth-development-office"),
+    dict(id="ue_conselho", nome="Conselho da União Europeia: comunicados", tipo="oficial", pais=None, idioma="en",
+         conector="rss", url="https://www.consilium.europa.eu/en/rss/pressreleases.ashx", criterio=_CRITERIO_CHANCELARIA,
+         nivel=2, controle="multilateral", controlador="org:UE",
+         controlador_nome="Conselho da União Europeia (os governos dos países-membros)",
+         controlador_fonte="https://www.consilium.europa.eu/en/council-eu/"),
+    dict(id="ue_comissao", nome="Comissão Europeia: sala de imprensa", tipo="oficial", pais=None, idioma="en",
+         conector="rss", url="https://ec.europa.eu/commission/presscorner/api/rss?language=en",
+         criterio=_CRITERIO_CHANCELARIA + " Inclui medidas de comércio e a chefe da diplomacia da UE.",
+         nivel=2, controle="multilateral", controlador="org:UE",
+         controlador_nome="Comissão Europeia",
+         controlador_fonte="https://commission.europa.eu/about/organisation-european-commission_en"),
+    dict(id="ru_mid", nome="Ministério das Relações Exteriores da Rússia", tipo="oficial", pais="RUS", idioma="en",
+         conector="rss", url="https://mid.ru/en/rss.php", criterio=_CRITERIO_CHANCELARIA,
+         nivel=1, controle="estatal", controlador="estado:RUS",
+         controlador_nome="Governo da Federação Russa (Ministério das Relações Exteriores)",
+         controlador_fonte="https://mid.ru/en/about/"),
     # Imprensa, um veículo por bloco
     dict(id="bbc_mundo", nome="BBC News: World", tipo="imprensa", pais="GBR", idioma="en", conector="rss",
          url="https://feeds.bbci.co.uk/news/world/rss.xml", criterio=_CRITERIO_IMPRENSA,
