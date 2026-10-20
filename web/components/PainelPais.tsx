@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { continente, datasDocumento, plural } from "@/lib/formatar";
 import type { PaisAtencao } from "@/lib/status";
 
@@ -54,6 +55,21 @@ export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar
           <p>Nenhuma notícia das fontes acompanhadas cita este país nas últimas {janelaHoras} horas.</p>
         )}
       </section>
+      {!semDado && atencao?.historias && atencao.historias.length > 0 && (
+        <section>
+          <h3>Histórias com este país</h3>
+          <ul className="lista-noticias">
+            {atencao.historias.map((h) => (
+              <li key={h.id}>
+                <Link href={`/historias/#h${h.id}`}>{h.titulo}</Link>
+                <div className="discreto">
+                  {plural(h.noticias, "notícia", "notícias")} · {plural(h.vozes, "voz independente", "vozes independentes")}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <section>
         <h3>Mercados</h3>
         <p className="sem-dado-texto">Sem medição ainda. Moeda, juros e bolsa do país entram na fase 2.</p>

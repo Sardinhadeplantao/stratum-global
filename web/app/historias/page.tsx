@@ -18,7 +18,7 @@ export default function Historias() {
       {lista.length === 0 ? (
         <p className="sem-dado-texto">Nenhuma história com mais de uma notícia nas últimas 24 horas.</p>
       ) : lista.map((h) => (
-        <section key={h.id}>
+        <section key={h.id} id={`h${h.id}`}>
           <h2>{h.titulo}</h2>
           <p className="discreto">
             {plural(h.noticias, "notícia", "notícias")} de {plural(h.fontes, "fonte", "fontes")} ·{" "}

@@ -24,6 +24,7 @@ NAO_CONTA = {"social"}  # rede social é pista, nunca entra em conta (regra 4)
 
 # O site é refeito a cada rodada. Se passar disto sem rodada nova, ele avisa que os dados estão parados
 AVISAR_ATRASO_APOS = timedelta(hours=2)
+HISTORIAS_POR_PAIS = 5                 # no painel do país (decisão 0009)
 
 
 def _iso(d):
@@ -131,6 +132,12 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "documentos_24h": dia_por_fonte.get(f["id"], 0),
         })
 
+    lista_historias = historias.recentes(engine, momento)
+    historias_do_pais: dict[str, list] = {}
+    for h in lista_historias:  # já vêm na ordem: mais vozes primeiro
+        for p in h["paises"]:
+            historias_do_pais.setdefault(p["iso"], []).append(
+                {"id": h["id"], "titulo": h["titulo"], "noticias": h["noticias"], "vozes": h["vozes"]})
     return {
         "versao_formato": VERSAO_FORMATO,
         "versao_robo": VERSAO,
@@ -143,7 +150,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "situacao": ultima["situacao"]},
         "agendador": agendador,
         "copia": copia,
-        "historias": historias.recentes(engine, momento),
+        "historias": lista_historias,
         "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
                             "janela_horas": regra_historias.CONFIG["janela_horas"]},
         "rodadas_recentes": [{"iniciada_em": _iso(r["iniciada_em"]), "situacao": r["situacao"]} for r in recentes],
@@ -168,7 +175,8 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "ignorados": list(dicionario.ignorados),
         },
         "paises": {iso: {"nome": dicionario.nome(iso) or iso, "citacoes": n, "nivel": nivel(n),
-                         "documentos": documentos_do_pais[iso]} for iso, n in ranking},
+                         "documentos": documentos_do_pais[iso],
+                         "historias": historias_do_pais.get(iso, [])[:HISTORIAS_POR_PAIS]} for iso, n in ranking},
         "mais_citados": [{"iso": iso, "nome": dicionario.nome(iso) or iso, "citacoes": n,
                           "proporcao": round(n / maximo, 4)} for iso, n in ranking[:MAIS_CITADOS]],
         "origem_fontes": [{"pais": p, "nome": dicionario.nome(p) or "Internacional", "documentos": n,
