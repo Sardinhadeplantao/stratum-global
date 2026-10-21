@@ -12,7 +12,7 @@ from datetime import timedelta
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, mercados, resumo, traducao
+from stratum import VERSAO, agendador, arquivo, avisos, config, copia, db, export, historias, mercados, resumo, traducao
 from stratum import fontes as catalogo
 from stratum.connectors import eventos as conectores_eventos, rss, series as conectores_series
 from stratum.domain.documento import hash_documento
@@ -123,6 +123,10 @@ def _gravar(engine, fonte_id: str, itens, rodada_id: int, conhecido_em) -> int:
         hashes = list(por_hash)
         for i in range(0, len(hashes), 500):
             existentes |= set(c.execute(select(db.documento.c.hash).where(db.documento.c.hash.in_(hashes[i:i + 500]))).scalars())
+            # arquivada (decisão 0015): continua contando como já vista
+            curtos = {arquivo.hash_curto(h): h for h in hashes[i:i + 500]}
+            existentes |= {curtos[x] for x in c.execute(select(db.documento_arquivado.c.hash_curto).where(
+                db.documento_arquivado.c.hash_curto.in_(list(curtos)))).scalars()}
         linhas = [dict(hash=h, fonte_id=fonte_id, rodada_id=rodada_id, url=it.url, titulo=it.titulo, resumo=it.resumo or None,
                        publicado_em=it.publicado_em, conhecido_em=conhecido_em)
                   for h, it in por_hash.items() if h not in existentes]

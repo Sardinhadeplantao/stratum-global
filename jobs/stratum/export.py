@@ -70,6 +70,12 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             select(db.coleta).join(ultima_coleta_id, db.coleta.c.id == ultima_coleta_id.c.id)).mappings()}
         total_por_fonte = dict(c.execute(select(db.documento.c.fonte_id, func.count())
                                          .group_by(db.documento.c.fonte_id)).all())
+        # Arquivo conferido (decisão 0015): as notícias que saíram do banco continuam nas contagens
+        arquivados = c.execute(select(db.arquivo).where(db.arquivo.c.tabela == "documento")
+                               .order_by(db.arquivo.c.id)).mappings().all()
+        for a in arquivados:
+            for f, n in json.loads(a["detalhe"] or "{}").get("por_fonte", {}).items():
+                total_por_fonte[f] = total_por_fonte.get(f, 0) + n
         dia_por_fonte = dict(c.execute(select(db.documento.c.fonte_id, func.count())
                                        .where(db.documento.c.conhecido_em >= limite_24h)
                                        .group_by(db.documento.c.fonte_id)).all())
@@ -170,6 +176,10 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "situacao": ultima["situacao"]},
         "agendador": agendador,
         "copia": copia,
+        "arquivo": {"documentos": sum(a["linhas"] for a in arquivados),
+                    "ultimo": {"etiqueta": arquivados[-1]["etiqueta"], "url": arquivados[-1]["url"],
+                               "corte": _iso(arquivados[-1]["corte"]), "feito_em": _iso(arquivados[-1]["feito_em"])}
+                    if arquivados else None},
         "historias": lista_historias,
         "traducao": estado_traducao,
         "mercados": estado_mercados,
@@ -253,7 +263,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None, "pontos": None, "terremotos": [], "faixa": [],
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "arquivo": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None, "pontos": None, "terremotos": [], "faixa": [],
         "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],

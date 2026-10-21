@@ -26,6 +26,20 @@ def test_documento_coletado_duas_vezes_vira_um_registro(engine, cfg, feed_rss):
     assert _contar(engine, db.documento) == 2
 
 
+def test_documento_arquivado_nao_entra_de_novo(engine, cfg, feed_rss, tmp_path):
+    # Decisão 0015: a notícia que saiu do banco para o arquivo conferido continua contando como já vista (regra 3)
+    from stratum import arquivo
+    fontes = [fonte("a", URL_A)]
+    sessao = SessaoFalsa({URL_A: feed_rss})
+    robo.rodar(engine, fontes, sessao, cfg, agora=Relogio())
+    pasta = tmp_path / "arquivo"
+    assert arquivo.separar(engine, pasta, agora=Relogio().t + timedelta(days=400))
+    arquivo.conferir_e_tirar(engine, pasta, url="https://github.com/dono/repo/releases/tag/teste")
+    assert _contar(engine, db.documento) == 0
+    depois = robo.rodar(engine, fontes, sessao, cfg, agora=Relogio(Relogio().t + timedelta(days=401)))
+    assert depois.novos == 0 and _contar(engine, db.documento) == 0
+
+
 def test_rastreio_na_url_nao_cria_documento_novo(engine, cfg, feed_rss):
     outra_versao = feed_rss.replace(b"utm_source=rss&amp;utm_medium=feed", b"utm_campaign=outra")
     robo.rodar(engine, [fonte("a", URL_A)], SessaoFalsa({URL_A: feed_rss}), cfg, agora=Relogio())

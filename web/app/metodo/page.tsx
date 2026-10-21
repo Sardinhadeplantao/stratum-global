@@ -250,6 +250,15 @@ export default function Metodo() {
               com a restauração testada.
             </>) : <span className="sem-dado-texto">—</span>}
           </dd>
+          <dt>Arquivo do banco</dt>
+          <dd>
+            Uma vez por mês, as notícias com mais de 12 meses e o registro de leituras com mais de 30 dias vão para um
+            arquivo permanente no GitHub e só saem do banco depois de conferidos (decisão 0015). As contagens somam o
+            banco e o arquivo.{" "}
+            {s.arquivo?.ultimo ? <>Último: <a href={s.arquivo.ultimo.url} target="_blank" rel="noreferrer">{s.arquivo.ultimo.etiqueta}</a>,
+              com {numero(s.arquivo.documentos)} notícias arquivadas até agora.</>
+              : s.arquivo ? "Nada arquivado ainda." : <span className="sem-dado-texto">—</span>}
+          </dd>
           <dt>Telegram</dt><dd>Um resumo às 7:30, 12:00 e 19:00 (Brasília). Problemas entram no resumo seguinte.</dd>
           <dt>Fontes funcionando</dt>
           <dd>{rodada ? `${s.totais.fontes_ok} de ${s.totais.fontes}` : <span className="sem-dado-texto">—</span>}</dd>

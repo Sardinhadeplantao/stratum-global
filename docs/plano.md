@@ -41,15 +41,15 @@ Já entregue:
 - Método com a regra de ouro, o que o sistema não faz, a versão de cada regra em vigor, a fila da tradução e um
   glossário curto.
 
+Também entregue: a retenção (decisão 0015, arquivo conferido). Banco medido em 21/10: 45,6 MB de 500 MB.
+
 Falta:
 
-- Retenção: medir o tamanho do banco e quanto ele cresce por semana (o manifesto da cópia semanal traz os dois).
-  A decisão 0001 previa apagar o detalhe das notícias depois de uns 90 dias, o que a regra 2 proíbe: a decisão nova
-  mantém tudo ou muda a regra 2 por escrito.
 - Completar a ficha das fontes: termos de uso e volume esperado por dia. Fonte nova entra com a ficha, uma amostra
   real guardada e um teste. Fonte que se cala além do esperado entra no resumo.
 - Lista de fontes: a China oficial, se aparecer um feed que funcione; GDELT para volume. A imprensa das regiões que
-  faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel) entra depois da decisão de retenção.
+  faltam (África, América hispânica, Japão e Coreia, Turquia, Irã, Israel): a retenção já está decidida (decisão
+  0015, arquivo conferido), então podem entrar.
 - Um dia novo anotado para medir a regra `historias-0.2` num dia que ela nunca viu (meta: pelo menos 90% dos pares
   juntados são da mesma história).
 - Opcional: o dono confere 30 pares do gabarito (`jobs/tests/gabarito/conferencia_dono.md`). Sem isso, o Método diz
@@ -104,8 +104,8 @@ Já entregue:
 
 Falta:
 
-- Decisão de quanto guardar (urgente): cotações só com o fechamento do dia, registro das leituras resumido, e medir o
-  peso de cada notícia (banco em 45,6 MB de 500 MB em 21/10; as notícias e o registro das leituras são o que mais cresce).
+- Cotações: guardar só o fechamento de cada dia (as cópias de hora em hora do dia em andamento são o que mais cresce
+  depois do arquivo conferido, decisão 0015).
 - Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
 - A reação medida a cada evento.
 - Atores e incentivos de cada ponto crítico, com decisão própria (é análise, não dado).

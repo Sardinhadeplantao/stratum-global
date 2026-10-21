@@ -42,7 +42,9 @@ def test_copia_so_as_tabelas_do_projeto():
                                                   "historia_documento",  # só ids, datas e a versão da regra
                                                   "traducao",            # títulos de notícia traduzidos
                                                   "serie", "observacao",  # câmbio oficial, dado público (decisão 0011)
-                                                  "contrato_futuro", "evento_local"}  # contratos e terremotos, públicos
+                                                  "contrato_futuro", "evento_local",  # contratos e terremotos, públicos
+                                                  "arquivo",               # etiqueta e endereço de cada arquivamento
+                                                  "documento_arquivado"}   # impressão curta de notícia arquivada
     assert not {"secrets", "decrypted_secrets", "job", "job_run_details", "_http_response"} & set(db.md.tables)
 
 
@@ -178,7 +180,7 @@ def _copia_editada(engine, pasta, editar_manifesto=None, editar_linha=None, tira
 def test_copia_de_antes_de_uma_migracao_continua_restauravel(engine, tmp_path):
     # Uma cópia feita pelo código da versão 0001 do esquema: sem a tabela resumo (0002) e sem a ficha da fonte (0003)
     ficha = {"nivel", "controle", "controlador", "controlador_nome", "controlador_fonte"}
-    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo", "historia_documento", "traducao", "serie", "observacao", "contrato_futuro", "evento_local"],
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo", "historia_documento", "traducao", "serie", "observacao", "contrato_futuro", "evento_local", "arquivo", "documento_arquivado"],
                    editar_linha=("fonte", lambda r: {k: v for k, v in r.items() if k not in ficha}))
     destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
     contagens = copia.restaurar(tmp_path / "velha", destino)

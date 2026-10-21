@@ -106,6 +106,8 @@ export type Status = {
   erro_banco: string | null;
   agendador?: Agendador | null;
   copia?: Copia | null;
+  /** Arquivo conferido (decisão 0015): notícias que saíram do banco para o GitHub, com o último arquivamento */
+  arquivo?: { documentos: number; ultimo: { etiqueta: string; url: string; corte: string | null; feito_em: string | null } | null } | null;
   historias?: Historia[];
   /** Contagem pronta das histórias das últimas 24 horas (o site não conta, regra 9) */
   contagem_historias?: { total: number; varias_vozes: number } | null;
