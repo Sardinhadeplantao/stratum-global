@@ -10,7 +10,7 @@ Uso:  python scripts/sondar_series.py
 """
 import sys
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -47,7 +47,7 @@ OFICIAIS = {
 def sondar_candidatas(sessao, ua) -> None:
     f = {"url": "https://query1.finance.yahoo.com/v8/finance/chart/"}
     ate = int(time.time()) + 86400
-    for grupo, codigos in YAHOO.items():
+    for grupo, codigos in ({} if "--so-contratos" in sys.argv else YAHOO).items():
         print(f"== Candidatas no Yahoo: {grupo}")
         for codigo in codigos:
             url = conectores.url_yahoo(f, codigo, date(2015, 1, 1), ate)
@@ -62,6 +62,22 @@ def sondar_candidatas(sessao, ua) -> None:
                       f"{obs[0].data if obs else '-'} a {obs[-1].data if obs else '-'} = {obs[-1].valor if obs else '-'}")
             except Exception as exc:  # noqa: BLE001 - a sonda só relata
                 print(f"FALHOU {codigo}: {type(exc).__name__}: {str(exc)[:120]}")
+    print("== Contratos futuros: o Yahoo diz qual contrato vale? (troca de contrato, decisão 0013)")
+    import json
+    for codigo in ["CL=F", "BZ=F", "NG=F", "TTF=F", "GC=F", "ZW=F", "CLX26.NYM", "CLZ26.NYM", "BZZ26.NYM", "BZF27.NYM"]:
+        url = conectores.url_yahoo(f, codigo, date.today() - timedelta(days=8), ate)
+        try:
+            r = json.loads(conectores._baixar(sessao, url, ua))["chart"]["result"][0]
+            meta, q = r["meta"], r["indicators"]["quote"][0]["close"]
+            dias = [str(datetime.fromtimestamp(t, timezone.utc).date()) for t in r.get("timestamp") or []]
+            print(f"{codigo}: chaves={sorted(meta)}")
+            print(f"  nomes: short={meta.get('shortName')!r} long={meta.get('longName')!r} "
+                  f"expira={meta.get('expireDate')} contrato={meta.get('underlyingSymbol')}")
+            print(f"  preço {meta.get('regularMarketPrice')} em {meta.get('regularMarketTime')}; "
+                  f"anterior {meta.get('chartPreviousClose')}/{meta.get('previousClose')}; "
+                  f"fechamentos {list(zip(dias, q))[-4:]}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"FALHOU {codigo}: {type(exc).__name__}: {str(exc)[:120]}")
     hoje = date.today()
     inicio = hoje - timedelta(days=12)
     print("== Candidatas oficiais de juros de 10 anos")

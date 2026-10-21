@@ -21,6 +21,6 @@ jobs:
       - working-directory: jobs
         run: |
           pip install -r requirements.txt
-          python scripts/sondar_series.py
+          python scripts/sondar_series.py --so-contratos
           python scripts/sondar_fontes.py
           python scripts/sondar_traducao.py
