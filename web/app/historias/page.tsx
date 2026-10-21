@@ -1,6 +1,7 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
 import { dataHora, datasDocumento, plural } from "@/lib/formatar";
 import { lerStatus } from "@/lib/status";
+import Reacao from "@/components/Reacao";
 import Titulo from "@/components/Titulo";
 
 export const metadata = { title: "Histórias · Stratum Global" };
@@ -27,6 +28,7 @@ export default function Historias() {
             <b>{plural(h.vozes, "voz independente", "vozes independentes")}</b> · última em {dataHora(h.ultima)}
             {h.paises.length > 0 && <> · {h.paises.map((p) => p.nome).join(", ")}</>}
           </p>
+          <Reacao r={h.reacao} />
           <details>
             <summary>Ver as notícias</summary>
             <ul className="regras">

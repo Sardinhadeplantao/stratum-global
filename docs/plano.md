@@ -102,12 +102,14 @@ Já entregue:
 - a página inicial em torno do mapa (decisão 0014): pontos críticos que acendem por regra (`pontos-0.1`), contexto de
   cada ponto com fonte, rotas esquemáticas, terremotos do USGS, o painel de cada país com os mercados dele, a aba
   Mercados (destaques, quantas sobem e caem, último mês, bolsas por região) ao lado das notícias, e a troca de contrato
-  das commodities fora da régua (`regua-1.1`).
+  das commodities fora da régua (`regua-1.1`);
+- a reação do mercado a cada evento (`reacao-0.1`, decisão 0017): em cada história e em cada ponto crítico em pauta, os
+  ativos ligados (dos pontos e dos países citados), o dia do evento e o pregão seguinte pela régua, a variação desde
+  o evento e a taxa-base de pelo menos um deles sair do normal por acaso.
 
 Falta:
 
 - Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
-- A reação medida a cada evento.
 - Atores e incentivos de cada ponto crítico, com decisão própria (é análise, não dado).
 
 **Pronto quando:** todo evento importante mostra se algum ativo ligado se mexeu fora do normal.

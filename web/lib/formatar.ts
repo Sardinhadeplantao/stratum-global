@@ -143,6 +143,21 @@ export function leituraSerie(situacao: string | null | undefined, extremo: strin
   return { texto: "Sem dado", classe: "sem-dado" };
 }
 
+/** Reação do mercado a um evento (decisão 0017). Cor só para estado medido; sem pregão e sem ativo ficam cinza. */
+export function situacaoReacao(s: string | null | undefined): { texto: string; classe: string } {
+  if (s === "fora_do_normal") return { texto: "Algum ativo ligado saiu do normal", classe: "sit-fora" };
+  if (s === "normal") return { texto: "Ativos ligados dentro do normal", classe: "sit-normal" };
+  if (s === "aguardando") return { texto: "Ainda sem pregão desde o evento", classe: "sem-dado" };
+  return { texto: "Nenhum ativo acompanhado está ligado a este evento", classe: "sem-dado" };
+}
+
+/** "Num período qualquer de 2 pregões, pelo menos um destes 3 ativos sai do normal em 47% das vezes (5 anos)". */
+export function textoTaxaBase(t: { pct: number; dias: number; anos: number } | null | undefined, ativos: number): string {
+  if (!t) return "Sem histórico suficiente para dizer quanto isso é comum.";
+  const quem = ativos === 1 ? "este ativo" : `pelo menos um destes ${ativos} ativos`;
+  return `Num período qualquer de ${t.dias} pregões, ${quem} sai do normal em ${t.pct}% das vezes (últimos ${t.anos} anos).`;
+}
+
 export type Conferencia = { com: string; data: string; oficial: number; diferenca: number; confere: boolean };
 
 /** "Confere com o BCE em 20/10/2026 (diferença de -0,12%)". O robô já decidiu se confere. */

@@ -44,6 +44,28 @@ export type DocumentoHistoria = {
 export type Historia = {
   id: number; titulo: string; titulo_original?: string | null; noticias: number; fontes: number; vozes: number; ultima: string | null;
   paises: PaisCitado[]; documentos: DocumentoHistoria[];
+  /** A primeira notícia: o começo do evento (decisão 0017) */
+  inicio?: string | null;
+  /** Pontos críticos citados nos títulos */
+  pontos?: string[];
+  reacao?: Reacao | null;
+};
+/** Reação do mercado a um evento (decisão 0017): a régua de sempre no dia do evento e no pregão seguinte, a variação
+ * desde o evento e a taxa-base. Coincidência no tempo, não causa. Tudo vem pronto do robô. */
+export type DiaReacao = {
+  data: string; variacao: number | null; percentil: number | null; extremo: "alta" | "baixa" | null; situacao: string; parcial: boolean;
+};
+export type AtivoReacao = {
+  id: string; simbolo: string; nome: string; medida: string; grupo: string | null;
+  por: { tipo: "ponto" | "pais"; id: string; nome: string };
+  base: { data: string; valor: number } | null; dias: DiaReacao[]; extremo: "alta" | "baixa" | null;
+  desde: number | null; ate: string | null; parcial: boolean;
+  /** Troca de contrato futuro entre a base e o último valor: sem "desde o evento" (contratos diferentes) */
+  troca_de_contrato?: boolean;
+};
+export type Reacao = {
+  regra: string; inicio: string; dia: string; situacao: "fora_do_normal" | "normal" | "aguardando" | "sem_ativo";
+  fora: number; ativos: AtivoReacao[]; taxa_base: { pct: number; periodos: number; dias: number; anos: number } | null;
 };
 /** Séries de mercado lidas pela régua única (decisão 0011). Tudo vem calculado do robô; o site só mostra. */
 export type Serie = {
@@ -88,6 +110,8 @@ export type Ponto = {
   noticias: number; vozes: number; com_acao: number;
   margens: PaisCitado[]; fatos: { texto: string; periodo: string; fonte: string; url: string }[];
   mercados: MercadoResumo[]; documentos: (Documento & { acao: boolean })[];
+  /** A primeira notícia das últimas 24 horas que cita o ponto, e a reação do mercado desde ela (decisão 0017) */
+  inicio?: string | null; reacao?: Reacao | null;
 };
 export type Terremoto = {
   id: string; titulo: string; url: string | null; magnitude: number | null; lat: number; lon: number;

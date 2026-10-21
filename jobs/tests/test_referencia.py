@@ -358,3 +358,80 @@ def test_dia_da_troca_de_contrato_nao_entra_na_regua(engine):
     # Sem saber o contrato, a mesma queda apareceria como fora do normal
     sem_contrato = mercados._ler(pontos, serie, 5, momento)
     assert sem_contrato["extremo"] == "baixa"
+
+
+# Reação do mercado a cada evento (decisão 0017): a régua de sempre, no dia do evento e no pregão seguinte
+
+def _pregao_seguinte(d):
+    return d + timedelta(days=3 if d.weekday() == 4 else 1)
+
+
+def test_reacao_mede_o_dia_do_evento_e_o_seguinte_contra_o_fechamento_anterior():
+    from stratum.domain import reacao
+    pontos = _serie(1300, escala=0.2, semente=6)
+    vespera, valor = pontos[-1]
+    dia = _pregao_seguinte(vespera)
+    seguinte, depois = _pregao_seguinte(dia), _pregao_seguinte(_pregao_seguinte(dia))
+    pontos += [(dia, valor * 1.001), (seguinte, valor * 1.001 * 1.03), (depois, valor * 1.001 * 1.03 * 0.99)]
+    m = reacao.Medidor({"brent": {"pts": pontos, "medida": "variacao_pct"}})
+    r = m.ativo("brent", dia)
+    assert r["base"] == {"data": vespera.isoformat(), "valor": valor}      # o último fechamento antes do evento
+    assert [d["data"] for d in r["dias"]] == [dia.isoformat(), seguinte.isoformat()]  # o 3º pregão não conta
+    assert r["dias"][0]["extremo"] is None and r["dias"][1]["extremo"] == "alta" and r["extremo"] == "alta"
+    assert r["desde"] == round((1.001 * 1.03 * 0.99 - 1) * 100, 2)        # desde o evento: até o último valor
+    e = m.evento(dia, [("brent", {"tipo": "ponto", "id": "ormuz", "nome": "Estreito de Ormuz"})])
+    assert e["situacao"] == "fora_do_normal" and e["fora"] == 1 and e["regra"] == reacao.REGRA
+
+
+def test_evento_sem_pregao_desde_entao_aguarda_e_sem_ativo_fica_sem_cor():
+    from stratum.domain import reacao
+    pontos = _serie(1300, escala=0.2)
+    ultimo = pontos[-1][0]
+    sabado = ultimo + timedelta(days=(5 - ultimo.weekday()) % 7 or 7)
+    m = reacao.Medidor({"brent": {"pts": pontos, "medida": "variacao_pct"}})
+    por = {"tipo": "pais", "id": "IRN", "nome": "Irã"}
+    assert m.evento(sabado, [("brent", por)])["situacao"] == "aguardando"
+    sem = m.evento(sabado, [])
+    assert sem["situacao"] == "sem_ativo" and sem["ativos"] == [] and sem["taxa_base"] is None
+
+
+def test_reacao_vem_com_a_taxa_base_dos_mesmos_ativos():
+    # Com mais ativos ligados, sair do normal por acaso fica mais comum. A taxa-base diz quanto, para esse conjunto:
+    # com 1 ativo e 2 pregões, cerca de 19% (1 - 0,9²); com 3 ativos independentes, cerca de 47%
+    from stratum.domain import reacao
+    series = {f"s{i}": {"pts": _serie(1300, escala=0.5, semente=20 + i), "medida": "variacao_pct"} for i in range(3)}
+    dia = _pregao_seguinte(series["s0"]["pts"][-1][0])
+    m = reacao.Medidor(series)
+    por = {"tipo": "pais", "id": "BRA", "nome": "Brasil"}
+    um = m.evento(dia, [("s0", por)])["taxa_base"]
+    tres = m.evento(dia, [(s, por) for s in series])["taxa_base"]
+    assert 12 <= um["pct"] <= 26 and um["dias"] == reacao.DIAS and um["anos"] == 5
+    assert 35 <= tres["pct"] <= 60
+
+
+def test_ativos_ligados_por_lista_escrita():
+    # De cada ponto citado, os mercados do ponto; de cada país citado, a moeda contra o dólar, a bolsa e o juro de
+    # 10 anos. O euro contra a moeda (BCE) não entra: confere a cotação e repetiria a mesma moeda.
+    from stratum import fontes as catalogo
+    from stratum.domain import pontos, reacao
+    ormuz = next(p for p in pontos.PONTOS if p["id"] == "ormuz")
+    ligados = reacao.ligados([{"iso": "USA", "nome": "Estados Unidos"}, {"iso": "BRA", "nome": "Brasil"}], [ormuz],
+                             catalogo.SERIES)
+    assert [s for s, _ in ligados] == ["commodity_bz", "commodity_cl", "commodity_ttf",
+                                       "yahoo_dxynyb", "bolsa_gspc", "juros_usa_10a", "yahoo_brl", "bolsa_bvsp"]
+    assert ligados[0][1] == {"tipo": "ponto", "id": "ormuz", "nome": "Estreito de Ormuz"}
+    assert reacao.ligados([{"iso": "KEN", "nome": "Quênia"}], [], catalogo.SERIES) == []
+
+
+def test_reacao_nao_mede_desde_o_evento_por_cima_da_troca_de_contrato():
+    # WTI de 20/10/2026: o contrato de novembro (103,66) virou o de dezembro (98,47). "Desde o evento" compararia
+    # contratos diferentes: fica sem número, e o dia da troca fica fora da régua
+    from stratum.domain import reacao
+    pontos = _serie(1300, escala=1.0, semente=9)
+    vespera = pontos[-1][0]
+    dia = _pregao_seguinte(vespera)
+    pontos[-1] = (vespera, 103.66)
+    pontos.append((dia, 98.47))
+    r = reacao.Medidor({"wti": {"pts": pontos, "medida": "variacao_pct", "trocas": {dia}}}).ativo("wti", dia)
+    assert r["desde"] is None and r["troca_de_contrato"]
+    assert r["dias"][0]["situacao"] == "troca_de_contrato" and r["extremo"] is None

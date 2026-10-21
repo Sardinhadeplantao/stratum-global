@@ -2,6 +2,7 @@
 import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import PainelPais, { type Pais } from "@/components/PainelPais";
+import Reacao from "@/components/Reacao";
 import Titulo from "@/components/Titulo";
 import { diaHora, estadoPonto, magnitude, numero, plural, situacao } from "@/lib/formatar";
 import type { DadosInicio, Selecao } from "./Inicio";
@@ -94,6 +95,7 @@ export default function PainelLateral({ dados, selecao, selecionar, porIso, atua
                         <span key={p.iso}>{i > 0 && ", "}<button type="button" className="link" onClick={() => selecionar({ tipo: "pais", id: p.iso })}>{p.nome}</button></span>
                       ))}</>}
                     </div>
+                    <Reacao r={h.reacao} compacta />
                   </li>
                 ))}
               </ul>

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie, estadoPonto, magnitude, donoFonte, linhaMinigrafico } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie, estadoPonto, magnitude, donoFonte, linhaMinigrafico, situacaoReacao, textoTaxaBase } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -118,4 +118,14 @@ test("minigráfico: do menor ao maior valor na altura; série parada fica no mei
   assert.equal(linhaMinigrafico([1, 3, 2], 10, 4), "0.0,4.0 5.0,0.0 10.0,2.0");
   assert.equal(linhaMinigrafico([5, 5], 10, 4), "0.0,2.0 10.0,2.0");
   assert.equal(linhaMinigrafico([5], 10, 4), null);
+});
+
+test("reação do mercado: cor só para estado medido e a taxa-base em texto (decisão 0017)", () => {
+  assert.equal(situacaoReacao("fora_do_normal").classe, "sit-fora");
+  assert.equal(situacaoReacao("aguardando").classe, "sem-dado");
+  assert.equal(situacaoReacao("sem_ativo").classe, "sem-dado");
+  assert.equal(textoTaxaBase({ pct: 22, dias: 2, anos: 5 }, 1),
+    "Num período qualquer de 2 pregões, este ativo sai do normal em 22% das vezes (últimos 5 anos).");
+  assert.match(textoTaxaBase({ pct: 49, dias: 2, anos: 5 }, 3), /pelo menos um destes 3 ativos sai do normal em 49%/);
+  assert.match(textoTaxaBase(null, 2), /Sem histórico/);
 });

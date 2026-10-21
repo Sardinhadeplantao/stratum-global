@@ -41,6 +41,7 @@ def pontos(contaveis: list[dict], por_fonte: dict, resumo_documento, series: dic
         citam = [d for d in contaveis if p["id"] in regra_pontos.citados(f"{d['titulo']}\n{d['resumo'] or ''}")]
         lista.append({
             "id": p["id"], "nome": p["nome"], "lon": p["lon"], "lat": p["lat"]} | estados[p["id"]] | {
+            "inicio": _iso(min(d["quando"] for d in citam)) if citam else None,  # 1ª notícia da janela (decisão 0017)
             "margens": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in p["margens"]],
             "fatos": p["fatos"],
             "mercados": [_mercado(series[sid]) for sid in p["mercados"] if sid in series],

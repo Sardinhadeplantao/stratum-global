@@ -113,9 +113,10 @@ class Leitura:
 
 
 def ler(pontos: list[tuple[date, float]], medida: str = "variacao_pct", frequencia: str = "diaria",
-        trocas: frozenset[date] | set[date] = frozenset()) -> Leitura:
+        trocas: frozenset[date] | set[date] = frozenset(), mudancas: bool = True) -> Leitura:
     """A leitura do último ponto da série. `pontos` em ordem de data, um por data.
-    `trocas`: dias em que o contrato futuro mudou; a variação deles não mede o mercado e fica fora da régua."""
+    `trocas`: dias em que o contrato futuro mudou; a variação deles não mede o mercado e fica fora da régua.
+    `mudancas=False`: só a leitura do dia, sem procurar extremo que persiste nem quebra de ritmo (mais rápido)."""
     if pontos and pontos[-1][0] in trocas:
         return Leitura("troca_de_contrato", data=pontos[-1][0], valor=pontos[-1][1])
     medidas = [m for m in MEDIDAS[medida](pontos) if m[0] not in trocas]
@@ -134,6 +135,8 @@ def ler(pontos: list[tuple[date, float]], medida: str = "variacao_pct", frequenc
     base.situacao, base.percentil, base.extremo = "ok", p, _lado(p)
     base.pontuacao = (x - median(referencia)) / escala if escala > 0 else None
     base.faixa = (quantil(referencia, EXTREMO / 100), quantil(referencia, 1 - EXTREMO / 100))
+    if not mudancas:
+        return base
 
     datas = [dd for dd, _ in medidas]
     ps = percentis(medidas, minimo)

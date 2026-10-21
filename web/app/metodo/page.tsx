@@ -29,6 +29,7 @@ export default function Metodo() {
   const SEM_BANCO = "Sem dado nesta atualização: o banco não abriu.";
   const criterios = agruparCriterios(s.fontes.filter((f) => f.ativa));
   const m = s.mercados;
+  const versaoReacao = [...(s.historias ?? []), ...(s.pontos?.lista ?? [])].find((x) => x.reacao)?.reacao?.regra;
   const nomeFonte = Object.fromEntries(s.fontes.map((f) => [f.id, f.nome]));
   return (<>
     <AvisoAtraso ate={s.avisar_atraso_apos} gerado={s.gerado_em} />
@@ -171,7 +172,7 @@ export default function Metodo() {
               dia completo dos dois. Diferença acima de {m.confere_ate_pct.toLocaleString("pt-BR")}%: &quot;não confere&quot;, sem cor
               de leitura</dd>
             <dt>Dia em andamento</dt><dd>A cotação de mercado do dia que ainda não fechou aparece marcada, com a hora da
-              leitura (lida a cada hora)</dd>
+              leitura (lida a cada rodada, de 15 em 15 minutos). Só o fechamento vai para o banco (decisão 0016)</dd>
           </dl>
         ) : <p className="sem-dado-texto">Sem dado nesta atualização.</p>}
         <ul className="regras">
@@ -223,6 +224,35 @@ export default function Metodo() {
           </div>
           </div>
         ))}
+      </section>
+
+      <section id="reacao">
+        <h2>Reação do mercado a cada evento</h2>
+        <p>
+          Em cada história e em cada ponto crítico em pauta, o robô mostra o que os ativos ligados fizeram no dia do evento
+          e no pregão seguinte, pela mesma régua das séries, e quanto subiram ou caíram desde o evento (decisão 0017).
+        </p>
+        <dl className="resumo">
+          <dt>Versão</dt><dd>{versaoReacao ?? "reacao-0.1"}</dd>
+          <dt>Evento</dt><dd>Cada história desta página e cada ponto crítico em pauta ou crítico. Começa na primeira notícia
+            (no ponto, a primeira das últimas 24 horas); o dia do evento é a data desse começo, em UTC</dd>
+          <dt>Ativos ligados</dt><dd>De cada ponto crítico citado nos títulos, os mercados do ponto. De cada país citado, a
+            moeda contra o dólar (o DXY, nos EUA), a bolsa e o juro de 10 anos, quando acompanhados</dd>
+          <dt>Dias</dt><dd>O dia do evento e o pregão seguinte de cada ativo: com fechamento diário, não dá para saber se a
+            notícia saiu antes ou depois do fechamento de cada mercado</dd>
+          <dt>Fora do normal</dt><dd>A régua acima: percentil da variação do dia contra os 5 anos da própria série. O dia em
+            andamento entra marcado e muda até fechar</dd>
+          <dt>Desde o evento</dt><dd>Do último fechamento antes do dia do evento até o último valor</dd>
+          <dt>Taxa-base</dt><dd>Em quantos por cento dos períodos de 2 pregões dos 5 anos anteriores pelo menos um dos mesmos
+            ativos saiu do normal. Com muitos ativos ligados, alguém sair do normal é comum</dd>
+        </dl>
+        <ul className="regras">
+          <li><b>Coincidência no tempo, não causa.</b> &quot;Saiu do normal no dia&quot; não quer dizer que foi por causa do
+            evento: o preço reage a muita coisa ao mesmo tempo.</li>
+          <li><b>Preço é contexto.</b> A reação não muda a ordem das histórias nem dos pontos e não gera aviso.</li>
+          <li><b>Movimento dentro do dia não é medido:</b> as séries são diárias. País sem série acompanhada fica sem ativo
+            ligado.</li>
+        </ul>
       </section>
 
       <section>
@@ -382,8 +412,8 @@ export default function Metodo() {
           <li>Grau de confirmação de cada fato (pista, relatado, corroborado, oficial, contestado) e importância: próxima
             etapa da fase 1, depois das histórias.</li>
           <li>Redes sociais (X e outras): ainda não são lidas. Quando entrarem, serão pista, nunca fato.</li>
-          <li>Mercados: as moedas já entram (régua acima). Juros, bolsas por país, commodities e cripto, e a tela Mercados
-            com os eventos do mesmo período (coincidência no tempo, não causa), vêm nas próximas etapas da fase 2.</li>
+          <li>Mercados: juro de 10 anos do Brasil (não há série oficial diária e gratuita num arquivo simples) e
+            movimento dentro do dia.</li>
           <li>Comércio, navios nos estreitos, sanções e conflito como séries: fase 4.</li>
           <li>Cadeias, exposição e hipóteses: fase 5.</li>
         </ul>
