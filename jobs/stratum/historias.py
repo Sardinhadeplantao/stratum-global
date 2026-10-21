@@ -9,7 +9,7 @@ from sqlalchemy import func, select
 
 from stratum import db, traducao
 from stratum.domain import historias as regra
-from stratum.domain import paises
+from stratum.domain import paises, pontos as regra_pontos
 
 JANELA_SITE = timedelta(hours=24)
 MAX_HISTORIAS = 20
@@ -75,6 +75,7 @@ def recentes(engine, agora: datetime, inicio: datetime | None = None, limite: in
         docs.sort(key=lambda x: (x["quando"], x["id"]), reverse=True)
         primeira = min(docs, key=lambda x: x["id"])
         isos = sorted({iso for x in docs for iso in paises.citados(x["titulo"], dic)})
+        citados = {pid for x in docs for pid in regra_pontos.citados(x["titulo"])}
         saida.append({
             "id": hid,
             "titulo": em_portugues.get(primeira["id"]) or primeira["titulo"],
@@ -82,8 +83,10 @@ def recentes(engine, agora: datetime, inicio: datetime | None = None, limite: in
             "noticias": len(docs),
             "fontes": len({x["fonte"] for x in docs}),
             "vozes": len({x["controlador"] or x["fonte"] for x in docs}),
+            "inicio": export._iso(docs[-1]["quando"]),  # a primeira notícia: o começo do evento (decisão 0017)
             "ultima": export._iso(docs[0]["quando"]),
             "paises": [{"iso": i, "nome": dic.nome(i) or i} for i in isos],
+            "pontos": [p["id"] for p in regra_pontos.PONTOS if p["id"] in citados],  # pontos críticos nos títulos
             "documentos": [{"titulo": em_portugues.get(x["id"]) or x["titulo"],
                             "titulo_original": x["titulo"] if x["id"] in em_portugues else None, "url": x["url"], "fonte": x["fonte"], "fonte_nome": x["fonte_nome"],
                             "publicado_em": export._iso(x["publicado_em"]), "conhecido_em": export._iso(x["conhecido_em"])}

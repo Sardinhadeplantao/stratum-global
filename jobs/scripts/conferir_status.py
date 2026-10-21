@@ -18,6 +18,25 @@ def _n(x, casas=2, sinal=False):
     return (f"{x:+.{casas}f}" if sinal else f"{x:.{casas}f}").replace(".", ",")
 
 
+SITUACAO_REACAO = {"fora_do_normal": "ALGUM ATIVO FORA DO NORMAL", "normal": "ativos ligados dentro do normal",
+                   "aguardando": "sem pregão desde o evento", "sem_ativo": "nenhum ativo acompanhado ligado"}
+
+
+def _reacao(r: dict | None, recuo: str) -> None:
+    """Uma linha por evento e uma por ativo ligado (decisão 0017)."""
+    if not r:
+        return
+    tb = r.get("taxa_base")
+    base = f" · taxa-base {tb['pct']}% em {tb['periodos']} períodos de {tb['dias']} pregões" if tb else ""
+    print(f"{recuo}reação ({r['regra']}, desde {r['inicio']}): {SITUACAO_REACAO.get(r['situacao'], r['situacao'])}{base}")
+    for a in r["ativos"]:
+        unidade = " p.p." if a.get("medida") == "diferenca" else "%"
+        dias = ", ".join(f"{d['data']} {_n(d['variacao'], sinal=True)}{unidade} p{_n(d['percentil'], 0)}"
+                         f"{' parcial' if d.get('parcial') else ''}{' FORA' if d['extremo'] else ''}" for d in a["dias"])
+        print(f"{recuo}  {a['simbolo']} (por {a['por']['nome']}): base {(a['base'] or {}).get('data')} · "
+              f"desde o evento {_n(a['desde'], sinal=True)}{unidade} · {dias or 'sem pregão'}")
+
+
 def main(caminho: str) -> int:
     try:
         s = json.load(open(caminho, encoding="utf-8"))
@@ -46,8 +65,13 @@ def main(caminho: str) -> int:
                 print(f"  {x['nome']}: {x['estado']} · notícias {x['noticias']}, vozes {x['vozes']}, com ação {x['com_acao']}")
                 for d in x["documentos"]:
                     print(f"    {'[ação] ' if d.get('acao') else ''}{d['fonte_nome']}: {d['titulo_original'] or d['titulo']}")
+                _reacao(x.get("reacao"), "    ")
     else:
         print("Pontos críticos: sem dado")
+    for hi in (s.get("historias") or [])[:8]:  # as com mais vozes, com a reação do mercado
+        print(f"  História {hi['id']} ({hi['vozes']} vozes, {', '.join(p['iso'] for p in hi['paises']) or 'sem país'}): "
+              f"{hi.get('titulo_original') or hi['titulo']}")
+        _reacao(hi.get("reacao"), "    ")
     tr = s.get("terremotos") or []
     print(f"Terremotos 4,5+ em 24 h: {len(tr)}" + (f" · o mais forte: M {tr[0]['magnitude']} · {tr[0]['titulo']}" if tr else ""))
     print(f"Faixa de baixo: {len(s.get('faixa') or [])} itens")

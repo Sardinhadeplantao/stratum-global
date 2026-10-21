@@ -2,13 +2,14 @@
 import json
 import os
 import unicodedata
-from datetime import timedelta
+from datetime import date, timedelta
 
 from sqlalchemy import func, or_, select
 
 from stratum import VERSAO, db, fontes as catalogo, historias, mapa, mercados, traducao
 from stratum.domain import historias as regra_historias
-from stratum.domain import paises
+from stratum.domain import paises, reacao
+from stratum.domain import pontos as regra_pontos
 
 VERSAO_FORMATO = 2
 ULTIMOS_DOCUMENTOS = 100  # a aba Notícias busca e filtra nestas (decisão 0014)
@@ -93,8 +94,9 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         estado_traducao = traducao.situacao(c)
         obs_por_fonte = dict(c.execute(select(db.serie.c.fonte_id, func.count()).select_from(
             db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
+        cot = mercados.cotacoes(c, momento, catalogo.SERIES, os.environ.get("STRATUM_CACHE_OBSERVACOES"), parciais)
         estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES,
-                                          copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"), parciais=parciais)
+                                          cot=cot)
         eventos = mapa.terremotos(c, momento)
         eventos_por_fonte = dict(c.execute(select(db.evento_local.c.fonte_id, func.count(func.distinct(db.evento_local.c.ext_id)))
                                            .group_by(db.evento_local.c.fonte_id)).all())
@@ -159,6 +161,16 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
 
     todas_historias = historias.recentes(engine, momento, limite=None)
     lista_historias = todas_historias[:historias.MAX_HISTORIAS]
+
+    # Reação do mercado a cada evento (decisão 0017): não muda a ordem das histórias nem dos pontos (regra 8)
+    medidor = mercados.medidor(cot, catalogo.SERIES, estado_mercados["series"])
+    pontos_por_id = {p["id"]: p for p in regra_pontos.PONTOS}
+    for h in lista_historias:
+        h["reacao"] = _reacao(medidor, h["inicio"], reacao.ligados(
+            h["paises"], [pontos_por_id[i] for i in h["pontos"]], catalogo.SERIES), series_por_id)
+    for p in estado_pontos["lista"]:
+        p["reacao"] = None if p["estado"] == "sem_pauta" else _reacao(
+            medidor, p["inicio"], reacao.ligados([], [pontos_por_id[p["id"]]], catalogo.SERIES), series_por_id)
     historias_do_pais: dict[str, list] = {}
     for h in todas_historias:  # já vêm na ordem: mais vozes primeiro
         for p in h["paises"]:
@@ -221,6 +233,17 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
                            "proporcao": round(n / max(origem.values()), 4)}
                           for p, n in sorted(origem.items(), key=lambda kv: (-kv[1], kv[0] or ""))],
     }
+
+
+def _reacao(medidor, inicio: str | None, ligacoes: list, series_por_id: dict) -> dict | None:
+    """A reação de um evento que começou em `inicio` (ISO, UTC), com o nome e o símbolo de cada ativo para o site."""
+    if not inicio:
+        return None
+    r = medidor.evento(date.fromisoformat(inicio[:10]), ligacoes)
+    for a in r["ativos"]:
+        s = series_por_id[a["id"]]
+        a.update(simbolo=s["simbolo"], nome=s["nome"], medida=s["medida"], grupo=s["grupo"])
+    return r | {"inicio": inicio}
 
 
 def _gravar_json(caminho: str, dados: dict) -> None:

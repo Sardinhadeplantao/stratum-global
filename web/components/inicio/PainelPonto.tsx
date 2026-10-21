@@ -1,3 +1,4 @@
+import Reacao from "@/components/Reacao";
 import Titulo from "@/components/Titulo";
 import { datasDocumento, estadoPonto, plural } from "@/lib/formatar";
 import type { Ponto } from "@/lib/status";
@@ -49,7 +50,8 @@ export default function PainelPonto({ ponto, voltar, selecionar }: {
         <h3>Mercados ligados</h3>
         {ponto.mercados.length === 0 ? <p className="sem-dado-texto">Sem série ligada nesta atualização.</p>
           : <ul className="lista-mercados">{ponto.mercados.map((s) => <LinhaMercado key={s.id} s={s} />)}</ul>}
-        <p className="discreto">Coincidência no tempo, não causa: o preço reage a muita coisa ao mesmo tempo.</p>
+        {ponto.reacao ? <><h4>Reação desde a primeira notícia das últimas 24 horas</h4><Reacao r={ponto.reacao} /></>
+          : <p className="discreto">Coincidência no tempo, não causa: o preço reage a muita coisa ao mesmo tempo.</p>}
       </section>
 
       <section>

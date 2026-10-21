@@ -69,6 +69,7 @@ jobs/stratum/
   traducao.py    títulos em português por tradução gratuita (Argos, decisão 0010); só lê, não decide
   domain/paises.py      regra de citação de países (dicionário, sem IA)
   domain/regua.py       a régua única das séries (percentil contra o próprio histórico, decisão 0011)
+  domain/reacao.py      reação do mercado a cada evento: ativos ligados, 2 pregões pela régua, taxa-base (decisão 0017)
   mercados.py    grava as cotações (revisão = registro novo) e monta a leitura de cada série para o site
   mapa.py        pontos críticos, terremotos e a faixa de baixo para a página inicial (decisão 0014)
   domain/pontos.py      regra dos pontos críticos (nomes e palavras de ação, sem IA) e os números do EIA com fonte

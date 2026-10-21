@@ -9,12 +9,13 @@ robô guarda uma cópia local das cotações (cache do GitHub) e pede ao banco s
 import gzip
 import json
 import os
+from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
 from sqlalchemy import func, select
 
 from stratum import db
-from stratum.domain import regua
+from stratum.domain import reacao, regua
 
 HISTORICO_DESDE = date(2015, 1, 1)   # 5 anos de janela e mais 5 para a taxa-base
 REVISAO_DIAS = 31                    # a cada leitura, pede de novo o último mês, para pegar revisões
@@ -229,12 +230,39 @@ def _amplitude(lista: list[dict]) -> dict:
                     "por_grupo": {g: contar([x for x in lista if x["grupo"] == g]) for g in grupos}}
 
 
-def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[dict], catalogo_series: list[dict],
-           copia: str | None = None, parciais: list[dict] | None = None) -> dict:
-    """Todas as séries ativas, ordenadas só pela pontuação (decisão 0011); sem leitura, no fim, pelo nome.
-    Do catálogo (código) vêm a validade e o dia em andamento de cada fonte, a conferência e o símbolo de cada série.
+@dataclass
+class Cotacoes:
+    """As séries como o sistema as conhecia no momento, com o dia em andamento desta rodada (decisão 0016)."""
+    pts: dict[str, list[tuple[date, float]]]
+    trocas: dict[str, set[date]]          # dias de troca de contrato futuro, por série
+    ultima_coleta: dict[str, datetime]
+
+
+def cotacoes(c, momento: datetime, catalogo_series: list[dict], copia: str | None = None,
+             parciais: list[dict] | None = None) -> Cotacoes:
+    """Lê as cotações uma vez por rodada: servem ao painel de mercados (`montar`) e à reação a cada evento (`medidor`).
     `copia`: caminho da cópia local das cotações (ver `carregar`). `parciais`: o dia em andamento lido nesta rodada,
     que não vai para o banco (decisão 0016)."""
+    conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
+    ativas = c.execute(select(db.serie.c.id).where(db.serie.c.ativa)).scalars().all()
+    todas, origem = carregar(c, copia)
+    trocas = trocas_de_contrato(c, momento)
+    print(f"Cotações: {origem['da_copia']} da cópia local, {origem['do_banco']} lidas do banco.", flush=True)
+    ultima_coleta = {sid: max(l[4] for l in linhas) for sid, linhas in todas.items()}
+    pts = {sid: _pontos(todas.get(sid, []), momento)
+           for sid in set(ativas) | {x for par in conferir.values() for x in par}}
+    for p in parciais or []:  # o dia em andamento desta rodada (decisão 0016): não está no banco
+        if p["serie_id"] in pts and p["conhecido_em"] <= momento:
+            pts[p["serie_id"]] = sorted({**dict(pts[p["serie_id"]]), p["data"]: p["valor"]}.items())
+            ultima_coleta[p["serie_id"]] = max(ultima_coleta.get(p["serie_id"], p["conhecido_em"]), p["conhecido_em"])
+    return Cotacoes(pts, trocas, ultima_coleta)
+
+
+def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[dict], catalogo_series: list[dict],
+           copia: str | None = None, parciais: list[dict] | None = None, cot: Cotacoes | None = None) -> dict:
+    """Todas as séries ativas, ordenadas só pela pontuação (decisão 0011); sem leitura, no fim, pelo nome.
+    Do catálogo (código) vêm a validade e o dia em andamento de cada fonte, a conferência e o símbolo de cada série.
+    `cot`: as cotações já lidas nesta rodada; sem elas, lê (ver `cotacoes`, que recebe `copia` e `parciais`)."""
     validade = {f["id"]: f["validade_dias"] for f in catalogo_fontes if f.get("validade_dias") and f.get("ativa", True)}
     em_andamento = {f["id"] for f in catalogo_fontes if f.get("dia_em_andamento")}
     conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
@@ -242,16 +270,8 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     simbolo = {s["id"]: s["simbolo"] for s in catalogo_series if s.get("simbolo")}
     inicio_mes = momento.date() - timedelta(days=DIAS_DO_MES)
     series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
-    todas, origem = carregar(c, copia)
-    trocas = trocas_de_contrato(c, momento)
-    print(f"Cotações: {origem['da_copia']} da cópia local, {origem['do_banco']} lidas do banco.", flush=True)
-    ultima_coleta = {sid: max(l[4] for l in linhas) for sid, linhas in todas.items()}
-    pts = {sid: _pontos(todas.get(sid, []), momento)
-           for sid in {s["id"] for s in series} | {x for par in conferir.values() for x in par}}
-    for p in parciais or []:  # o dia em andamento desta rodada (decisão 0016): não está no banco
-        if p["serie_id"] in pts and p["conhecido_em"] <= momento:
-            pts[p["serie_id"]] = sorted({**dict(pts[p["serie_id"]]), p["data"]: p["valor"]}.items())
-            ultima_coleta[p["serie_id"]] = max(ultima_coleta.get(p["serie_id"], p["conhecido_em"]), p["conhecido_em"])
+    cot = cot or cotacoes(c, momento, catalogo_series, copia, parciais)
+    pts, trocas, ultima_coleta = cot.pts, cot.trocas, cot.ultima_coleta
     lista = []
     for s in series:
         f = fontes.get(s["fonte_id"]) or {}
@@ -285,3 +305,14 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
             "amplitude": _amplitude(lista),
             "fora_do_normal": sum(1 for x in lista if x["extremo"]),
             "nao_conferem": sum(1 for x in lista if x["situacao"] == "nao_confere")}
+
+
+def medidor(cot: Cotacoes, catalogo_series: list[dict], lista: list[dict]) -> reacao.Medidor:
+    """As séries do painel, para medir a reação a cada evento (decisão 0017). Leva a leitura do último dia de cada
+    série (`lista`, de `montar`), para a reação dizer do último dia o mesmo que o painel diz."""
+    frequencia = {s["id"]: s["frequencia"] for s in catalogo_series}
+    return reacao.Medidor({x["id"]: {
+        "pts": cot.pts[x["id"]], "medida": x["medida"], "frequencia": frequencia.get(x["id"], "diaria"),
+        "trocas": cot.trocas.get(x["id"], set()),
+        "ultimo": {"data": date.fromisoformat(x["data"]) if x["data"] else None, "situacao": x["situacao"],
+                   "parcial": x["parcial"]}} for x in lista if x["id"] in cot.pts})
