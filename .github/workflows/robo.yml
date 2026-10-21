@@ -113,7 +113,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
-          for w in robo.yml copia.yml; do
+          for w in robo.yml copia.yml arquivo.yml; do
             gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$w/enable" || echo "não foi possível renovar o agendamento de $w"
           done
 

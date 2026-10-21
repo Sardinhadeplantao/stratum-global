@@ -20,13 +20,17 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
   (`resumo.py`, decisão 0005). Problemas entram no resumo; não há mensagem fora desses horários.
 - **Cópia**: toda semana, `.github/workflows/copia.yml` copia as tabelas do projeto e testa a restauração
   (`copia.py`, decisão 0007). Fica como artefato do GitHub, público; tabela com dado pessoal não entra sem decisão.
+- **Arquivo**: todo mês, `.github/workflows/arquivo.yml` leva o que passou do prazo para um release do GitHub
+  (permanente e público) e só tira do banco depois de baixar de volta e conferir (`arquivo.py`, decisão 0015).
 - **IA**: nenhuma é obrigatória. Planejado: tarefa agendada do Claude para o briefing (fase 3) e API gratuita
   (Groq/Gemini) como ajudante opcional. LLM local foi descartada (`docs/decisoes/0001-arquitetura.md`).
 
 ## Regras que nenhuma mudança pode quebrar
 
 1. **Duas datas em tudo**: quando aconteceu (`publicado_em`, `ocorreu_em`) e quando o sistema soube (`conhecido_em`, UTC).
-2. **Nada é apagado nem reescrito.** O robô só insere. Correção vira registro novo. `downgrade` de migração não existe.
+2. **Nada é reescrito, e nada se perde.** O robô só insere. Correção vira registro novo. `downgrade` de migração não existe.
+   Só o arquivo conferido tira do banco (decisão 0015): notícias com mais de 12 meses e o registro de leituras com mais
+   de 30 dias, depois de guardados num release do GitHub e conferidos linha por linha.
 3. **Documento repetido não entra duas vezes**: identidade pelo hash da URL canônica (`domain/documento.py`).
 4. **Notícia entra com grau de confirmação.** Rede social é pista, nunca fato, e nunca entra em conta.
 5. **Escopo por lista com critério escrito.** Toda fonte em `fontes.py` tem `criterio`. Nada entra por parecer importante.
@@ -59,6 +63,7 @@ jobs/stratum/
   resumo.py      resumo das 7:30, 12:00 e 19:00
   agendador.py   Supabase dispara o robô a cada 15 minutos
   copia.py       cópia semanal do banco e restauração
+  arquivo.py     arquivo conferido: separa, confere o que voltou do GitHub e só então tira do banco
   historias.py   liga cada notícia nova à sua história e lista as histórias recentes (decisão 0009)
   domain/historias.py   regra das histórias (assinatura de entidades, sem IA)
   traducao.py    títulos em português por tradução gratuita (Argos, decisão 0010); só lê, não decide

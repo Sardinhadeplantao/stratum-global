@@ -47,7 +47,8 @@ def test_toda_serie_tem_fonte_de_dados_e_medida_da_regua():
     for s in fontes.SERIES:
         f = por_id[s["fonte"]]
         assert f["tipo"] == "dados" and f["conector"] in robo.CONECTORES_SERIES
-        assert f["a_cada_horas"] > 0 and f["validade_dias"] > 0
+        # sem a_cada_horas, a fonte é lida em toda rodada (o Yahoo, decisão 0016)
+        assert (f.get("a_cada_horas") is None or f["a_cada_horas"] > 0) and f["validade_dias"] > 0
         assert s["medida"] in regua.MEDIDAS and s["frequencia"] in regua.MINIMO and s["nome"] and s["unidade"]
         assert f.get("ativa", True) or not s.get("ativa", True)  # fonte fora da lista leva as séries junto
         # É verdade? A conferência usa séries oficiais ativas (decisão 0012)

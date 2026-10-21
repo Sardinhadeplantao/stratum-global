@@ -240,12 +240,12 @@ def test_status_traz_a_conferencia_com_o_bce_e_o_dia_em_andamento(engine, cfg):
         return [Observacao("BRL=X", d, round(reais[d] / dolares[d], 4)) for d in dias] + [Observacao("BRL=X", hoje, 5.5)]
 
     relogio = Relogio(datetime.combine(hoje, datetime.min.time()) + timedelta(hours=14))
-    robo.rodar(engine, [BCE, yahoo], None, cfg, agora=relogio, series=series,
-               conectores_series={"bce": bce, "yahoo": mercado})
-    m = export.montar(engine, agora=relogio)["mercados"]
+    r = robo.rodar(engine, [BCE, yahoo], None, cfg, agora=relogio, series=series,
+                   conectores_series={"bce": bce, "yahoo": mercado})
+    m = export.montar(engine, agora=relogio, parciais=r.parciais)["mercados"]
     por_id = {x["id"]: x for x in m["series"]}
     brl = por_id["yahoo_brl"]
-    assert brl["parcial"] and brl["data"] == hoje.isoformat() and brl["conferir"]
+    assert brl["parcial"] and brl["data"] == hoje.isoformat() and brl["conferir"] and brl["valor"] == 5.5
     assert brl["conferencia"]["com"] == "BCE" and brl["conferencia"]["data"] == dias[-1].isoformat()
     assert brl["conferencia"]["confere"] and abs(brl["conferencia"]["diferenca"]) < 0.01
     assert not por_id["bce_brl"]["parcial"] and por_id["bce_brl"]["conferencia"] is None
@@ -307,6 +307,52 @@ def test_toda_bolsa_tem_regiao():
     bolsas = [s for s in catalogo.SERIES if s["grupo"] == "bolsas"]
     assert all(s.get("regiao") in catalogo.REGIOES for s in bolsas)
     assert {s["regiao"] for s in bolsas} == set(catalogo.REGIOES)
+
+
+def test_dia_em_andamento_vai_para_o_site_e_nao_para_o_banco(engine, cfg):
+    # Decisão 0016: só o dia que fechou é gravado; o dia em andamento da rodada vai direto para o status.json
+    yahoo = next(f for f in catalogo.FONTES if f["id"] == "yahoo_cambio")
+    brl = next(s for s in catalogo.SERIES if s["id"] == "yahoo_brl")
+    assert yahoo.get("a_cada_horas") is None  # lido em toda rodada, a cada 15 minutos
+    ontem, hoje = date(2026, 10, 20), date(2026, 10, 21)
+    leituras = {"v": [Observacao("BRL=X", ontem, 5.03), Observacao("BRL=X", hoje, 5.01)]}
+    relogio = Relogio(datetime(2026, 10, 21, 14))
+    kw = dict(series=[brl], conectores_series={"yahoo": lambda *_: leituras["v"]})
+    r = robo.rodar(engine, [yahoo], None, cfg, agora=relogio, **kw)
+    assert r.novos == 1 and [(p["serie_id"], p["data"], p["valor"]) for p in r.parciais] == [("yahoo_brl", hoje, 5.01)]
+    leituras["v"] = [Observacao("BRL=X", ontem, 5.03), Observacao("BRL=X", hoje, 5.02)]  # 15 minutos depois
+    relogio.t += timedelta(minutes=15)
+    assert robo.rodar(engine, [yahoo], None, cfg, agora=relogio, **kw).novos == 0  # nada novo no banco
+    relogio.t = datetime(2026, 10, 22, 0, 15)  # o dia 21 fechou: agora entra
+    leituras["v"] = [Observacao("BRL=X", hoje, 5.04), Observacao("BRL=X", date(2026, 10, 22), 5.05)]
+    assert robo.rodar(engine, [yahoo], None, cfg, agora=relogio, **kw).novos == 1
+    with engine.connect() as c:
+        assert c.execute(select(db.observacao.c.data, db.observacao.c.valor).order_by(db.observacao.c.id)).all() == [
+            (ontem, 5.03), (hoje, 5.04)]
+
+
+def test_contrato_do_dia_em_andamento_e_gravado_sem_o_preco(engine, cfg):
+    # O contrato vigente é fato, não preço provisório: sem ele a troca de contrato não seria vista (decisões 0014 e 0016)
+    commodities = next(f for f in catalogo.FONTES if f["id"] == "yahoo_commodities")
+    wti = next(s for s in catalogo.SERIES if s["id"] == "commodity_cl")
+    hoje = date(2026, 10, 21)
+    lido = [Observacao("CL=F", date(2026, 10, 20), 98.4), Observacao("CL=F", hoje, 99.1, contrato="Dec 26")]
+    robo.rodar(engine, [commodities], None, cfg, agora=Relogio(datetime(2026, 10, 21, 14)), series=[wti],
+               conectores_series={"yahoo": lambda *_: lido})
+    with engine.connect() as c:
+        assert c.execute(select(db.observacao.c.data)).scalars().all() == [date(2026, 10, 20)]
+        assert c.execute(select(db.contrato_futuro.c.data, db.contrato_futuro.c.contrato)).all() == [(hoje, "Dec 26")]
+
+
+def test_simbolo_no_padrao_do_mercado():
+    # Decisão 0016: BASE/COTADA (USD/CAD = quantos dólares canadenses vale um dólar americano)
+    simbolo = {s["id"]: s["simbolo"] for s in catalogo.SERIES}
+    assert all(simbolo.values())
+    assert [simbolo[i] for i in ("bce_usd", "bce_brl", "yahoo_brl", "yahoo_cad", "yahoo_gbpusd", "yahoo_audusd",
+                                 "yahoo_dxynyb", "juros_usa_10a", "juros_deu_10a", "cripto_btc", "bolsa_gspc",
+                                 "commodity_bz")] == [
+        "EUR/USD", "EUR/BRL", "USD/BRL", "USD/CAD", "GBP/USD", "AUD/USD", "DXY", "US10Y", "DE10Y", "BTC/USD", "S&P 500",
+        "Brent"]
 
 
 def test_juros_medem_a_diferenca_em_pontos():

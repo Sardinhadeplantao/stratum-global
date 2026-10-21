@@ -55,7 +55,8 @@ def ordem_alfabetica(nome: str) -> str:
     return unicodedata.normalize("NFD", nome).encode("ascii", "ignore").decode().casefold()
 
 
-def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | None = None) -> dict:
+def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | None = None,
+           parciais: list[dict] | None = None) -> dict:
     momento = agora()
     limite_24h = momento - timedelta(hours=24)
     inicio_janela = momento - timedelta(hours=JANELA_HORAS)
@@ -70,6 +71,12 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             select(db.coleta).join(ultima_coleta_id, db.coleta.c.id == ultima_coleta_id.c.id)).mappings()}
         total_por_fonte = dict(c.execute(select(db.documento.c.fonte_id, func.count())
                                          .group_by(db.documento.c.fonte_id)).all())
+        # Arquivo conferido (decisão 0015): as notícias que saíram do banco continuam nas contagens
+        arquivados = c.execute(select(db.arquivo).where(db.arquivo.c.tabela == "documento")
+                               .order_by(db.arquivo.c.id)).mappings().all()
+        for a in arquivados:
+            for f, n in json.loads(a["detalhe"] or "{}").get("por_fonte", {}).items():
+                total_por_fonte[f] = total_por_fonte.get(f, 0) + n
         dia_por_fonte = dict(c.execute(select(db.documento.c.fonte_id, func.count())
                                        .where(db.documento.c.conhecido_em >= limite_24h)
                                        .group_by(db.documento.c.fonte_id)).all())
@@ -87,7 +94,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         obs_por_fonte = dict(c.execute(select(db.serie.c.fonte_id, func.count()).select_from(
             db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
         estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES,
-                                          copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"))
+                                          copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"), parciais=parciais)
         eventos = mapa.terremotos(c, momento)
         eventos_por_fonte = dict(c.execute(select(db.evento_local.c.fonte_id, func.count(func.distinct(db.evento_local.c.ext_id)))
                                            .group_by(db.evento_local.c.fonte_id)).all())
@@ -170,6 +177,10 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "situacao": ultima["situacao"]},
         "agendador": agendador,
         "copia": copia,
+        "arquivo": {"documentos": sum(a["linhas"] for a in arquivados),
+                    "ultimo": {"etiqueta": arquivados[-1]["etiqueta"], "url": arquivados[-1]["url"],
+                               "corte": _iso(arquivados[-1]["corte"]), "feito_em": _iso(arquivados[-1]["feito_em"])}
+                    if arquivados else None},
         "historias": lista_historias,
         "traducao": estado_traducao,
         "mercados": estado_mercados,
@@ -234,8 +245,9 @@ def diagnostico(engine, agora=db.agora) -> list[str]:
     return linhas
 
 
-def escrever(engine, caminho: str, agendador: dict | None = None, copia: dict | None = None) -> None:
-    dados = montar(engine, agendador=agendador, copia=copia)
+def escrever(engine, caminho: str, agendador: dict | None = None, copia: dict | None = None,
+             parciais: list[dict] | None = None) -> None:
+    dados = montar(engine, agendador=agendador, copia=copia, parciais=parciais)
     _gravar_json(caminho, dados)
     if os.environ.get("STRATUM_DIAGNOSTICO"):
         print("::group::Diagnóstico da regra de países (uma linha por notícia)")
@@ -253,7 +265,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None, "pontos": None, "terremotos": [], "faixa": [],
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "arquivo": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None, "pontos": None, "terremotos": [], "faixa": [],
         "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],

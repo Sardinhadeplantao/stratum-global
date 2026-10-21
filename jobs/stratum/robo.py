@@ -12,7 +12,7 @@ from datetime import timedelta
 import requests
 from sqlalchemy import exc as erros_sql, select
 
-from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, mercados, resumo, traducao
+from stratum import VERSAO, agendador, arquivo, avisos, config, copia, db, export, historias, mercados, resumo, traducao
 from stratum import fontes as catalogo
 from stratum.connectors import eventos as conectores_eventos, rss, series as conectores_series
 from stratum.domain.documento import hash_documento
@@ -28,6 +28,8 @@ class Resultado:
     situacao: str                       # ok | parcial | falhou
     novos: int = 0
     falhas: list[str] = field(default_factory=list)
+    # Dia em andamento lido nesta rodada (decisão 0016): vai direto para o status.json, não para o banco
+    parciais: list[dict] = field(default_factory=list)
 
 
 def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES,
@@ -52,7 +54,10 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
                 with engine.connect() as c:
                     primeira = mercados.desde(c, da_fonte)
                 itens = conectores_series[f["conector"]](f, da_fonte, session, cfg.user_agent, primeira)
-                novos = mercados.gravar(engine, da_fonte, itens, rid, agora())
+                lido_em = agora()
+                aberto = lido_em.date() if f.get("dia_em_andamento") else None  # o dia que ainda não fechou
+                novos = mercados.gravar(engine, da_fonte, itens, rid, lido_em, ate_dia=aberto)
+                resultado.parciais += mercados.parciais(da_fonte, itens, aberto, lido_em)
             elif f["conector"] in conectores_eventos:
                 itens = conectores_eventos[f["conector"]](f, session, cfg.user_agent)
                 novos = _gravar_eventos(engine, f["id"], itens, rid, agora())
@@ -123,6 +128,10 @@ def _gravar(engine, fonte_id: str, itens, rodada_id: int, conhecido_em) -> int:
         hashes = list(por_hash)
         for i in range(0, len(hashes), 500):
             existentes |= set(c.execute(select(db.documento.c.hash).where(db.documento.c.hash.in_(hashes[i:i + 500]))).scalars())
+            # arquivada (decisão 0015): continua contando como já vista
+            curtos = {arquivo.hash_curto(h): h for h in hashes[i:i + 500]}
+            existentes |= {curtos[x] for x in c.execute(select(db.documento_arquivado.c.hash_curto).where(
+                db.documento_arquivado.c.hash_curto.in_(list(curtos)))).scalars()}
         linhas = [dict(hash=h, fonte_id=fonte_id, rodada_id=rodada_id, url=it.url, titulo=it.titulo, resumo=it.resumo or None,
                        publicado_em=it.publicado_em, conhecido_em=conhecido_em)
                   for h, it in por_hash.items() if h not in existentes]
@@ -199,7 +208,8 @@ def main(argv=None) -> int:
             copia=estado_copia)
         print(f"Resumo do Telegram: {envio}")
         if args.exportar:
-            export.escrever(engine, args.exportar, agendador=estado.para_status(), copia=estado_copia)
+            export.escrever(engine, args.exportar, agendador=estado.para_status(), copia=estado_copia,
+                            parciais=resultado.parciais)
     except erros_sql.SQLAlchemyError as exc:  # o banco caiu no meio da rodada: o site diz isso, sem a mensagem crua
         print(f"O banco falhou no meio da rodada ({type(exc).__name__}).")
         if args.exportar:

@@ -1,0 +1,104 @@
+name: Arquivo do banco
+
+# Arquivo conferido (decisão 0015): uma vez por mês, o que passou do prazo (notícias com mais de 12 meses e o registro
+# de leituras com mais de 30 dias) vai para um release do GitHub, público como o repositório, permanente e gratuito.
+# Só sai do banco depois de baixado de volta do GitHub, restaurado num banco vazio e comparado linha por linha.
+# Numa branch, o ensaio faz o caminho inteiro com uma rodada real num banco temporário e prazo zero, e apaga o
+# release de ensaio no fim (regra 13: só a main toca o banco de produção).
+on:
+  schedule:
+    - cron: "23 11 2 * *"   # dia 2 de cada mês, 8:23 em Brasília
+  workflow_dispatch:
+  push:
+    branches: ["claude/**"]
+    paths: ["jobs/stratum/arquivo.py", ".github/workflows/arquivo.yml"]
+
+permissions: {}   # cada job pede só o que usa
+concurrency: { group: "arquivo-${{ github.ref_name }}", cancel-in-progress: false }
+
+jobs:
+  arquivo:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions: { contents: write }   # criar o release do arquivo
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
+
+      - name: Instalar
+        working-directory: jobs
+        run: pip install -r requirements.txt
+
+      - name: Separar o que passou do prazo (nada sai do banco)
+        working-directory: jobs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
+        run: python -m stratum.arquivo --separar ../arquivo
+
+      - name: Guardar no GitHub e baixar de volta
+        if: hashFiles('arquivo/manifesto.json') != ''
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          etiqueta=$(python3 -c "import json; print(json.load(open('arquivo/manifesto.json'))['etiqueta'])")
+          gh release create "$etiqueta" arquivo/* --target "$GITHUB_SHA" --title "Arquivo do banco: $etiqueta" \
+            --notes-file arquivo/LEIAME.md
+          gh release download "$etiqueta" --dir baixado
+          echo "ETIQUETA=$etiqueta" >> "$GITHUB_ENV"
+
+      - name: Conferir o que voltou e só então tirar do banco
+        if: env.ETIQUETA != ''
+        working-directory: jobs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
+        run: python -m stratum.arquivo --conferir-e-tirar ../baixado --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$ETIQUETA"
+
+  ensaio:
+    if: github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions: { contents: write }   # o release de ensaio, apagado no fim; nenhum segredo do banco aqui
+    env:
+      DATABASE_URL: sqlite:///ensaio.db   # banco temporário, dentro de jobs/
+      ETIQUETA: ensaio-${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
+
+      - name: Uma rodada real do robô no banco temporário
+        working-directory: jobs
+        run: |
+          pip install -r requirements.txt
+          python -m stratum.robo
+
+      - name: Separar tudo (prazo zero)
+        working-directory: jobs
+        run: python -m stratum.arquivo --separar ../arquivo --ensaio
+
+      - name: Guardar no GitHub (release de ensaio) e baixar de volta
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release create "$ETIQUETA" arquivo/* --target "$GITHUB_SHA" --prerelease \
+            --title "Ensaio do arquivo (apagado no fim)" --notes-file arquivo/LEIAME.md
+          gh release download "$ETIQUETA" --dir baixado
+
+      - name: Conferir o que voltou e tirar do banco temporário
+        working-directory: jobs
+        run: |
+          python -m stratum.arquivo --conferir-e-tirar ../baixado --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$ETIQUETA"
+          DATABASE_URL=sqlite:///pesquisa.db python -m stratum.arquivo --restaurar ../baixado   # num banco separado
+
+      - name: Apagar o release de ensaio
+        if: always()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh release delete "$ETIQUETA" --yes --cleanup-tag || true

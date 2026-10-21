@@ -169,6 +169,28 @@ evento_local = Table(
     Index("ix_evento_local_ocorreu", "ocorreu_em"),
 )
 
+# Arquivo conferido (decisão 0015): cada tabela de cada arquivamento, guardado num release do GitHub
+arquivo = Table(
+    "arquivo", md,
+    Column("id", Id, primary_key=True, autoincrement=True),
+    Column("etiqueta", String(64), nullable=False),     # arquivo-AAAA-MM-DD-HHMM (o release no GitHub)
+    Column("tabela", String(64), nullable=False),
+    Column("corte", DateTime, nullable=False),           # saiu o que o sistema conheceu antes disto
+    Column("linhas", Integer, nullable=False),
+    Column("sha256", String(64), nullable=False),        # impressão digital do arquivo da tabela
+    Column("url", Text, nullable=False),
+    Column("detalhe", Text),                             # JSON; nas notícias, quantas por fonte
+    Column("feito_em", DateTime, nullable=False),
+    Index("ux_arquivo_tabela", "etiqueta", "tabela", unique=True),
+)
+
+# Notícia arquivada continua contando como já vista (regra 3): os primeiros 60 bits do hash, 8 bytes
+documento_arquivado = Table(
+    "documento_arquivado", md,
+    Column("hash_curto", BigInteger, primary_key=True, autoincrement=False),
+    Column("arquivado_em", DateTime, nullable=False),
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 
