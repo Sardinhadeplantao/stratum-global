@@ -5,7 +5,7 @@ on:
   push:
     branches: ["claude/**"]
     paths: ["jobs/scripts/sondar_fontes.py", "jobs/scripts/sondar_traducao.py", "jobs/stratum/traducao.py",
-            "jobs/scripts/sondar_series.py", "jobs/stratum/connectors/series.py"]
+            "jobs/scripts/sondar_series.py", "jobs/stratum/connectors/series.py", "jobs/scripts/sondar_navios.py"]
   workflow_dispatch:
 
 permissions: { contents: read }
@@ -21,6 +21,7 @@ jobs:
       - working-directory: jobs
         run: |
           pip install -r requirements.txt
+          python scripts/sondar_navios.py
           python scripts/sondar_series.py --so-contratos
           python scripts/sondar_fontes.py
           python scripts/sondar_traducao.py
