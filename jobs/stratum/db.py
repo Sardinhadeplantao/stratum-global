@@ -139,6 +139,36 @@ observacao = Table(
     Index("ix_observacao_serie", "serie_id", "data", "conhecido_em"),
 )
 
+# Contrato futuro que valia em cada dia, quando a fonte diz (decisão 0014). No dia em que muda, a variação da série
+# não mede o mercado e fica fora da régua. Só inserção: o contrato de um dia é o último registro dele.
+contrato_futuro = Table(
+    "contrato_futuro", md,
+    Column("serie_id", String(64), ForeignKey("serie.id"), primary_key=True),
+    Column("data", Date, primary_key=True),
+    Column("contrato", String(32), primary_key=True),   # "Dec 26"
+    Column("conhecido_em", DateTime, nullable=False),
+)
+
+# Evento com lugar no mapa (decisão 0014): hoje, terremotos do USGS. Cada versão entra uma vez; revisão da magnitude
+# ou do lugar vira registro novo (regra 2), e o site mostra a mais recente de cada evento.
+evento_local = Table(
+    "evento_local", md,
+    Column("id", Id, primary_key=True, autoincrement=True),
+    Column("fonte_id", String(64), ForeignKey("fonte.id"), nullable=False),
+    Column("ext_id", String(64), nullable=False),       # o código do evento na fonte
+    Column("versao", String(64), nullable=False),       # o que identifica a versão na fonte (hora da atualização)
+    Column("titulo", Text, nullable=False),
+    Column("url", Text),
+    Column("magnitude", Float),
+    Column("lat", Float, nullable=False),
+    Column("lon", Float, nullable=False),
+    Column("ocorreu_em", DateTime, nullable=False),
+    Column("conhecido_em", DateTime, nullable=False),
+    Column("rodada_id", Id, ForeignKey("rodada.id")),
+    Index("ux_evento_local_versao", "fonte_id", "ext_id", "versao", unique=True),
+    Index("ix_evento_local_ocorreu", "ocorreu_em"),
+)
+
 MIGRACOES = Path(__file__).parent / "migracoes"
 
 

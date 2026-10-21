@@ -56,7 +56,27 @@ def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em
             linhas.append(dict(serie_id=chave[0], data=o.data, valor=o.valor, rodada_id=rodada_id, conhecido_em=conhecido_em))
         for i in range(0, len(linhas), LOTE):
             c.execute(db.observacao.insert(), linhas[i:i + LOTE])
+        # Contrato futuro do dia (decisão 0014): entra quando é novo para a data; o mesmo de novo é ignorado
+        contratos = [dict(serie_id=por_codigo[o.codigo], data=o.data, contrato=o.contrato, conhecido_em=conhecido_em)
+                     for o in obs if o.contrato]
+        db.inserir_ignorando_repetidos(c, db.contrato_futuro, contratos, ["serie_id", "data", "contrato"])
     return len(linhas)
+
+
+def trocas_de_contrato(c, ate: datetime) -> dict[str, set[date]]:
+    """Por série, os dias em que o contrato futuro mudou em relação ao dia anterior com contrato conhecido, com o que
+    o sistema sabia em `ate`. Dia sem contrato conhecido não marca troca (não dá para saber)."""
+    por_serie: dict[str, dict[date, str]] = {}
+    for sid, d, contrato in c.execute(select(db.contrato_futuro.c.serie_id, db.contrato_futuro.c.data,
+                                             db.contrato_futuro.c.contrato)
+                                      .where(db.contrato_futuro.c.conhecido_em <= ate)
+                                      .order_by(db.contrato_futuro.c.conhecido_em)):
+        por_serie.setdefault(sid, {})[d] = contrato  # o último registro de cada dia vale
+    trocas = {}
+    for sid, dias in por_serie.items():
+        ordenados = sorted(dias.items())
+        trocas[sid] = {d for (_, antes), (d, agora) in zip(ordenados, ordenados[1:]) if agora != antes}
+    return trocas
 
 
 def pontos(c, serie_id: str, ate: datetime) -> list[tuple[date, float]]:
@@ -150,9 +170,9 @@ def leitura(c, s: dict, validade_dias: int | None, momento: datetime) -> dict:
 
 
 def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, momento: datetime,
-         dia_em_andamento: bool = False, conferida: dict | None = None) -> dict:
-    """Situação: ok | nao_confere | parada | historico_curto | sem_dado. Só "ok" tem cor de leitura."""
-    lido = regua.ler(pts, s["medida"], s["frequencia"])
+         dia_em_andamento: bool = False, conferida: dict | None = None, trocas: set[date] = frozenset()) -> dict:
+    """Situação: ok | nao_confere | troca_de_contrato | parada | historico_curto | sem_dado. Só "ok" tem cor."""
+    lido = regua.ler(pts, s["medida"], s["frequencia"], trocas)
     situacao = lido.situacao
     if lido.data and validade_dias is not None and (momento.date() - lido.data).days > validade_dias:
         situacao = "parada"  # o dado ficou velho: cinza, mesmo com leitura
@@ -179,6 +199,7 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
     series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
     todas, origem = carregar(c, copia)
+    trocas = trocas_de_contrato(c, momento)
     print(f"Cotações: {origem['da_copia']} da cópia local, {origem['do_banco']} lidas do banco.", flush=True)
     ultima_coleta = {sid: max(l[4] for l in linhas) for sid, linhas in todas.items()}
     pts = {sid: _pontos(todas.get(sid, []), momento)
@@ -201,8 +222,14 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
                       "conhecido_em": ultima_coleta[s["id"]].isoformat(timespec="seconds") + "Z"
                       if s["id"] in ultima_coleta else None,
                       "conferir": s["id"] in conferir}
-                     | _ler(pts[s["id"]], dict(s), validade.get(s["fonte_id"]), momento, andamento, conferida))
+                     | _ler(pts[s["id"]], dict(s), validade.get(s["fonte_id"]), momento, andamento, conferida,
+                            trocas.get(s["id"], set())))
     lista.sort(key=lambda x: (x["situacao"] != "ok" or x["pontuacao"] is None, -abs(x["pontuacao"] or 0)))
+    por_pais: dict[str, list[str]] = {}
+    for x in lista:  # moeda, juros e bolsa de cada país, para o painel do país (decisão 0014)
+        if x["pais"]:
+            por_pais.setdefault(x["pais"], []).append(x["id"])
     return {"regua": regua.parametros(), "validade_dias": validade, "confere_ate_pct": CONFERE_ATE_PCT, "series": lista,
+            "por_pais": por_pais,
             "fora_do_normal": sum(1 for x in lista if x["extremo"]),
             "nao_conferem": sum(1 for x in lista if x["situacao"] == "nao_confere")}

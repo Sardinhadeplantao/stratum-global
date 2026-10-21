@@ -24,6 +24,7 @@ class Observacao:
     codigo: str        # o código da série na fonte (USD no BCE, DEXBZUS no FRED)
     data: date         # quando aconteceu (o dia da cotação)
     valor: float
+    contrato: str | None = None  # contrato futuro que valia nesse dia ("Dec 26"), quando a fonte diz (decisão 0014)
 
 
 def _baixar(session, url: str, user_agent: str, codificacao: str = "utf-8-sig") -> str:
@@ -151,9 +152,28 @@ def interpretar_yahoo(texto: str, codigo: str) -> list[Observacao]:
     # O último preço negociado vale para o dia dele: a barra do dia demora a ser atualizada (em 20/10, a barra fechava
     # em 5,0370 e o último preço era 5,0238; a conta pelo BCE dava 5,0236). É também a oscilação do dia em andamento.
     preco, quando = meta.get("regularMarketPrice"), meta.get("regularMarketTime")
+    ultimo_dia = None
     if isinstance(preco, (int, float)) and math.isfinite(preco) and isinstance(quando, int):
-        por_dia[datetime.fromtimestamp(quando, fuso).date()] = _significativos(preco)
-    return [Observacao(codigo, d, v) for d, v in sorted(por_dia.items())]
+        ultimo_dia = datetime.fromtimestamp(quando, fuso).date()
+        por_dia[ultimo_dia] = _significativos(preco)
+    # Contrato futuro: o Yahoo diz o mês no nome ("Crude Oil Dec 26"), e ele vale para o dia do último preço
+    contrato = contrato_futuro(meta) if ultimo_dia else None
+    return [Observacao(codigo, d, v, contrato if d == ultimo_dia else None) for d, v in sorted(por_dia.items())]
+
+
+_CONTRATO = re.compile(r"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ -]?(\d{1,4})\b")
+
+
+def contrato_futuro(meta: dict) -> str | None:
+    """O mês do contrato no nome que o Yahoo dá ao futuro ("Gold Dec 26", "Corn Futures,Dec-2026"). Sem mês, None
+    (o Brent e o TTF não dizem; a sonda de 21/10 mostrou)."""
+    if meta.get("instrumentType") != "FUTURE":
+        return None
+    for nome in (meta.get("shortName"), meta.get("longName")):
+        m = _CONTRATO.search(nome or "")
+        if m:
+            return f"{m.group(1)} {m.group(2)}"
+    return None
 
 
 def ler_yahoo(fonte: dict, series: list[dict], session, user_agent: str, desde: date) -> list[Observacao]:

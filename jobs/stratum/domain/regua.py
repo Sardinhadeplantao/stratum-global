@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from statistics import median
 
-REGUA = "regua-1.0"
+REGUA = "regua-1.1"  # 1.1: o dia da troca de contrato futuro fica fora da régua (decisão 0014)
 JANELA_ANOS = 5
 MINIMO = {"diaria": 250, "mensal": 24}   # medidas no histórico; abaixo disso, "histórico curto"
 EXTREMO = 5                              # fora do normal: percentil até 5 ou a partir de 95
@@ -100,7 +100,7 @@ def _episodio(condicao: list[bool], datas: list[date], validos: list[bool], recu
 
 @dataclass
 class Leitura:
-    situacao: str                        # ok | historico_curto | sem_dado
+    situacao: str                        # ok | historico_curto | sem_dado | troca_de_contrato
     data: date | None = None             # data do último ponto (quando aconteceu)
     valor: float | None = None
     medida: float | None = None          # a variação do último ponto
@@ -112,9 +112,13 @@ class Leitura:
     mudancas: list[dict] = field(default_factory=list)
 
 
-def ler(pontos: list[tuple[date, float]], medida: str = "variacao_pct", frequencia: str = "diaria") -> Leitura:
-    """A leitura do último ponto da série. `pontos` em ordem de data, um por data."""
-    medidas = MEDIDAS[medida](pontos)
+def ler(pontos: list[tuple[date, float]], medida: str = "variacao_pct", frequencia: str = "diaria",
+        trocas: frozenset[date] | set[date] = frozenset()) -> Leitura:
+    """A leitura do último ponto da série. `pontos` em ordem de data, um por data.
+    `trocas`: dias em que o contrato futuro mudou; a variação deles não mede o mercado e fica fora da régua."""
+    if pontos and pontos[-1][0] in trocas:
+        return Leitura("troca_de_contrato", data=pontos[-1][0], valor=pontos[-1][1])
+    medidas = [m for m in MEDIDAS[medida](pontos) if m[0] not in trocas]
     if not medidas:
         return Leitura("sem_dado" if not pontos else "historico_curto",
                        data=pontos[-1][0] if pontos else None, valor=pontos[-1][1] if pontos else None)

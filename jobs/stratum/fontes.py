@@ -102,6 +102,14 @@ FONTES: list[dict] = [
                   "na troca de contrato, o preço pode saltar." + _CRITERIO_YAHOO),
     dict(_YAHOO, id="yahoo_cripto", nome="Yahoo Finance: cripto (não oficial)",
          criterio="As duas maiores criptomoedas por valor de mercado." + _CRITERIO_YAHOO),
+    # Eventos com lugar no mapa (decisão 0014)
+    dict(id="usgs_terremotos", nome="USGS: terremotos de magnitude 4,5 ou mais", tipo="dados", pais="USA", idioma="en",
+         conector="usgs", url="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson",
+         criterio="Terremotos de magnitude 4,5 ou mais no mundo, nas últimas 24 horas, do serviço geológico oficial dos "
+                  "EUA (feed público, sem chave): camada de contexto do mapa (decisão 0014).",
+         nivel=1, controle="estatal", controlador="estado:USA",
+         controlador_nome="Governo federal dos EUA (U.S. Geological Survey, Departamento do Interior)",
+         controlador_fonte="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php ; https://www.usgs.gov/about/about-us"),
     # Juros de 10 anos, oficiais (decisão 0013)
     dict(id="tesouro_eua", nome="Tesouro dos EUA: curva de juros diária", tipo="dados", pais="USA", idioma="en",
          conector="tesouro", url="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/",
