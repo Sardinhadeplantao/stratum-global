@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -68,6 +68,8 @@ test("séries: dia sem fuso, valor e variação como o robô gravou", () => {
   assert.equal(variacao(0.4512), "+0,45%");
   assert.equal(variacao(-1.2), "-1,20%");
   assert.equal(variacao(null), "—");
+  assert.equal(variacaoSerie(0.1, "diferenca"), "+0,10 p.p.");
+  assert.equal(variacaoSerie(0.45, "variacao_pct"), "+0,45%");
 });
 
 test("régua: a mesma cor para alta e queda fora do normal; sem leitura é cinza", () => {

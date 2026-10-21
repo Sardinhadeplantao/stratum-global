@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacaoSerie } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 import Titulo from "@/components/Titulo";
 
@@ -156,7 +156,8 @@ export default function Metodo() {
         {m ? (
           <dl className="resumo">
             <dt>Versão</dt><dd>{m.regua.versao}</dd>
-            <dt>Medida</dt><dd>Variação em % desde a cotação anterior (fim de semana e feriado não contam)</dd>
+            <dt>Medida</dt><dd>Preço (moeda, bolsa, commodity, cripto): variação em % desde a cotação anterior. Juros: diferença em
+              pontos percentuais (p.p.). Fim de semana e feriado não contam</dd>
             <dt>Histórico</dt><dd>As variações dos {m.regua.janela_anos} anos anteriores, sem o próprio dia e sem nada depois dele</dd>
             <dt>Fora do normal</dt><dd>Percentil até {m.regua.extremo} (queda) ou a partir de {100 - m.regua.extremo} (alta)</dd>
             <dt>Mínimo</dt><dd>{numero(m.regua.minimo.diaria)} cotações no histórico; abaixo disso, &quot;histórico curto&quot;, sem leitura</dd>
@@ -195,9 +196,9 @@ export default function Metodo() {
                       <td>{x.nome}<div className="discreto">{x.unidade} · {x.fonte_nome}</div></td>
                       <td>{dia(x.data)}{x.parcial && <div className="discreto">em andamento · {hora(x.conhecido_em)}</div>}</td>
                       <td className="numero">{valor(x.valor)}</td>
-                      <td className="numero">{variacao(x.variacao)}</td>
+                      <td className="numero">{variacaoSerie(x.variacao, x.medida)}</td>
                       <td className="numero">{x.percentil === null ? "—" : x.percentil.toLocaleString("pt-BR")}</td>
-                      <td className="numero">{x.faixa ? `${variacao(x.faixa[0])} a ${variacao(x.faixa[1])}` : "—"}</td>
+                      <td className="numero">{x.faixa ? `${variacaoSerie(x.faixa[0], x.medida)} a ${variacaoSerie(x.faixa[1], x.medida)}` : "—"}</td>
                       <td>
                         <span className={`ponto ${l.classe}`} aria-hidden /> {l.texto}
                         {x.mudancas.map((mu, i) => <div key={i} className="discreto">{textoMudanca(mu)}</div>)}

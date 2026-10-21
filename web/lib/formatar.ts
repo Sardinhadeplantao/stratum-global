@@ -119,6 +119,12 @@ export function variacao(n: number | null | undefined): string {
   return `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
 }
 
+/** Variação na unidade da medida: preço em % ("+0,45%"), juros em pontos percentuais ("+0,10 p.p."). */
+export function variacaoSerie(n: number | null | undefined, medida: string | null | undefined): string {
+  if (medida !== "diferenca" || n === null || n === undefined) return variacao(n);
+  return `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} p.p.`;
+}
+
 /** Leitura da régua (decisão 0011). Cor só para estado medido: fora do normal (os dois lados com a mesma cor),
  *  dentro do normal; parada, histórico curto e sem dado ficam cinza. */
 export function leituraSerie(situacao: string | null | undefined, extremo: string | null | undefined): { texto: string; classe: string } {

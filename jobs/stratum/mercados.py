@@ -131,6 +131,7 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
             if conferida:
                 conferida["com"] = "BCE"
         lista.append({"id": s["id"], "nome": s["nome"], "unidade": s["unidade"], "pais": s["pais"], "codigo": s["codigo"],
+                      "medida": s["medida"],  # variacao_pct (em %) ou diferenca (em pontos percentuais)
                       "fonte": s["fonte_id"], "fonte_nome": f.get("nome", s["fonte_id"]),
                       "conhecido_em": ultima_coleta[s["id"]].isoformat(timespec="seconds") + "Z"
                       if s["id"] in ultima_coleta else None,

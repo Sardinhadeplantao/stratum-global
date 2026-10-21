@@ -46,6 +46,8 @@ export type Historia = {
 /** Séries de mercado lidas pela régua única (decisão 0011). Tudo vem calculado do robô; o site só mostra. */
 export type Serie = {
   id: string; nome: string; unidade: string; pais: string | null; codigo: string; fonte: string; fonte_nome: string;
+  /** variacao_pct (preço, em %) ou diferenca (juros, em pontos percentuais) */
+  medida: string;
   conhecido_em: string | null; situacao: "ok" | "nao_confere" | "parada" | "historico_curto" | "sem_dado"; data: string | null;
   /** Dia em andamento (decisão 0012): a oscilação do dia, ainda não fechada */
   parcial: boolean;

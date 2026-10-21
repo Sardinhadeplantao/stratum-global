@@ -29,7 +29,12 @@ def variacao_pct(pontos: list[tuple[date, float]]) -> list[tuple[date, float]]:
     return [(d, (v / anterior - 1) * 100) for (_, anterior), (d, v) in zip(pontos, pontos[1:]) if anterior > 0]
 
 
-MEDIDAS = {"variacao_pct": variacao_pct}
+def diferenca(pontos: list[tuple[date, float]]) -> list[tuple[date, float]]:
+    """Medida de taxa (juros): a diferença em pontos percentuais desde a observação anterior."""
+    return [(d, v - anterior) for (_, anterior), (d, v) in zip(pontos, pontos[1:])]
+
+
+MEDIDAS = {"variacao_pct": variacao_pct, "diferenca": diferenca}
 
 
 def anos_antes(d: date, anos: int) -> date:

@@ -247,3 +247,16 @@ def test_status_traz_a_conferencia_com_o_bce_e_o_dia_em_andamento(engine, cfg):
     assert brl["conferencia"]["confere"] and abs(brl["conferencia"]["diferenca"]) < 0.01
     assert not por_id["bce_brl"]["parcial"] and por_id["bce_brl"]["conferencia"] is None
     assert m["confere_ate_pct"] == 2.0 and m["nao_conferem"] == 0
+
+
+def test_juros_medem_a_diferenca_em_pontos():
+    # Decisão 0011: taxa se mede em pontos percentuais; 4,00% -> 4,10% é +0,10 ponto, não +2,5%
+    assert regua.diferenca([(date(2026, 10, 19), 4.0), (date(2026, 10, 20), 4.1)])[0][1] == pytest.approx(0.1)
+    normais = [((i * 7) % 11 - 5) / 100 for i in range(1300)]       # de -0,05 a +0,05 ponto por dia
+    dias = _dias_uteis(1302)
+    taxa, pontos = 4.0, []
+    for d, m in zip(dias, [0.0] + normais + [0.25]):
+        taxa += m
+        pontos.append((d, taxa))
+    lido = regua.ler(pontos, medida="diferenca")
+    assert lido.medida == pytest.approx(0.25) and lido.extremo == "alta"
