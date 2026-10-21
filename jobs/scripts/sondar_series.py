@@ -105,10 +105,12 @@ def main() -> None:
         amostra = da_fonte[:2] if f["conector"] == "bce" else da_fonte[:1]
         url = {"bce": lambda: conectores.url_bce(f, [s["codigo"] for s in amostra], desde),
                "fred": lambda: conectores.url_fred(f, amostra[0]["codigo"], desde),
-               "yahoo": lambda: conectores.url_yahoo(f, amostra[0]["codigo"], desde, int(time.time()) + 86400)}[f["conector"]]()
+               "yahoo": lambda: conectores.url_yahoo(f, amostra[0]["codigo"], desde, int(time.time()) + 86400),
+               }.get(f["conector"], lambda: None)()  # os juros têm o bruto na sonda das candidatas
         try:
-            bruto = conectores._baixar(sessao, url, ua)
-            print(f"::group::Bruto de {f['id']} [{url}]\n" + "\n".join(bruto.splitlines()[:12])[:6000] + "\n::endgroup::")
+            if url:
+                bruto = conectores._baixar(sessao, url, ua)
+                print(f"::group::Bruto de {f['id']} [{url}]\n" + "\n".join(bruto.splitlines()[:12])[:6000] + "\n::endgroup::")
             obs = conectores.CONECTORES[f["conector"]](f, da_fonte, sessao, ua, desde)
         except Exception as exc:  # noqa: BLE001 - a sonda só relata
             print(f"FALHOU {f['id']}: {type(exc).__name__}: {str(exc)[:160]}  [{url}]")
