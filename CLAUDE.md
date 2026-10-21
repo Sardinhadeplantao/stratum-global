@@ -54,7 +54,7 @@ O endereço do site acompanha o nome do repositório sozinho (o robô usa o nome
 ```
 jobs/stratum/
   domain/        regras puras (sem banco, rede ou IA)
-  connectors/    um conector por tipo de fonte; devolvem itens, não gravam (series.py: cotações; eventos.py: USGS)
+  connectors/    um conector por tipo de fonte; devolvem itens, não gravam (series.py: cotações e navios; eventos.py: USGS)
   fontes.py      a lista de fontes (única) e a lista de séries (SERIES)
   db.py          esquema; mudou? crie migração nova em migracoes/versions/
   robo.py        uma rodada: coletar, gravar, registrar, avisar
@@ -77,8 +77,9 @@ jobs/stratum/
 jobs/tests/      test_referencia.py = casos de referência (não altere para passar)
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
-                 sondar_fontes.py, sondar_series.py e sondar_traducao.py (testam fonte candidata, séries e tradução no
-                 Actions, workflow sondar.yml); conferir_status.py (números reais no fim de cada rodada)
+                 sondar_fontes.py, sondar_series.py, sondar_navios.py e sondar_traducao.py (testam fonte candidata,
+                 séries, PortWatch e tradução no Actions, workflow sondar.yml); conferir_status.py (números reais no
+                 fim de cada rodada)
 web/             site; dados do robô em public/dados/ (gerados, fora do git); a página inicial em components/inicio/
 ```
 

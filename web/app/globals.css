@@ -215,7 +215,7 @@ h1, h2, h3 { line-height: 1.2; }
   background: var(--superficie-2); border: 1px solid var(--borda); border-radius: 8px; padding: 7px 10px; color: var(--texto); cursor: pointer; font: inherit;
 }
 .lista-pontos button:hover { border-color: var(--borda-forte); }
-.lp-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lp-nome { min-width: 0; line-height: 1.25; overflow-wrap: anywhere; }  /* quebra em vez de cortar o nome */
 .selo-estado {
   display: inline-block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; padding: 1px 7px; border-radius: 999px;
   border: 1px solid var(--borda-forte); color: var(--texto-2); white-space: nowrap; line-height: 1.5;
@@ -284,6 +284,18 @@ h1, h2, h3 { line-height: 1.2; }
 .reacao-linha b { color: var(--texto); }
 .detalhe h4 { margin: 12px 0 2px; font-size: 12px; color: var(--texto-2); font-weight: 600; }
 
+/* Navios no estreito (decisão 0018): média de 7 dias | último ano; a leitura embaixo */
+.lista-navios { list-style: none; margin: 0; padding: 0; }
+.lista-navios li { padding: 6px 0; border-bottom: 1px solid var(--borda); }
+.lista-navios li:last-child { border-bottom: 0; }
+.nv-linha { display: grid; grid-template-columns: minmax(0, 1fr) auto 56px; align-items: center; gap: 10px; }
+.nv-nome { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.nv-nome small { font-size: 11px; }
+.nv-valor { font-size: 16px; font-weight: 600; }
+.nv-valor.fora { color: var(--ouro); }
+.nv-detalhe { margin: 3px 0 0 !important; font-size: 12px; color: var(--texto-2); }
+.selo-navios { color: var(--ouro); white-space: nowrap; }
+
 /* Aba Mercados: quadros de destaque, quantas sobem e caem, bolsas por região */
 .quadros { list-style: none; margin: 12px 0 8px; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .quadro {
@@ -344,7 +356,7 @@ h1, h2, h3 { line-height: 1.2; }
 .faixa-item small { color: var(--texto-2); font-size: 11.5px; }
 .faixa-item b { font-weight: 400; margin-right: 2px; }
 .faixa-ponto b { color: var(--falhou); }
-.faixa-mercado b { color: var(--ouro); }
+.faixa-mercado b, .faixa-navios b { color: var(--ouro); }
 .faixa-terremoto b { color: var(--terremoto); }
 @keyframes rolar { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 

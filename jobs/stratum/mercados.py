@@ -215,6 +215,7 @@ def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, mome
 DESTAQUES = {"bolsa_gspc": "S&P 500", "juros_usa_10a": "US10Y", "yahoo_dxynyb": "DXY", "commodity_gc": "Ouro",
              "commodity_bz": "Brent", "cripto_btc": "BTC/USD", "yahoo_brl": "USD/BRL", "bolsa_bvsp": "Ibovespa"}
 DIAS_DO_MES = 30  # o minigráfico: as cotações dos últimos 30 dias corridos, como o sistema as conhecia
+GRUPO_NAVIOS = "navios"
 
 
 def _amplitude(lista: list[dict]) -> dict:
@@ -269,7 +270,8 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     regiao = {s["id"]: s["regiao"] for s in catalogo_series if s.get("regiao")}
     simbolo = {s["id"]: s["simbolo"] for s in catalogo_series if s.get("simbolo")}
     inicio_mes = momento.date() - timedelta(days=DIAS_DO_MES)
-    series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
+    series = [s for s in c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings()
+              if s["grupo"] != GRUPO_NAVIOS]  # navios não são mercado: vão para o painel do ponto (decisão 0018)
     cot = cot or cotacoes(c, momento, catalogo_series, copia, parciais)
     pts, trocas, ultima_coleta = cot.pts, cot.trocas, cot.ultima_coleta
     lista = []
@@ -316,3 +318,37 @@ def medidor(cot: Cotacoes, catalogo_series: list[dict], lista: list[dict]) -> re
         "trocas": cot.trocas.get(x["id"], set()),
         "ultimo": {"data": date.fromisoformat(x["data"]) if x["data"] else None, "situacao": x["situacao"],
                    "parcial": x["parcial"]}} for x in lista if x["id"] in cot.pts})
+
+
+def navios(cot: Cotacoes, catalogo_fontes: list[dict], catalogo_series: list[dict], momento: datetime,
+           fontes: dict[str, dict]) -> dict[str, list[dict]]:
+    """Navios por dia em cada ponto crítico (decisão 0018): a média de 7 dias lida pela régua, a mesma média um ano
+    antes e a do último ano, uma por semana, para o minigráfico. Por ponto: todos os navios, depois os petroleiros."""
+    validade = {f["id"]: f.get("validade_dias") for f in catalogo_fontes}
+    saida: dict[str, list[dict]] = {}
+    for s in catalogo_series:
+        if s["grupo"] != GRUPO_NAVIOS or s["id"] not in cot.pts:
+            continue
+        pts = cot.pts[s["id"]]
+        lido = _ler(pts, s, validade.get(s["fonte"]), momento)
+        semanas = regua.media_7d(pts)
+        um_ano = ultimos = None
+        if semanas:
+            fim = semanas[-1][0]
+            por_dia = dict(semanas)
+            um_ano = next((por_dia[fim - timedelta(days=365 + k)] for k in range(4)
+                           if fim - timedelta(days=365 + k) in por_dia), None)
+            ultimos = [v for d, v in semanas if d > fim - timedelta(days=365)][::-7][::-1]
+        media = lido["variacao"]
+        f = fontes.get(s["fonte"]) or {}
+        saida.setdefault(s["ponto"], []).append({
+            "id": s["id"], "simbolo": s["simbolo"], "nome": s["nome"], "unidade": s["unidade"],
+            "situacao": lido["situacao"], "data": lido["data"], "valor_dia": lido["valor"], "media_7d": _r(media, 1),
+            "percentil": lido["percentil"], "extremo": lido["extremo"], "faixa": lido["faixa"], "mudancas": lido["mudancas"],
+            "um_ano_antes": _r(um_ano, 1),
+            "contra_um_ano": _r((media / um_ano - 1) * 100, 0) if media is not None and um_ano else None,
+            "ano": [round(v, 1) for v in ultimos or []],
+            "fonte_nome": f.get("nome", s["fonte"]),
+            "conhecido_em": cot.ultima_coleta[s["id"]].isoformat(timespec="seconds") + "Z" if s["id"] in cot.ultima_coleta else None,
+        })
+    return saida

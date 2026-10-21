@@ -8,7 +8,8 @@ from dataclasses import dataclass, field
 from datetime import date
 from statistics import median
 
-REGUA = "regua-1.1"  # 1.1: o dia da troca de contrato futuro fica fora da régua (decisão 0014)
+REGUA = "regua-1.2"  # 1.1: o dia da troca de contrato futuro fica fora da régua (decisão 0014)
+                     # 1.2: contagens (navios por dia) medidas pela média de 7 dias (decisão 0018)
 JANELA_ANOS = 5
 MINIMO = {"diaria": 250, "mensal": 24}   # medidas no histórico; abaixo disso, "histórico curto"
 EXTREMO = 5                              # fora do normal: percentil até 5 ou a partir de 95
@@ -16,12 +17,14 @@ PERSISTENCIA = 2                         # extremo que persiste: períodos segui
 RITMO_PONTOS = 20                        # agitação = DAM das últimas 20 medidas
 RITMO_EXTREMO = 95                       # quebra de ritmo: agitação no percentil 95 ou mais
 ESCALA_DAM = 1.4826                      # DAM vezes isto = um desvio-padrão numa curva normal
+MEDIA_DIAS = 7                           # contagens: o nível da semana, não a variação de um dia para o outro
 
 
 def parametros() -> dict:
     """Os parâmetros em vigor, para a tela Método (regra 6)."""
     return {"versao": REGUA, "janela_anos": JANELA_ANOS, "minimo": dict(MINIMO), "extremo": EXTREMO,
-            "persistencia": PERSISTENCIA, "ritmo_pontos": RITMO_PONTOS, "ritmo_extremo": RITMO_EXTREMO}
+            "persistencia": PERSISTENCIA, "ritmo_pontos": RITMO_PONTOS, "ritmo_extremo": RITMO_EXTREMO,
+            "media_dias": MEDIA_DIAS}
 
 
 def variacao_pct(pontos: list[tuple[date, float]]) -> list[tuple[date, float]]:
@@ -34,7 +37,14 @@ def diferenca(pontos: list[tuple[date, float]]) -> list[tuple[date, float]]:
     return [(d, v - anterior) for (_, anterior), (d, v) in zip(pontos, pontos[1:])]
 
 
-MEDIDAS = {"variacao_pct": variacao_pct, "diferenca": diferenca}
+def media_7d(pontos: list[tuple[date, float]]) -> list[tuple[date, float]]:
+    """Medida de contagem (navios por dia, decisão 0018): a média das últimas 7 observações. De 0 para 4 navios não é
+    "+400%": o que se compara com o histórico é o nível da semana."""
+    return [(pontos[i][0], sum(v for _, v in pontos[i + 1 - MEDIA_DIAS:i + 1]) / MEDIA_DIAS)
+            for i in range(MEDIA_DIAS - 1, len(pontos))]
+
+
+MEDIDAS = {"variacao_pct": variacao_pct, "diferenca": diferenca, "media_7d": media_7d}
 
 
 def anos_antes(d: date, anos: int) -> date:

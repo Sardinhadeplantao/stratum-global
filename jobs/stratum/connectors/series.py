@@ -13,7 +13,7 @@ import re
 import time
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
-from urllib.parse import quote
+from urllib.parse import quote, urlencode
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 TEMPO_LIMITE = 60  # segundos: a primeira leitura traz 10 anos
@@ -306,5 +306,51 @@ def ler_japao(fonte: dict, series: list[dict], session, user_agent: str, desde: 
     return _desde(saida, desde)
 
 
+# PortWatch, do FMI (decisão 0018): navios por dia em cada estreito, numa camada pública do ArcGIS. Código da série:
+# "<estreito>:<campo>", como "chokepoint6:n_total" (Ormuz, todos os navios) ou "chokepoint6:n_tanker" (petroleiros).
+PORTWATCH_PAGINA = 1000   # o máximo que a camada devolve por pedido (maxRecordCount, sonda de 21/10)
+PORTWATCH_CAMPOS = ("n_total", "n_tanker")
+
+
+def url_portwatch(fonte: dict, estreitos: list[str], desde: date, deslocamento: int) -> str:
+    lista = ",".join(f"'{e}'" for e in estreitos)
+    return fonte["url"] + "/0/query?" + urlencode({
+        "where": f"portid IN ({lista}) AND date >= DATE '{desde.isoformat()}'",
+        "outFields": ",".join(("date", "portid") + PORTWATCH_CAMPOS), "orderByFields": "date,portid",
+        "resultOffset": deslocamento, "resultRecordCount": PORTWATCH_PAGINA, "returnGeometry": "false", "f": "json"})
+
+
+def interpretar_portwatch(texto: str) -> tuple[list[Observacao], bool]:
+    """As observações de uma página e se a camada tem mais páginas. Resposta sem a lista, ou com campo faltando, é
+    erro: o formato mudou e o robô não adivinha."""
+    dados = json.loads(texto)
+    if "error" in dados or not isinstance(dados.get("features"), list):
+        raise ValueError(f"PortWatch: resposta inesperada ({str(dados.get('error') or list(dados))[:120]})")
+    saida = []
+    for f in dados["features"]:
+        a = f.get("attributes") or {}
+        if not _DATA_ISO.match(str(a.get("date"))) or not a.get("portid") or any(a.get(c) is None for c in PORTWATCH_CAMPOS):
+            raise ValueError(f"PortWatch: linha sem data, estreito ou contagem ({str(a)[:120]})")
+        dia = date.fromisoformat(a["date"])
+        saida += [Observacao(f"{a['portid']}:{c}", dia, float(a[c])) for c in PORTWATCH_CAMPOS]
+    return saida, bool(dados.get("exceededTransferLimit"))
+
+
+def ler_portwatch(fonte: dict, series: list[dict], session, user_agent: str, desde: date) -> list[Observacao]:
+    """Um pedido por página de 1000 linhas, todos os estreitos juntos. A primeira leitura traz o histórico desde 2019
+    (uns 23 pedidos); as seguintes, o último mês."""
+    estreitos = sorted({s["codigo"].split(":")[0] for s in series})
+    pedidos = {s["codigo"] for s in series}
+    saida, deslocamento = [], 0
+    while True:
+        obs, mais = interpretar_portwatch(_baixar(session, url_portwatch(fonte, estreitos, desde, deslocamento), user_agent))
+        saida += [o for o in obs if o.codigo in pedidos]
+        if not mais or not obs:
+            return saida
+        deslocamento += PORTWATCH_PAGINA
+        if deslocamento > 200 * PORTWATCH_PAGINA:  # proteção: a resposta diz que sempre tem mais
+            raise RuntimeError("PortWatch: páginas demais")
+
+
 CONECTORES = {"bce": ler_bce, "fred": ler_fred, "yahoo": ler_yahoo, "tesouro": ler_tesouro,
-              "bundesbank": ler_bundesbank, "boe": ler_boe, "japao": ler_japao}
+              "bundesbank": ler_bundesbank, "boe": ler_boe, "japao": ler_japao, "portwatch": ler_portwatch}

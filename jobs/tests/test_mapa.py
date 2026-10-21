@@ -100,3 +100,31 @@ def test_faixa_mostra_ponto_critico_e_ultimas_noticias(engine):
     faixa = export.montar(engine, agora=lambda: AGORA)["faixa"]
     assert faixa[0]["tipo"] == "ponto" and faixa[0]["id"] == "bab_el_mandeb"
     assert [i["tipo"] for i in faixa].count("noticia") == 2
+
+
+def test_ponto_mostra_os_navios_por_dia_fora_do_mercado(engine):
+    # Decisão 0018: navios por dia de Ormuz (PortWatch), pela média de 7 dias; não entram no painel de mercados
+    import random
+    from datetime import date
+    from stratum import mercados
+    from stratum.connectors.series import Observacao
+    navios = [s for s in catalogo.SERIES if s["id"] in ("navios_ormuz", "petroleiros_ormuz")]
+    with engine.begin() as c:
+        db.gravar_fontes(c, [f for f in catalogo.FONTES if f["id"] == "portwatch"])
+        db.gravar_series(c, navios)
+    rnd, d, obs = random.Random(5), date(2019, 1, 1), []
+    while d <= date(2026, 10, 11):
+        obs += [Observacao("chokepoint6:n_total", d, float(round(rnd.gauss(100, 12)))),
+                Observacao("chokepoint6:n_tanker", d, float(round(rnd.gauss(40, 6))))]
+        d += timedelta(days=1)
+    for i, v in enumerate([4, 0, 7, 2, 3, 7, 3]):  # 12 a 18/10/2026, como a sonda de 21/10 trouxe
+        obs.append(Observacao("chokepoint6:n_total", date(2026, 10, 12) + timedelta(days=i), float(v)))
+    mercados.gravar(engine, navios, obs, None, datetime(2026, 10, 21, 6))
+    s = export.montar(engine, agora=lambda: AGORA)
+    ormuz = next(p for p in s["pontos"]["lista"] if p["id"] == "ormuz")
+    total = ormuz["navios"][0]
+    assert (total["id"], total["data"], total["media_7d"], total["extremo"]) == ("navios_ormuz", "2026-10-18", 3.7, "baixa")
+    assert 90 < total["um_ano_antes"] < 110 and total["contra_um_ano"] < -90 and len(total["ano"]) == 53
+    assert ormuz["navios"][1]["id"] == "petroleiros_ormuz"
+    assert not any(x["grupo"] == "navios" for x in s["mercados"]["series"])  # navio não é mercado
+    assert any(i["tipo"] == "navios" and i["id"] == "ormuz" for i in s["faixa"])

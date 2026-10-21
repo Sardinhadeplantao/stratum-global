@@ -97,6 +97,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         cot = mercados.cotacoes(c, momento, catalogo.SERIES, os.environ.get("STRATUM_CACHE_OBSERVACOES"), parciais)
         estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES,
                                           cot=cot)
+        navios = mercados.navios(cot, catalogo.FONTES, catalogo.SERIES, momento, {f["id"]: f for f in fontes})
         eventos = mapa.terremotos(c, momento)
         eventos_por_fonte = dict(c.execute(select(db.evento_local.c.fonte_id, func.count(func.distinct(db.evento_local.c.ext_id)))
                                            .group_by(db.evento_local.c.fonte_id)).all())
@@ -156,7 +157,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         })
 
     series_por_id = {s["id"]: s for s in estado_mercados["series"]}
-    estado_pontos = mapa.pontos(contaveis, por_fonte, resumo_documento, series_por_id, dicionario)
+    estado_pontos = mapa.pontos(contaveis, por_fonte, resumo_documento, series_por_id, dicionario, navios)
     ultimos_resumidos = [resumo_documento(d) for d in ultimos]
 
     todas_historias = historias.recentes(engine, momento, limite=None)

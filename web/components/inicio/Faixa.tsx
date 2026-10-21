@@ -22,8 +22,9 @@ export default function Faixa({ itens, selecionar }: { itens: ItemFaixa[]; selec
   if (itens.length === 0) return <div className="faixa"><span className="sem-dado-texto faixa-vazia">Sem itens nesta atualização.</span></div>;
   const conteudo = (chave: string) => itens.map((i, n) => (
     <span key={`${chave}-${n}`} className={`faixa-item faixa-${i.tipo}`}>
-      {i.tipo === "ponto" && i.id ? (
-        <button type="button" onClick={() => selecionar({ tipo: "ponto", id: i.id! })}><b>●</b> {i.texto}<small> {i.detalhe}</small></button>
+      {(i.tipo === "ponto" || i.tipo === "navios") && i.id ? (
+        <button type="button" onClick={() => selecionar({ tipo: "ponto", id: i.id! })}>
+          <b>{i.tipo === "ponto" ? "●" : i.extremo === "baixa" ? "▼" : "▲"}</b> {i.texto}<small> {i.detalhe}</small></button>
       ) : i.tipo === "mercado" ? (
         <><b>{(i.variacao ?? 0) > 0 ? "▲" : "▼"}</b> {i.texto} {variacaoSerie(i.variacao, i.medida)}
           <small> fora do normal{i.parcial ? " · hoje" : ""}</small></>

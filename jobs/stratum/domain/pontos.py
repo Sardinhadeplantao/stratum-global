@@ -19,9 +19,10 @@ def _fato(texto: str, periodo: str, url: str = EIA) -> dict:
     return {"texto": texto, "periodo": periodo, "fonte": "EIA (agência de energia dos EUA)", "url": url}
 
 
-# lon, lat: o centro do ponto no mapa. mercados: ids das séries ligadas (fontes.SERIES)
+# lon, lat: o centro do ponto no mapa. mercados: ids das séries ligadas (fontes.SERIES). portwatch: o estreito no
+# PortWatch do FMI, para os navios por dia (decisão 0018); portwatch_nota: o que a conta do PortWatch não cobre
 PONTOS: list[dict] = [
-    dict(id="ormuz", nome="Estreito de Ormuz", lon=56.4, lat=26.5, margens=["IRN", "OMN", "ARE"],
+    dict(id="ormuz", nome="Estreito de Ormuz", lon=56.4, lat=26.5, margens=["IRN", "OMN", "ARE"], portwatch="chokepoint6",
          termos=["Strait of Hormuz", "Hormuz", "Estreito de Ormuz", "Ormuz"],
          mercados=["commodity_bz", "commodity_cl", "commodity_ttf"],
          fatos=[_fato("20,9 milhões de barris de petróleo por dia, cerca de um quarto do petróleo vendido por mar e "
@@ -30,35 +31,40 @@ PONTOS: list[dict] = [
                       "que os sinais dos navios na região ficaram pouco confiáveis desde o fim de fevereiro de 2026",
                       "2026", EIA_STEO)]),
     dict(id="bab_el_mandeb", nome="Bab el-Mandeb e Mar Vermelho", lon=43.4, lat=12.6, margens=["YEM", "DJI", "ERI"],
+         portwatch="chokepoint4",
          termos=["Bab el-Mandeb", "Bab al-Mandab", "Bab-el-Mandeb", "Bab el Mandeb", "Red Sea", "Mar Vermelho"],
          mercados=["commodity_bz", "commodity_ttf"],
          fatos=[_fato("4,2 milhões de barris de petróleo por dia; o fluxo caiu muito depois dos ataques houthis a navios, "
                       "a partir do fim de 2023", "1º semestre de 2025"),
                 _fato("Subiu para 8,1 milhões de barris por dia", "2º trimestre de 2026", EIA_STEO)]),
-    dict(id="suez", nome="Canal de Suez e oleoduto SUMED", lon=32.35, lat=30.4, margens=["EGY"],
+    dict(id="suez", nome="Canal de Suez e oleoduto SUMED", lon=32.35, lat=30.4, margens=["EGY"], portwatch="chokepoint1",
+         portwatch_nota="Só os navios do canal; o petróleo do oleoduto SUMED não aparece nesta conta.",
          termos=["Suez Canal", "Suez", "SUMED", "Canal de Suez"],
          mercados=["commodity_bz", "commodity_ttf"],
          fatos=[_fato("4,9 milhões de barris de petróleo por dia (eram 8,8 em 2023)", "1º semestre de 2025")]),
-    dict(id="malaca", nome="Estreito de Malaca", lon=100.9, lat=2.9, margens=["MYS", "IDN", "SGP"],
+    dict(id="malaca", nome="Estreito de Malaca", lon=100.9, lat=2.9, margens=["MYS", "IDN", "SGP"], portwatch="chokepoint5",
          termos=["Strait of Malacca", "Malacca Strait", "Malacca", "Singapore Strait", "Estreito de Malaca"],
          mercados=["commodity_bz", "bolsa_000001ss"],
          fatos=[_fato("23,2 milhões de barris de petróleo por dia, cerca de 29% do petróleo vendido por mar: o maior "
                       "ponto de passagem do mundo", "1º semestre de 2025"),
                 _fato("16,6 milhões de barris por dia", "2º trimestre de 2026", EIA_STEO)]),
     dict(id="estreitos_turcos", nome="Estreitos turcos (Bósforo e Dardanelos)", lon=29.05, lat=41.1, margens=["TUR"],
+         portwatch="chokepoint3", portwatch_nota="Só o Bósforo: o PortWatch não conta os Dardanelos à parte.",
          termos=["Bosporus", "Bosphorus", "Dardanelles", "Turkish Straits", "Bósforo", "Dardanelos", "Estreitos turcos"],
          mercados=["commodity_bz", "commodity_zw", "yahoo_try"],
          fatos=[_fato("3,7 milhões de barris de petróleo e derivados por dia, cerca de 5% do comércio marítimo",
                       "1º semestre de 2025")]),
     dict(id="estreitos_dinamarqueses", nome="Estreitos dinamarqueses", lon=11.0, lat=55.7, margens=["DNK", "SWE"],
+         portwatch="chokepoint10", portwatch_nota="Só o Øresund: o Grande Belt, rota dos navios de maior calado, não é "
+                                                  "coberto pelo PortWatch.",
          termos=["Danish Straits", "Great Belt", "Øresund", "Oresund", "Estreitos dinamarqueses"],
          mercados=["commodity_bz"], fatos=[]),
-    dict(id="panama", nome="Canal do Panamá", lon=-79.7, lat=9.1, margens=["PAN"],
+    dict(id="panama", nome="Canal do Panamá", lon=-79.7, lat=9.1, margens=["PAN"], portwatch="chokepoint2",
          termos=["Panama Canal", "Canal do Panamá", "Canal de Panamá"],
          mercados=["commodity_cl", "commodity_zs", "commodity_zc"],
          fatos=[_fato("Mais de 2,3 milhões de barris de petróleo por dia (ano fiscal de outubro a setembro)",
                       "ano fiscal de 2025")]),
-    dict(id="cabo_boa_esperanca", nome="Cabo da Boa Esperança", lon=18.5, lat=-34.4, margens=["ZAF"],
+    dict(id="cabo_boa_esperanca", nome="Cabo da Boa Esperança", lon=18.5, lat=-34.4, margens=["ZAF"], portwatch="chokepoint7",
          termos=["Cape of Good Hope", "Cabo da Boa Esperança"], mercados=["commodity_bz"], fatos=[]),
 ]
 

@@ -1,9 +1,10 @@
 import Reacao from "@/components/Reacao";
 import Titulo from "@/components/Titulo";
-import { datasDocumento, estadoPonto, plural } from "@/lib/formatar";
-import type { Ponto } from "@/lib/status";
+import { datasDocumento, dia, estadoPonto, leituraSerie, media, percentualInteiro, plural, textoMudanca } from "@/lib/formatar";
+import type { Navios, Ponto } from "@/lib/status";
 import type { Selecao } from "./Inicio";
 import LinhaMercado from "./LinhaMercado";
+import Minigrafico from "./Minigrafico";
 
 /** Contexto de um ponto crítico (decisão 0014): o estado pela regra, por que importa (com fonte e período), quem está
  * nas margens, os mercados ligados e as notícias que o citam. */
@@ -47,6 +48,18 @@ export default function PainelPonto({ ponto, voltar, selecionar }: {
       </section>
 
       <section>
+        <h3>Navios no estreito</h3>
+        {(ponto.navios ?? []).length === 0 ? <p className="sem-dado-texto">Sem dado do PortWatch nesta atualização.</p>
+          : <ul className="lista-navios">{ponto.navios!.map((n) => <LinhaNavios key={n.id} n={n} />)}</ul>}
+        {ponto.portwatch_nota && <p className="discreto">{ponto.portwatch_nota}</p>}
+        <p className="discreto">
+          Fonte: <a href="https://portwatch.imf.org/" target="_blank" rel="noreferrer">FMI, PortWatch</a>, atualizado uma vez
+          por semana; a média de 7 dias é conta do Stratum. Conta os navios pelo sinal (AIS) que eles transmitem: navio com
+          o sinal desligado não aparece.
+        </p>
+      </section>
+
+      <section>
         <h3>Mercados ligados</h3>
         {ponto.mercados.length === 0 ? <p className="sem-dado-texto">Sem série ligada nesta atualização.</p>
           : <ul className="lista-mercados">{ponto.mercados.map((s) => <LinhaMercado key={s.id} s={s} />)}</ul>}
@@ -74,5 +87,26 @@ export default function PainelPonto({ ponto, voltar, selecionar }: {
           citado. É análise, por isso entra com regra própria (decisão 0014).</p>
       </section>
     </div>
+  );
+}
+
+/** Navios por dia (decisão 0018): a média de 7 dias pela régua, um ano antes e o último ano no minigráfico. */
+function LinhaNavios({ n }: { n: Navios }) {
+  const l = leituraSerie(n.situacao, n.extremo);
+  return (
+    <li>
+      <div className="nv-linha">
+        <span className="nv-nome"><b>{n.simbolo}</b><small className="discreto">por dia, média de 7 dias{n.data ? ` até ${dia(n.data).slice(0, 5)}` : ""}</small></span>
+        <span className={`nv-valor numero ${n.extremo ? "fora" : ""}`}>{media(n.media_7d)}</span>
+        <Minigrafico valores={n.ano} fora={!!n.extremo} />
+      </div>
+      <p className="nv-detalhe">
+        <span className={`ponto ${l.classe}`} aria-hidden /> {l.texto}
+        {n.percentil !== null && <> (percentil {n.percentil.toLocaleString("pt-BR")} dos últimos 5 anos)</>}
+        {n.um_ano_antes !== null && <> · um ano antes: {media(n.um_ano_antes)} ({percentualInteiro(n.contra_um_ano)})</>}
+        {n.faixa && <> · normal: {media(n.faixa[0])} a {media(n.faixa[1])}</>}
+      </p>
+      {n.mudancas.map((m, i) => <p key={i} className="nv-detalhe discreto">{textoMudanca(m)}</p>)}
+    </li>
   );
 }

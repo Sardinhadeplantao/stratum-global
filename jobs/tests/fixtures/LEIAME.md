@@ -13,5 +13,7 @@ estes arquivos.
   caracteres japoneses na cópia do log).
 - `usgs_4.5_day.geojson`: USGS, terremotos 4,5+ do dia, sonda de 21/10/2026 às 01:30 UTC (os 2 primeiros terremotos
   que a sonda imprime; o resto da resposta ficou de fora).
+- `portwatch_ormuz.json`: PortWatch (FMI), Estreito de Ormuz de 29/9 a 18/10/2026, sonda de 21/10/2026 às 11:47 UTC
+  (só a lista `features` da resposta, linha por linha como veio; o cabeçalho com a descrição dos campos ficou de fora).
 - `feed_rss.xml` e `feed_atom.xml`: feeds de exemplo, montados para testar casos difíceis (artigo repetido, âncora,
   link perigoso); não são notícias reais.
