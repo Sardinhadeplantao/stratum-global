@@ -1,12 +1,17 @@
-"""Séries de dados (decisão 0011): BCE e FRED, arquivos públicos sem chave. Devolvem observações; quem grava é o robô.
+"""Séries de dados (decisões 0011 e 0012): BCE, FRED e Yahoo Finance, sem chave. Devolvem observações; quem grava é
+o robô.
 
 O formato é conferido na entrada: coluna que falta ou valor ilegível é erro, nunca um número inventado.
 Valor vazio (feriado no FRED) é só ausência de dado.
 """
 import csv
 import io
+import json
+import time
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timezone
+from urllib.parse import quote
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 TEMPO_LIMITE = 60  # segundos: a primeira leitura traz 10 anos
 
@@ -19,7 +24,8 @@ class Observacao:
 
 
 def _baixar(session, url: str, user_agent: str) -> str:
-    r = session.get(url, headers={"User-Agent": user_agent, "Accept": "text/csv, */*;q=0.5"}, timeout=TEMPO_LIMITE)
+    r = session.get(url, headers={"User-Agent": user_agent, "Accept": "text/csv, application/json, */*;q=0.5"},
+                    timeout=TEMPO_LIMITE)
     if r.status_code >= 400:
         raise RuntimeError(f"HTTP {r.status_code}")
     return r.content.decode("utf-8-sig")
@@ -92,4 +98,57 @@ def ler_fred(fonte: dict, series: list[dict], session, user_agent: str, desde: d
     return saida
 
 
-CONECTORES = {"bce": ler_bce, "fred": ler_fred}
+# Yahoo Finance: cotações de mercado, não oficiais (decisão 0012); um arquivo JSON por série, com o dia em andamento
+def url_yahoo(fonte: dict, codigo: str, desde: date, ate: int) -> str:
+    inicio = int(datetime(desde.year, desde.month, desde.day, tzinfo=timezone.utc).timestamp())
+    return f"{fonte['url']}{quote(codigo)}?period1={inicio}&period2={ate}&interval=1d"
+
+
+def _significativos(v: float) -> float:
+    """6 algarismos significativos: a fonte manda 5.432100296020508 para 5,4321."""
+    return float(f"{v:.6g}")
+
+
+def interpretar_yahoo(texto: str, codigo: str) -> list[Observacao]:
+    try:
+        dados = json.loads(texto)
+    except ValueError:
+        raise ValueError("formato inesperado: a resposta não é JSON") from None
+    chart = dados.get("chart") if isinstance(dados, dict) else None
+    if not isinstance(chart, dict) or chart.get("error") or not chart.get("result"):
+        motivo = (chart or {}).get("error") if isinstance(chart, dict) else None
+        raise ValueError(f"formato inesperado: sem cotações ({str(motivo)[:80] if motivo else 'resposta vazia'})")
+    r = chart["result"][0]
+    meta = r.get("meta") or {}
+    if meta.get("symbol") != codigo:
+        raise ValueError(f"formato inesperado: veio {meta.get('symbol')!r}, esperado {codigo}")
+    try:
+        fuso = ZoneInfo(meta.get("exchangeTimezoneName") or "UTC")
+    except ZoneInfoNotFoundError:
+        raise ValueError(f"formato inesperado: fuso {meta.get('exchangeTimezoneName')!r}") from None
+    instantes = r.get("timestamp") or []
+    try:
+        fechamentos = r["indicators"]["quote"][0]["close"] or []
+    except (KeyError, IndexError, TypeError):
+        raise ValueError("formato inesperado: faltam os fechamentos") from None
+    if len(instantes) != len(fechamentos):
+        raise ValueError("formato inesperado: datas e valores em número diferente")
+    por_dia: dict[date, float] = {}
+    for t, v in zip(instantes, fechamentos):
+        if v is None:
+            continue
+        if not isinstance(v, (int, float)) or v <= 0:
+            raise ValueError(f"valor ilegível em {codigo}: {str(v)[:20]!r}")
+        por_dia[datetime.fromtimestamp(t, fuso).date()] = _significativos(v)  # o último valor do dia vale
+    return [Observacao(codigo, d, v) for d, v in sorted(por_dia.items())]
+
+
+def ler_yahoo(fonte: dict, series: list[dict], session, user_agent: str, desde: date) -> list[Observacao]:
+    ate = int(time.time()) + 86400
+    saida = []
+    for s in series:
+        saida += interpretar_yahoo(_baixar(session, url_yahoo(fonte, s["codigo"], desde, ate), user_agent), s["codigo"])
+    return saida
+
+
+CONECTORES = {"bce": ler_bce, "fred": ler_fred, "yahoo": ler_yahoo}

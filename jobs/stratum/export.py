@@ -86,8 +86,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         estado_traducao = traducao.situacao(c)
         obs_por_fonte = dict(c.execute(select(db.serie.c.fonte_id, func.count()).select_from(
             db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
-        validade = {f["id"]: f["validade_dias"] for f in catalogo.FONTES if f.get("validade_dias")}
-        estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, validade)
+        estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES)
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}

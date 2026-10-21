@@ -88,12 +88,15 @@ Já entregue:
 - a régua única (`regua-1.0`) e o detector de mudança, com os parâmetros fixados antes do primeiro dado
   (decisão 0011): percentil da variação contra os 5 anos anteriores, fora do normal até 5 ou a partir de 95, mínimo
   de 250 cotações, extremo que persiste por 2 dias, quebra de ritmo e taxa-base;
-- moedas do G20 contra o euro (BCE, 13) e contra o dólar (FRED/H.10, 10, e o índice amplo do dólar), lidas no ritmo de
-  cada fonte, com revisão gravada como registro novo; a leitura de cada uma aparece na tela Método.
+- moedas do G20 contra o euro (BCE, 13, oficial) e contra o dólar (Yahoo Finance, 12, e o DXY), lidas no ritmo de cada
+  fonte, com revisão gravada como registro novo e o dia em andamento marcado. O FRED saiu (uma semana de atraso) e o
+  Yahoo, que é de mercado e não oficial, é conferido com a conta pelo BCE (decisão 0012). A leitura de cada uma aparece
+  na tela Método;
+- conferência no fim de cada rodada: o log do GitHub mostra fontes com falha, notícias e a leitura de cada série
+  (`jobs/scripts/conferir_status.py`).
 
 Falta:
 
-- Conferir a primeira rodada real e trocar as amostras dos testes por trechos reais (`jobs/scripts/sondar_series.py`).
 - Séries por lista: juros de 10 anos (série diária oficial: Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Japão),
   bolsa por país, commodities (Banco Mundial, EIA), cripto. Cada tipo usa a medida já escrita na decisão 0011.
 - A reação medida a cada evento.

@@ -70,13 +70,15 @@ jobs/tests/      test_referencia.py = casos de referência (não altere para pas
 jobs/tests/gabarito/  manchetes agrupadas em eventos (fase 1); o conjunto de teste não serve para ajustar regra
 jobs/scripts/    ferramentas avulsas: preparar_paises.py (mapa), preparar_nomes_paises.py (dicionário),
                  sondar_fontes.py, sondar_series.py e sondar_traducao.py (testam fonte candidata, séries e tradução no
-                 Actions, workflow sondar.yml)
+                 Actions, workflow sondar.yml); conferir_status.py (números reais no fim de cada rodada)
 web/             site; dados do robô em public/dados/ (gerados, fora do git)
 ```
 
 ## Como trabalhar
 
 - Uma tarefa por sessão, com um "pronto quando" claro (veja `docs/plano.md`).
+- Confira cada etapa com dados reais antes de dar por pronta: a sonda e a "Conferência da rodada" no fim do log do
+  robô no GitHub. Amostra de teste é trecho real copiado desse log; o site nunca mostra dado simulado.
 - **Economia, pedido do dono**: o limite de uso é dele. Cada coisa se faz uma vez, direto, sem várias cópias do
   Claude em paralelo (workflows, agentes) nem leituras repetidas. Exceção só quando o dono pedir, ou uma revisão
   curta, de um agente, quando o código mexe no banco ou em senhas.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoMudanca, tipoFonte, valor, variacao } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -77,6 +77,15 @@ test("régua: a mesma cor para alta e queda fora do normal; sem leitura é cinza
   assert.equal(leituraSerie("parada", null).classe, "sem-dado");
   assert.equal(leituraSerie("historico_curto", null).classe, "sem-dado");
   assert.equal(leituraSerie(undefined, null).texto, "Sem dado");
+  assert.equal(leituraSerie("nao_confere", null).classe, "sit-falhou");
+});
+
+test("conferência com a fonte oficial vem decidida do robô", () => {
+  const c = { com: "BCE", data: "2026-10-20", oficial: 5.0236, diferenca: -0.12, confere: true };
+  assert.equal(textoConferencia(c, true), "Confere com o BCE em 20/10/2026 (diferença de -0,12%).");
+  assert.equal(textoConferencia({ ...c, diferenca: 3.4, confere: false }, true), "Não confere com o BCE em 20/10/2026: diferença de +3,40%.");
+  assert.equal(textoConferencia(null, true), "Ainda sem dia em comum com a fonte oficial para conferir.");
+  assert.equal(textoConferencia(null, false), null);
 });
 
 test("mudança vem com a taxa-base", () => {

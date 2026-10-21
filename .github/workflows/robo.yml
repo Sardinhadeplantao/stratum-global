@@ -110,6 +110,12 @@ jobs:
             gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$w/enable" || echo "não foi possível renovar o agendamento de $w"
           done
 
+      # Por último, para ficar no fim do log: os números reais desta rodada, para conferir cada etapa sem abrir o site
+      - name: Conferência da rodada
+        if: always()
+        working-directory: jobs
+        run: python scripts/conferir_status.py ../web/public/dados/status.json || true
+
   deploy:
     if: github.ref == 'refs/heads/main' && needs.build.outputs.site_ligado == 'true'
     needs: build

@@ -240,3 +240,39 @@ def test_serie_parada_fica_sem_cor(engine):
         parada = mercados.leitura(c, serie, 5, ultimo + timedelta(days=9))
     assert em_dia["situacao"] == "ok" and em_dia["extremo"] == "alta"
     assert parada["situacao"] == "parada" and parada["extremo"] is None and parada["mudancas"] == []
+
+
+def test_cotacao_de_mercado_que_nao_bate_com_o_bce_fica_sem_cor():
+    # É verdade? O dólar em reais do Yahoo é conferido com a conta pelo BCE no mesmo dia (decisão 0012)
+    from datetime import datetime
+    from stratum import mercados
+    euro_em_reais, euro_em_dolares = _serie(1300, escala=0.2, semente=4), _serie(1300, escala=0.2, semente=5)
+    dolar_em_reais = [(d, r / u) for (d, r), (_, u) in zip(euro_em_reais, euro_em_dolares)]
+    dia, valor = dolar_em_reais[-1]
+    dolar_em_reais[-1] = (dia, valor * 1.04)  # 4% fora da conta do BCE: dado errado ou dia anormal
+    momento = datetime.combine(dia, datetime.min.time()) + timedelta(days=1)
+    serie = {"id": "yahoo_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+
+    conferida = mercados.conferencia(dolar_em_reais, euro_em_reais, euro_em_dolares, antes_de=None)
+    assert conferida["data"] == dia.isoformat() and conferida["diferenca"] == 4.0 and not conferida["confere"]
+    lido = mercados._ler(dolar_em_reais, serie, 5, momento, conferida=conferida)
+    assert lido["situacao"] == "nao_confere" and lido["extremo"] is None and lido["mudancas"] == []
+
+    certo = dolar_em_reais[:-1] + [(dia, valor)]
+    assert mercados.conferencia(certo, euro_em_reais, euro_em_dolares, antes_de=None)["confere"]
+
+
+def test_dia_em_andamento_aparece_marcado_e_fica_fora_da_conferencia():
+    from datetime import datetime
+    from stratum import mercados
+    euro_em_reais, euro_em_dolares = _serie(1300, escala=0.2, semente=4), _serie(1300, escala=0.2, semente=5)
+    dolar_em_reais = [(d, r / u) for (d, r), (_, u) in zip(euro_em_reais, euro_em_dolares)]
+    hoje = dolar_em_reais[-1][0] + timedelta(days=3 if dolar_em_reais[-1][0].weekday() == 4 else 1)
+    dolar_em_reais.append((hoje, dolar_em_reais[-1][1] * 1.003))  # o dia de hoje, às 14h, ainda sem o BCE
+    momento = datetime.combine(hoje, datetime.min.time()) + timedelta(hours=14)
+    serie = {"id": "yahoo_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+    conferida = mercados.conferencia(dolar_em_reais, euro_em_reais, euro_em_dolares, antes_de=hoje)
+    assert conferida["data"] == dolar_em_reais[-2][0].isoformat() and conferida["confere"]  # o último dia fechado
+    lido = mercados._ler(dolar_em_reais, serie, 5, momento, dia_em_andamento=True, conferida=conferida)
+    assert lido["parcial"] and lido["data"] == hoje.isoformat() and lido["situacao"] == "ok"
+    assert not mercados._ler(dolar_em_reais[:-1], serie, 5, momento, dia_em_andamento=True)["parcial"]

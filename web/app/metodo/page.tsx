@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, leituraSerie, numero, plural, situacao, textoMudanca, tipoFonte, valor, variacao } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 import Titulo from "@/components/Titulo";
 
@@ -166,6 +166,11 @@ export default function Metodo() {
             <dt>Validade</dt><dd>{Object.entries(m.validade_dias).map(([f, d]) => `${nomeFonte[f] ?? f}: ${d} dias`).join(" · ")}.
               Passou disso, a série fica parada (cinza)</dd>
             <dt>Revisão</dt><dd>Valor corrigido pela fonte entra como registro novo; o antigo fica</dd>
+            <dt>Conferência</dt><dd>Cotação de mercado (Yahoo, não oficial) é comparada com a mesma conta pelo BCE, no último
+              dia completo dos dois. Diferença acima de {m.confere_ate_pct.toLocaleString("pt-BR")}%: &quot;não confere&quot;, sem cor
+              de leitura</dd>
+            <dt>Dia em andamento</dt><dd>A cotação de mercado do dia que ainda não fechou aparece marcada, com a hora da
+              leitura (lida a cada hora)</dd>
           </dl>
         ) : <p className="sem-dado-texto">Sem dado nesta atualização.</p>}
         <ul className="regras">
@@ -188,7 +193,7 @@ export default function Metodo() {
                   return (
                     <tr key={x.id}>
                       <td>{x.nome}<div className="discreto">{x.unidade} · {x.fonte_nome}</div></td>
-                      <td>{dia(x.data)}</td>
+                      <td>{dia(x.data)}{x.parcial && <div className="discreto">em andamento · {hora(x.conhecido_em)}</div>}</td>
                       <td className="numero">{valor(x.valor)}</td>
                       <td className="numero">{variacao(x.variacao)}</td>
                       <td className="numero">{x.percentil === null ? "—" : x.percentil.toLocaleString("pt-BR")}</td>
@@ -196,6 +201,8 @@ export default function Metodo() {
                       <td>
                         <span className={`ponto ${l.classe}`} aria-hidden /> {l.texto}
                         {x.mudancas.map((mu, i) => <div key={i} className="discreto">{textoMudanca(mu)}</div>)}
+                        {textoConferencia(x.conferencia, x.conferir) &&
+                          <div className={x.situacao === "nao_confere" ? "erro" : "discreto"}>{textoConferencia(x.conferencia, x.conferir)}</div>}
                       </td>
                     </tr>
                   );

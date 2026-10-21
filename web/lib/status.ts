@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Mudanca } from "./formatar";
+import type { Conferencia, Mudanca } from "./formatar";
 
 /** Formato do public/dados/status.json gravado pelo robô (jobs/stratum/export.py, versão 2). */
 export type Coleta = { em: string | null; situacao: string; itens_lidos: number; itens_novos: number; erro: string | null };
@@ -46,14 +46,18 @@ export type Historia = {
 /** Séries de mercado lidas pela régua única (decisão 0011). Tudo vem calculado do robô; o site só mostra. */
 export type Serie = {
   id: string; nome: string; unidade: string; pais: string | null; codigo: string; fonte: string; fonte_nome: string;
-  conhecido_em: string | null; situacao: "ok" | "parada" | "historico_curto" | "sem_dado"; data: string | null;
+  conhecido_em: string | null; situacao: "ok" | "nao_confere" | "parada" | "historico_curto" | "sem_dado"; data: string | null;
+  /** Dia em andamento (decisão 0012): a oscilação do dia, ainda não fechada */
+  parcial: boolean;
+  /** É verdade? Cotação de mercado comparada com a conta pela fonte oficial (decisão 0012) */
+  conferir: boolean; conferencia: Conferencia | null;
   valor: number | null; variacao: number | null; percentil: number | null; extremo: "alta" | "baixa" | null;
   pontuacao: number | null; faixa: [number, number] | null; historico: number; mudancas: Mudanca[];
 };
 export type Mercados = {
   regua: { versao: string; janela_anos: number; minimo: Record<string, number>; extremo: number; persistencia: number;
     ritmo_pontos: number; ritmo_extremo: number };
-  validade_dias: Record<string, number>; series: Serie[]; fora_do_normal: number;
+  validade_dias: Record<string, number>; confere_ate_pct: number; series: Serie[]; fora_do_normal: number; nao_conferem: number;
 };
 export type Status = {
   versao_formato: number;

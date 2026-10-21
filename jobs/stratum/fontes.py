@@ -69,13 +69,23 @@ FONTES: list[dict] = [
          nivel=2, controle="multilateral", controlador="org:BCE",
          controlador_nome="Banco Central Europeu, instituição da União Europeia independente por tratado",
          controlador_fonte="https://www.ecb.europa.eu/ecb/orga/independence/html/index.en.html ; https://data.ecb.europa.eu/data/datasets/EXR"),
+    # Saiu da lista em 21/10 (decisão 0012): o Fed publica uma vez por semana; o que foi gravado fica
     dict(id="fred_cambio", nome="FRED: câmbio do Fed (H.10) e índice do dólar", tipo="dados", pais="USA", idioma="en",
          conector="fred", url="https://fred.stlouisfed.org/graph/fredgraph.csv", a_cada_horas=12, validade_dias=12,
+         ativa=False,
          criterio=_CRITERIO_MOEDAS + " O Fed publica a tabela H.10 às segundas, com a semana anterior; o índice amplo "
                                      "mede o dólar contra as moedas dos parceiros comerciais dos EUA.",
          nivel=1, controle="publico", controlador="estado:USA",
          controlador_nome="Federal Reserve (Conselho do Fed, autor da H.10; republicada pelo Banco do Fed de St. Louis)",
          controlador_fonte="https://www.federalreserve.gov/releases/h10/ ; https://fred.stlouisfed.org/legal/"),
+    dict(id="yahoo_cambio", nome="Yahoo Finance: dólar no mercado (não oficial)", tipo="dados", pais="USA", idioma="en",
+         conector="yahoo", url="https://query1.finance.yahoo.com/v8/finance/chart/", a_cada_horas=1, validade_dias=5,
+         dia_em_andamento=True,
+         criterio=_CRITERIO_MOEDAS + " Cotação de mercado do mesmo dia, com o dia em andamento; não há fonte oficial "
+                                     "diária contra o dólar. Conferida com o BCE (decisão 0012). Uso pessoal, não comercial.",
+         nivel=3, controle="privado", controlador="grupo:yahoo",
+         controlador_nome="Yahoo Inc., controlada por fundos da Apollo Global Management desde 2021 (a Verizon ficou com 10%)",
+         controlador_fonte="https://en.wikipedia.org/wiki/Yahoo ; https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html"),
     # Imprensa, um veículo por bloco
     dict(id="bbc_mundo", nome="BBC News: World", tipo="imprensa", pais="GBR", idioma="en", conector="rss",
          url="https://feeds.bbci.co.uk/news/world/rss.xml", criterio=_CRITERIO_IMPRENSA,
@@ -121,12 +131,22 @@ FONTES: list[dict] = [
 
 
 
-def _moeda(fonte: str, codigo: str, nome: str, unidade: str, pais: str | None) -> dict:
-    return dict(id=f"{fonte.split('_')[0]}_{codigo.lower()}", fonte=fonte, codigo=codigo, nome=nome, unidade=unidade,
-                pais=pais, frequencia="diaria", medida="variacao_pct")
+def _moeda(fonte: str, codigo: str, nome: str, unidade: str, pais: str | None, **extra) -> dict:
+    ident = f"{fonte.split('_')[0]}_{codigo.lower().replace('=x', '').replace('-', '').replace('.', '')}"
+    return dict(id=ident, fonte=fonte, codigo=codigo, nome=nome, unidade=unidade, pais=pais, frequencia="diaria",
+                medida="variacao_pct") | extra
 
 
-# Séries (decisão 0011). O nome segue a fonte, sem conta: "Euro em reais" sobe quando o euro fica mais caro.
+def _dolar(codigo: str, nome: str, unidade: str, pais: str, conferir: tuple[str, str] | None) -> dict:
+    """Yahoo (decisão 0012). `conferir`: a mesma cotação pela conta do BCE, numerador ÷ denominador."""
+    return _moeda("yahoo_cambio", codigo, nome, unidade, pais, conferir=conferir)
+
+
+def _fred(codigo: str, nome: str, unidade: str, pais: str) -> dict:
+    return _moeda("fred_cambio", codigo, nome, unidade, pais, ativa=False)  # saiu em 21/10 (decisão 0012)
+
+
+# Séries (decisões 0011 e 0012). O nome segue a fonte, sem conta: "Euro em reais" sobe quando o euro fica mais caro.
 SERIES: list[dict] = [
     _moeda("bce_cambio", "USD", "Euro em dólares", "US$ por €", "USA"),
     _moeda("bce_cambio", "JPY", "Euro em ienes", "¥ por €", "JPN"),
@@ -141,17 +161,30 @@ SERIES: list[dict] = [
     _moeda("bce_cambio", "ZAR", "Euro em rands", "R por €", "ZAF"),
     _moeda("bce_cambio", "AUD", "Euro em dólares australianos", "A$ por €", "AUS"),
     _moeda("bce_cambio", "CAD", "Euro em dólares canadenses", "C$ por €", "CAN"),
-    _moeda("fred_cambio", "DTWEXBGS", "Índice amplo do dólar", "índice (jan/2006 = 100)", "USA"),
-    _moeda("fred_cambio", "DEXBZUS", "Dólar em reais", "R$ por US$", "BRA"),
-    _moeda("fred_cambio", "DEXCHUS", "Dólar em yuans", "CN¥ por US$", "CHN"),
-    _moeda("fred_cambio", "DEXJPUS", "Dólar em ienes", "¥ por US$", "JPN"),
-    _moeda("fred_cambio", "DEXUSUK", "Libra em dólares", "US$ por £", "GBR"),
-    _moeda("fred_cambio", "DEXINUS", "Dólar em rupias indianas", "₹ por US$", "IND"),
-    _moeda("fred_cambio", "DEXKOUS", "Dólar em wons", "₩ por US$", "KOR"),
-    _moeda("fred_cambio", "DEXMXUS", "Dólar em pesos mexicanos", "MX$ por US$", "MEX"),
-    _moeda("fred_cambio", "DEXCAUS", "Dólar em dólares canadenses", "C$ por US$", "CAN"),
-    _moeda("fred_cambio", "DEXUSAL", "Dólar australiano em dólares americanos", "US$ por A$", "AUS"),
-    _moeda("fred_cambio", "DEXSFUS", "Dólar em rands", "R por US$", "ZAF"),
+    _dolar("BRL=X", "Dólar em reais", "R$ por US$", "BRA", ("bce_brl", "bce_usd")),
+    _dolar("CNY=X", "Dólar em yuans", "CN¥ por US$", "CHN", ("bce_cny", "bce_usd")),
+    _dolar("JPY=X", "Dólar em ienes", "¥ por US$", "JPN", ("bce_jpy", "bce_usd")),
+    _dolar("GBPUSD=X", "Libra em dólares", "US$ por £", "GBR", ("bce_usd", "bce_gbp")),
+    _dolar("INR=X", "Dólar em rupias indianas", "₹ por US$", "IND", ("bce_inr", "bce_usd")),
+    _dolar("IDR=X", "Dólar em rupias indonésias", "Rp por US$", "IDN", ("bce_idr", "bce_usd")),
+    _dolar("KRW=X", "Dólar em wons", "₩ por US$", "KOR", ("bce_krw", "bce_usd")),
+    _dolar("MXN=X", "Dólar em pesos mexicanos", "MX$ por US$", "MEX", ("bce_mxn", "bce_usd")),
+    _dolar("TRY=X", "Dólar em liras turcas", "₺ por US$", "TUR", ("bce_try", "bce_usd")),
+    _dolar("ZAR=X", "Dólar em rands", "R por US$", "ZAF", ("bce_zar", "bce_usd")),
+    _dolar("AUDUSD=X", "Dólar australiano em dólares americanos", "US$ por A$", "AUS", ("bce_usd", "bce_aud")),
+    _dolar("CAD=X", "Dólar em dólares canadenses", "C$ por US$", "CAN", ("bce_cad", "bce_usd")),
+    _dolar("DX-Y.NYB", "Índice do dólar (DXY)", "índice (mar/1973 = 100)", "USA", None),
+    _fred("DTWEXBGS", "Índice amplo do dólar", "índice (jan/2006 = 100)", "USA"),
+    _fred("DEXBZUS", "Dólar em reais", "R$ por US$", "BRA"),
+    _fred("DEXCHUS", "Dólar em yuans", "CN¥ por US$", "CHN"),
+    _fred("DEXJPUS", "Dólar em ienes", "¥ por US$", "JPN"),
+    _fred("DEXUSUK", "Libra em dólares", "US$ por £", "GBR"),
+    _fred("DEXINUS", "Dólar em rupias indianas", "₹ por US$", "IND"),
+    _fred("DEXKOUS", "Dólar em wons", "₩ por US$", "KOR"),
+    _fred("DEXMXUS", "Dólar em pesos mexicanos", "MX$ por US$", "MEX"),
+    _fred("DEXCAUS", "Dólar em dólares canadenses", "C$ por US$", "CAN"),
+    _fred("DEXUSAL", "Dólar australiano em dólares americanos", "US$ por A$", "AUS"),
+    _fred("DEXSFUS", "Dólar em rands", "R por US$", "ZAF"),
 ]
 
 

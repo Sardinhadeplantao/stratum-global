@@ -125,9 +125,20 @@ export function leituraSerie(situacao: string | null | undefined, extremo: strin
   if (situacao === "ok" && extremo === "alta") return { texto: "Fora do normal: alta", classe: "sit-fora" };
   if (situacao === "ok" && extremo === "baixa") return { texto: "Fora do normal: queda", classe: "sit-fora" };
   if (situacao === "ok") return { texto: "Dentro do normal", classe: "sit-normal" };
+  if (situacao === "nao_confere") return { texto: "Não confere com a fonte oficial", classe: "sit-falhou" };
   if (situacao === "parada") return { texto: "Parada (dado velho)", classe: "sem-dado" };
   if (situacao === "historico_curto") return { texto: "Histórico curto", classe: "sem-dado" };
   return { texto: "Sem dado", classe: "sem-dado" };
+}
+
+export type Conferencia = { com: string; data: string; oficial: number; diferenca: number; confere: boolean };
+
+/** "Confere com o BCE em 20/10/2026 (diferença de -0,12%)". O robô já decidiu se confere. */
+export function textoConferencia(c: Conferencia | null | undefined, conferir: boolean | undefined): string | null {
+  if (!c) return conferir ? "Ainda sem dia em comum com a fonte oficial para conferir." : null;
+  const diferenca = variacao(c.diferenca);
+  return c.confere ? `Confere com o ${c.com} em ${dia(c.data)} (diferença de ${diferenca}).`
+    : `Não confere com o ${c.com} em ${dia(c.data)}: diferença de ${diferenca}.`;
 }
 
 export type Mudanca = { tipo: string; sentido: string; desde: string; taxa_base: { vezes: number; anos: number } };

@@ -82,8 +82,9 @@ def test_faixa_normal_e_pontuacao():
 # Leitores
 
 def test_bce_le_as_taxas_de_referencia():
-    obs = conectores.interpretar_bce((FIXTURES / "bce_exr.csv").read_text())
-    assert Observacao("BRL", date(2026, 10, 16), 6.3345) in obs and len(obs) == 4
+    obs = conectores.interpretar_bce((FIXTURES / "bce_exr.csv").read_text())  # trecho real de 20/10
+    assert Observacao("JPY", date(2026, 10, 20), 177.34) in obs and Observacao("USD", date(2026, 10, 15), 1.1208) in obs
+    assert len(obs) == 11
 
 
 def test_bce_endereco_pede_todas_as_moedas_numa_chamada():
@@ -93,9 +94,15 @@ def test_bce_endereco_pede_todas_as_moedas_numa_chamada():
                    "?startPeriod=2015-01-01&format=csvdata&detail=dataonly")
 
 
-def test_fred_le_o_csv_e_pula_o_feriado():
-    obs = conectores.interpretar_fred((FIXTURES / "fred_dexbzus.csv").read_text(), "DEXBZUS")
-    assert [o.data for o in obs] == [date(2026, 10, 8), date(2026, 10, 10)]  # 9/10 veio vazio: sem dado, não zero
+def test_fred_le_o_csv():
+    obs = conectores.interpretar_fred((FIXTURES / "fred_dtwexbgs.csv").read_text(), "DTWEXBGS")  # trecho real de 20/10
+    assert obs[-1] == Observacao("DTWEXBGS", date(2026, 10, 16), 121.4048) and len(obs) == 4
+
+
+def test_fred_feriado_e_ausencia_de_dado_nao_zero():
+    # Caso de borda do formato (o FRED deixa o valor vazio no feriado): vira falta de dado, nunca zero
+    obs = conectores.interpretar_fred("observation_date,DTWEXBGS\n2026-10-13,121.4433\n2026-10-14,\n", "DTWEXBGS")
+    assert [o.data for o in obs] == [date(2026, 10, 13)]
 
 
 @pytest.mark.parametrize("texto, codigo", [
@@ -125,10 +132,28 @@ class SessaoCsv:
 
 def test_fred_uma_chamada_por_serie():
     f = next(f for f in catalogo.FONTES if f["id"] == "fred_cambio")
-    sessao = SessaoCsv((FIXTURES / "fred_dexbzus.csv").read_bytes())
-    obs = conectores.ler_fred(f, [{"codigo": "DEXBZUS"}], sessao, "teste", date(2026, 10, 1))
-    assert sessao.chamadas == ["https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXBZUS&cosd=2026-10-01"]
-    assert len(obs) == 2
+    sessao = SessaoCsv((FIXTURES / "fred_dtwexbgs.csv").read_bytes())
+    obs = conectores.ler_fred(f, [{"codigo": "DTWEXBGS"}], sessao, "teste", date(2026, 10, 1))
+    assert sessao.chamadas == ["https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS&cosd=2026-10-01"]
+    assert len(obs) == 4
+
+
+def test_yahoo_endereco_por_serie():
+    f = next(f for f in catalogo.FONTES if f["id"] == "yahoo_cambio")
+    assert conectores.url_yahoo(f, "BRL=X", date(2015, 1, 1), 1800000000) == (
+        "https://query1.finance.yahoo.com/v8/finance/chart/BRL%3DX?period1=1420070400&period2=1800000000&interval=1d")
+
+
+@pytest.mark.parametrize("texto, motivo", [
+    ('{"chart":{"result":null,"error":{"code":"Not Found","description":"No data found"}}}', "sem cotações"),
+    ('<html>Too Many Requests</html>', "não é JSON"),
+    ('{"chart":{"result":[{"meta":{"symbol":"JPY=X","exchangeTimezoneName":"Europe/London"},"timestamp":[1],'
+     '"indicators":{"quote":[{"close":[150.1]}]}}],"error":null}}', "esperado BRL=X"),
+])
+def test_yahoo_resposta_inesperada_e_erro(texto, motivo):
+    # Casos de borda do formato: erro da fonte, página de bloqueio, outra moeda
+    with pytest.raises(ValueError, match=motivo):
+        conectores.interpretar_yahoo(texto, "BRL=X")
 
 
 # Robô
@@ -180,3 +205,30 @@ def test_status_traz_as_series_com_a_regua(engine, cfg):
     assert serie["id"] == "bce_brl" and serie["situacao"] == "ok" and serie["percentil"] is not None
     assert serie["fonte_nome"] == BCE["nome"] and serie["data"] == dias[-1].isoformat()
     assert next(f for f in s["fontes"] if f["id"] == "bce_cambio")["observacoes"] == 1300
+
+
+def test_status_traz_a_conferencia_com_o_bce_e_o_dia_em_andamento(engine, cfg):
+    yahoo = next(f for f in catalogo.FONTES if f["id"] == "yahoo_cambio")
+    series = [s for s in catalogo.SERIES if s["id"] in ("bce_brl", "bce_usd", "yahoo_brl")]
+    dias = _dias_uteis(1300, date(2021, 6, 1))
+    reais = {d: 6 + ((i * 7) % 11) / 1000 for i, d in enumerate(dias)}
+    dolares = {d: 1.1 + ((i * 5) % 7) / 1000 for i, d in enumerate(dias)}
+    hoje = dias[-1] + timedelta(days=3 if dias[-1].weekday() == 4 else 1)
+
+    def bce(f, ss, *_):
+        return [Observacao("BRL", d, v) for d, v in reais.items()] + [Observacao("USD", d, v) for d, v in dolares.items()]
+
+    def mercado(f, ss, *_):  # a conta do BCE em cada dia, mais o dia de hoje em andamento
+        return [Observacao("BRL=X", d, round(reais[d] / dolares[d], 4)) for d in dias] + [Observacao("BRL=X", hoje, 5.5)]
+
+    relogio = Relogio(datetime.combine(hoje, datetime.min.time()) + timedelta(hours=14))
+    robo.rodar(engine, [BCE, yahoo], None, cfg, agora=relogio, series=series,
+               conectores_series={"bce": bce, "yahoo": mercado})
+    m = export.montar(engine, agora=relogio)["mercados"]
+    por_id = {x["id"]: x for x in m["series"]}
+    brl = por_id["yahoo_brl"]
+    assert brl["parcial"] and brl["data"] == hoje.isoformat() and brl["conferir"]
+    assert brl["conferencia"]["com"] == "BCE" and brl["conferencia"]["data"] == dias[-1].isoformat()
+    assert brl["conferencia"]["confere"] and abs(brl["conferencia"]["diferenca"]) < 0.01
+    assert not por_id["bce_brl"]["parcial"] and por_id["bce_brl"]["conferencia"] is None
+    assert m["confere_ate_pct"] == 2.0 and m["nao_conferem"] == 0

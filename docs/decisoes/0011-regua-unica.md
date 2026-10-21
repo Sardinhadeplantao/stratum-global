@@ -2,6 +2,9 @@
 
 Data: 2026-10-20
 
+Atualização de 21/10: as moedas contra o dólar passaram do FRED para o Yahoo Finance, conferidas com o BCE
+(decisão 0012). A régua não mudou.
+
 ## Contexto
 
 A fase 2 traz os mercados. A regra 6 pede uma régua só para todas as séries: dizer "fora do normal" comparando cada
