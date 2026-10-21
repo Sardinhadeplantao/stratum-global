@@ -55,7 +55,8 @@ def ordem_alfabetica(nome: str) -> str:
     return unicodedata.normalize("NFD", nome).encode("ascii", "ignore").decode().casefold()
 
 
-def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | None = None) -> dict:
+def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | None = None,
+           parciais: list[dict] | None = None) -> dict:
     momento = agora()
     limite_24h = momento - timedelta(hours=24)
     inicio_janela = momento - timedelta(hours=JANELA_HORAS)
@@ -93,7 +94,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         obs_por_fonte = dict(c.execute(select(db.serie.c.fonte_id, func.count()).select_from(
             db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
         estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES,
-                                          copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"))
+                                          copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"), parciais=parciais)
         eventos = mapa.terremotos(c, momento)
         eventos_por_fonte = dict(c.execute(select(db.evento_local.c.fonte_id, func.count(func.distinct(db.evento_local.c.ext_id)))
                                            .group_by(db.evento_local.c.fonte_id)).all())
@@ -244,8 +245,9 @@ def diagnostico(engine, agora=db.agora) -> list[str]:
     return linhas
 
 
-def escrever(engine, caminho: str, agendador: dict | None = None, copia: dict | None = None) -> None:
-    dados = montar(engine, agendador=agendador, copia=copia)
+def escrever(engine, caminho: str, agendador: dict | None = None, copia: dict | None = None,
+             parciais: list[dict] | None = None) -> None:
+    dados = montar(engine, agendador=agendador, copia=copia, parciais=parciais)
     _gravar_json(caminho, dados)
     if os.environ.get("STRATUM_DIAGNOSTICO"):
         print("::group::Diagnóstico da regra de países (uma linha por notícia)")

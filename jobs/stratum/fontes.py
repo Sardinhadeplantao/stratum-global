@@ -25,7 +25,7 @@ _CRITERIO_JUROS = ("Juros do título de 10 anos, de fonte oficial: o preço do d
                    "sanção e eleição. Os títulos de referência listados no plano da fase 2 (decisão 0013).")
 _CRITERIO_YAHOO = " Cotação de mercado do mesmo dia, com o dia em andamento (decisões 0012 e 0013). Uso pessoal, não comercial."
 _YAHOO = dict(tipo="dados", pais="USA", idioma="en", url="https://query1.finance.yahoo.com/v8/finance/chart/", conector="yahoo",
-              a_cada_horas=1, validade_dias=5, dia_em_andamento=True, nivel=3, controle="privado", controlador="grupo:yahoo",
+              validade_dias=5, dia_em_andamento=True, nivel=3, controle="privado", controlador="grupo:yahoo",  # toda rodada (0016)
               controlador_nome="Yahoo Inc., controlada por fundos da Apollo Global Management desde 2021 (a Verizon ficou com 10%)",
               controlador_fonte="https://en.wikipedia.org/wiki/Yahoo ; https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html")
 _GOVUK = "https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D="
@@ -88,7 +88,7 @@ FONTES: list[dict] = [
          controlador_nome="Federal Reserve (Conselho do Fed, autor da H.10; republicada pelo Banco do Fed de St. Louis)",
          controlador_fonte="https://www.federalreserve.gov/releases/h10/ ; https://fred.stlouisfed.org/legal/"),
     dict(id="yahoo_cambio", nome="Yahoo Finance: dólar no mercado (não oficial)", tipo="dados", pais="USA", idioma="en",
-         conector="yahoo", url="https://query1.finance.yahoo.com/v8/finance/chart/", a_cada_horas=1, validade_dias=5,
+         conector="yahoo", url="https://query1.finance.yahoo.com/v8/finance/chart/", validade_dias=5,  # toda rodada (0016)
          dia_em_andamento=True,
          criterio=_CRITERIO_MOEDAS + " Cotação de mercado do mesmo dia, com o dia em andamento; não há fonte oficial "
                                      "diária contra o dólar. Conferida com o BCE (decisão 0012). Uso pessoal, não comercial.",
@@ -299,3 +299,36 @@ SERIES: list[dict] = [
 
 def ativas(fontes: list[dict] = FONTES) -> list[dict]:
     return [f for f in fontes if f.get("ativa", True)]
+
+
+# Símbolo no padrão do mercado (decisão 0016). Moedas como BASE/COTADA: USD/CAD = quantos C$ vale US$ 1.
+_MOEDA_DO_PAIS = {"BRA": "BRL", "CHN": "CNY", "JPN": "JPY", "GBR": "GBP", "IND": "INR", "IDN": "IDR", "KOR": "KRW",
+                  "MEX": "MXN", "TUR": "TRY", "ZAF": "ZAR", "AUS": "AUD", "CAN": "CAD"}
+_SIMBOLOS = {
+    "DX-Y.NYB": "DXY", "DTWEXBGS": "USD amplo", "DEXUSUK": "GBP/USD", "DEXUSAL": "AUD/USD",
+    "BTC-USD": "BTC/USD", "ETH-USD": "ETH/USD",
+    "^GSPC": "S&P 500", "^BVSP": "Ibovespa", "000001.SS": "SSE Composite", "^N225": "Nikkei 225", "^NSEI": "Nifty 50",
+    "^FTSE": "FTSE 100", "^GDAXI": "DAX", "^FCHI": "CAC 40", "FTSEMIB.MI": "FTSE MIB", "^GSPTSE": "S&P/TSX",
+    "^AXJO": "S&P/ASX 200", "^KS11": "KOSPI", "^MXX": "IPC", "^JKSE": "IDX Composite", "XU100.IS": "BIST 100",
+    "^J203.JO": "JSE All Share", "^MERV": "Merval", "^STOXX50E": "EURO STOXX 50",
+    "BZ=F": "Brent", "CL=F": "WTI", "NG=F": "Henry Hub", "TTF=F": "TTF", "GC=F": "Ouro", "SI=F": "Prata",
+    "HG=F": "Cobre", "ALI=F": "Alumínio", "ZW=F": "Trigo", "ZC=F": "Milho", "ZS=F": "Soja",
+}
+_JUROS = {"USA": "US10Y", "DEU": "DE10Y", "GBR": "UK10Y", "JPN": "JP10Y"}
+
+
+def _simbolo(s: dict) -> str:
+    if s["codigo"] in _SIMBOLOS:
+        return _SIMBOLOS[s["codigo"]]
+    if s["grupo"] == "juros":
+        return _JUROS[s["pais"]]
+    if s["fonte"] == "bce_cambio":
+        return f"EUR/{s['codigo']}"
+    par = s["codigo"].removesuffix("=X")
+    if len(par) == 6:  # GBPUSD=X, AUDUSD=X
+        return f"{par[:3]}/{par[3:]}"
+    return f"USD/{par if s['fonte'] == 'yahoo_cambio' else _MOEDA_DO_PAIS[s['pais']]}"
+
+
+for _s in SERIES:
+    _s.setdefault("simbolo", _simbolo(_s))

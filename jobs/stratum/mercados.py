@@ -32,19 +32,22 @@ def desde(c, series: list[dict]) -> date:
     return max(HISTORICO_DESDE, min(ultimas.values()) - timedelta(days=REVISAO_DIAS))
 
 
-def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em: datetime) -> int:
+def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em: datetime,
+           ate_dia: date | None = None) -> int:
     """Grava o que é novo: data que o banco não tem, ou valor diferente do último conhecido (revisão da fonte).
-    Devolve quantas observações entraram."""
+    Com `ate_dia`, o dia em andamento (essa data ou depois) fica de fora: só o dia que fechou vai para o banco
+    (decisão 0016). Devolve quantas observações entraram."""
     por_codigo = {s["codigo"]: s["id"] for s in series}
     # A mesma data duas vezes na mesma leitura (dois arquivos da fonte que se sobrepõem): vale a última
-    obs = list({(o.codigo, o.data): o for o in observacoes if o.codigo in por_codigo}.values())
-    if not obs:
+    todas = list({(o.codigo, o.data): o for o in observacoes if o.codigo in por_codigo}.values())
+    obs = [o for o in todas if ate_dia is None or o.data < ate_dia]
+    if not todas:
         return 0
     with engine.begin() as c:
         atuais = {}
         for sid, d, v in c.execute(select(db.observacao.c.serie_id, db.observacao.c.data, db.observacao.c.valor)
                                    .where(db.observacao.c.serie_id.in_(list(por_codigo.values())),
-                                          db.observacao.c.data >= min(o.data for o in obs))
+                                          db.observacao.c.data >= min(o.data for o in todas))
                                    .order_by(db.observacao.c.id)):
             atuais[(sid, d)] = v  # o último registro de cada data é o valor mais recente
         linhas = []
@@ -56,11 +59,26 @@ def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em
             linhas.append(dict(serie_id=chave[0], data=o.data, valor=o.valor, rodada_id=rodada_id, conhecido_em=conhecido_em))
         for i in range(0, len(linhas), LOTE):
             c.execute(db.observacao.insert(), linhas[i:i + LOTE])
-        # Contrato futuro do dia (decisão 0014): entra quando é novo para a data; o mesmo de novo é ignorado
+        # Contrato futuro do dia (decisão 0014): entra quando é novo para a data; o mesmo de novo é ignorado. O do dia
+        # em andamento também entra: o contrato vigente é fato, não preço provisório (decisão 0016)
         contratos = [dict(serie_id=por_codigo[o.codigo], data=o.data, contrato=o.contrato, conhecido_em=conhecido_em)
-                     for o in obs if o.contrato]
+                     for o in todas if o.contrato]
         db.inserir_ignorando_repetidos(c, db.contrato_futuro, contratos, ["serie_id", "data", "contrato"])
     return len(linhas)
+
+
+def parciais(series: list[dict], observacoes, ate_dia: date | None, lido_em: datetime) -> list[dict]:
+    """O dia em andamento de cada série, como lido nesta rodada (decisão 0016): não vai para o banco, vai para o
+    status.json com a data do dia e a hora da leitura."""
+    if ate_dia is None:
+        return []
+    por_codigo = {s["codigo"]: s["id"] for s in series}
+    ultimo = {}
+    for o in observacoes:
+        if o.codigo in por_codigo and o.data >= ate_dia and (o.codigo not in ultimo or o.data >= ultimo[o.codigo].data):
+            ultimo[o.codigo] = o
+    return [dict(serie_id=por_codigo[c], data=o.data, valor=o.valor, contrato=o.contrato, conhecido_em=lido_em)
+            for c, o in ultimo.items()]
 
 
 def trocas_de_contrato(c, ate: datetime) -> dict[str, set[date]]:
@@ -193,9 +211,8 @@ def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, mome
 # Quadros de destaque do painel de mercados (decisão 0014): um número por grande mercado, para quem lê do Brasil.
 # Bolsa e juro dos EUA, dólar no mundo, ouro, petróleo, cripto, e o dólar e a bolsa do Brasil. Escolha fixa, não muda
 # com o dia: o que se mexeu fora do normal aparece pela régua, não por estar aqui.
-DESTAQUES = {"bolsa_gspc": "S&P 500", "juros_usa_10a": "Juro EUA 10 anos", "yahoo_dxynyb": "Índice do dólar",
-             "commodity_gc": "Ouro", "commodity_bz": "Petróleo Brent", "cripto_btc": "Bitcoin", "yahoo_brl": "Dólar em reais",
-             "bolsa_bvsp": "Ibovespa"}
+DESTAQUES = {"bolsa_gspc": "S&P 500", "juros_usa_10a": "US10Y", "yahoo_dxynyb": "DXY", "commodity_gc": "Ouro",
+             "commodity_bz": "Brent", "cripto_btc": "BTC/USD", "yahoo_brl": "USD/BRL", "bolsa_bvsp": "Ibovespa"}
 DIAS_DO_MES = 30  # o minigráfico: as cotações dos últimos 30 dias corridos, como o sistema as conhecia
 
 
@@ -213,14 +230,16 @@ def _amplitude(lista: list[dict]) -> dict:
 
 
 def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[dict], catalogo_series: list[dict],
-           copia: str | None = None) -> dict:
+           copia: str | None = None, parciais: list[dict] | None = None) -> dict:
     """Todas as séries ativas, ordenadas só pela pontuação (decisão 0011); sem leitura, no fim, pelo nome.
-    Do catálogo (código) vêm a validade e o dia em andamento de cada fonte e a conferência de cada série.
-    `copia`: caminho da cópia local das cotações (ver `carregar`)."""
+    Do catálogo (código) vêm a validade e o dia em andamento de cada fonte, a conferência e o símbolo de cada série.
+    `copia`: caminho da cópia local das cotações (ver `carregar`). `parciais`: o dia em andamento lido nesta rodada,
+    que não vai para o banco (decisão 0016)."""
     validade = {f["id"]: f["validade_dias"] for f in catalogo_fontes if f.get("validade_dias") and f.get("ativa", True)}
     em_andamento = {f["id"] for f in catalogo_fontes if f.get("dia_em_andamento")}
     conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
     regiao = {s["id"]: s["regiao"] for s in catalogo_series if s.get("regiao")}
+    simbolo = {s["id"]: s["simbolo"] for s in catalogo_series if s.get("simbolo")}
     inicio_mes = momento.date() - timedelta(days=DIAS_DO_MES)
     series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
     todas, origem = carregar(c, copia)
@@ -229,6 +248,10 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     ultima_coleta = {sid: max(l[4] for l in linhas) for sid, linhas in todas.items()}
     pts = {sid: _pontos(todas.get(sid, []), momento)
            for sid in {s["id"] for s in series} | {x for par in conferir.values() for x in par}}
+    for p in parciais or []:  # o dia em andamento desta rodada (decisão 0016): não está no banco
+        if p["serie_id"] in pts and p["conhecido_em"] <= momento:
+            pts[p["serie_id"]] = sorted({**dict(pts[p["serie_id"]]), p["data"]: p["valor"]}.items())
+            ultima_coleta[p["serie_id"]] = max(ultima_coleta.get(p["serie_id"], p["conhecido_em"]), p["conhecido_em"])
     lista = []
     for s in series:
         f = fontes.get(s["fonte_id"]) or {}
@@ -240,7 +263,8 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
                                     antes_de=ultimo if andamento and ultimo >= momento.date() else None)
             if conferida:
                 conferida["com"] = "BCE"
-        lista.append({"id": s["id"], "nome": s["nome"], "unidade": s["unidade"], "pais": s["pais"], "codigo": s["codigo"],
+        lista.append({"id": s["id"], "simbolo": simbolo.get(s["id"], s["nome"]), "nome": s["nome"], "unidade": s["unidade"],
+                      "pais": s["pais"], "codigo": s["codigo"],
                       "medida": s["medida"],  # variacao_pct (em %) ou diferenca (em pontos percentuais)
                       "grupo": s["grupo"], "regiao": regiao.get(s["id"]),
                       "mes": [v for d, v in pts[s["id"]] if d > inicio_mes],

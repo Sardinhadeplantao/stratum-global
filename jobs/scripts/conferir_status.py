@@ -72,7 +72,8 @@ def main(caminho: str) -> int:
         conf = x.get("conferencia")
         conferida = (f" · {conf['com']} {conf['data']}: {_n(conf['diferenca'], sinal=True)}% "
                      f"{'confere' if conf['confere'] else 'NÃO CONFERE'}") if conf else ""
-        print(f"  {x['nome']}: {x.get('data')}{' (em andamento)' if x.get('parcial') else ''} = {x.get('valor')}"
+        print(f"  {x.get('simbolo') or ''} {x['nome']}: {x.get('data')}{' (em andamento, fora do banco)' if x.get('parcial') else ''}"
+              f" = {x.get('valor')}"
               f" · {_n(x.get('variacao'), sinal=True)}{unidade} · percentil {_n(x.get('percentil'), 1)} · {leitura}{conferida}")
         for mu in x.get("mudancas") or []:
             print(f"    mudança: {mu['tipo']} ({mu['sentido']}) desde {mu['desde']}, "

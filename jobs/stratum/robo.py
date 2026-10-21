@@ -28,6 +28,8 @@ class Resultado:
     situacao: str                       # ok | parcial | falhou
     novos: int = 0
     falhas: list[str] = field(default_factory=list)
+    # Dia em andamento lido nesta rodada (decisão 0016): vai direto para o status.json, não para o banco
+    parciais: list[dict] = field(default_factory=list)
 
 
 def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES,
@@ -52,7 +54,10 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
                 with engine.connect() as c:
                     primeira = mercados.desde(c, da_fonte)
                 itens = conectores_series[f["conector"]](f, da_fonte, session, cfg.user_agent, primeira)
-                novos = mercados.gravar(engine, da_fonte, itens, rid, agora())
+                lido_em = agora()
+                aberto = lido_em.date() if f.get("dia_em_andamento") else None  # o dia que ainda não fechou
+                novos = mercados.gravar(engine, da_fonte, itens, rid, lido_em, ate_dia=aberto)
+                resultado.parciais += mercados.parciais(da_fonte, itens, aberto, lido_em)
             elif f["conector"] in conectores_eventos:
                 itens = conectores_eventos[f["conector"]](f, session, cfg.user_agent)
                 novos = _gravar_eventos(engine, f["id"], itens, rid, agora())
@@ -203,7 +208,8 @@ def main(argv=None) -> int:
             copia=estado_copia)
         print(f"Resumo do Telegram: {envio}")
         if args.exportar:
-            export.escrever(engine, args.exportar, agendador=estado.para_status(), copia=estado_copia)
+            export.escrever(engine, args.exportar, agendador=estado.para_status(), copia=estado_copia,
+                            parciais=resultado.parciais)
     except erros_sql.SQLAlchemyError as exc:  # o banco caiu no meio da rodada: o site diz isso, sem a mensagem crua
         print(f"O banco falhou no meio da rodada ({type(exc).__name__}).")
         if args.exportar:

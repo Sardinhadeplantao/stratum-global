@@ -47,7 +47,8 @@ export type Historia = {
 };
 /** Séries de mercado lidas pela régua única (decisão 0011). Tudo vem calculado do robô; o site só mostra. */
 export type Serie = {
-  id: string; nome: string; unidade: string; pais: string | null; codigo: string; fonte: string; fonte_nome: string;
+  /** No padrão do mercado: USD/BRL, EUR/USD, DXY, US10Y, S&P 500 (decisão 0016) */
+  id: string; simbolo?: string; nome: string; unidade: string; pais: string | null; codigo: string; fonte: string; fonte_nome: string;
   /** variacao_pct (preço, em %) ou diferenca (juros, em pontos percentuais) */
   medida: string;
   /** moedas | juros | bolsas | commodities | cripto (decisão 0013) */
@@ -79,7 +80,7 @@ export type Mercados = {
 export type Contagem = { sobem: number; caem: number; estaveis: number };
 export type Amplitude = Contagem & { proporcao_sobem: number | null; por_grupo: Record<string, Contagem> };
 /** Resumo de uma série nos painéis (a leitura completa está em mercados.series). */
-export type MercadoResumo = Pick<Serie, "id" | "nome" | "unidade" | "medida" | "data" | "valor" | "variacao" | "percentil"
+export type MercadoResumo = Pick<Serie, "id" | "simbolo" | "nome" | "unidade" | "medida" | "data" | "valor" | "variacao" | "percentil"
   | "extremo" | "situacao" | "parcial" | "conhecido_em" | "mes">;
 /** Ponto crítico do mapa (decisão 0014): estado por regra, com o contexto e as fontes. */
 export type Ponto = {

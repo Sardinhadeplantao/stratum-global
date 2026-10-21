@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Pais } from "@/components/PainelPais";
-import { plural } from "@/lib/formatar";
+import { NIVEIS_PADRAO } from "@/lib/constantes";
+import { hora, plural } from "@/lib/formatar";
+import { type DadosInicio, escolherDados } from "@/lib/inicio";
 import type { Status } from "@/lib/status";
 import CamadasMapa from "./CamadasMapa";
 import Faixa from "./Faixa";
@@ -13,9 +15,8 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export type Selecao = { tipo: "pais" | "ponto"; id: string };
 export type Camadas = { pontos: boolean; rotas: boolean; citacoes: boolean; terremotos: boolean };
 
-/** Os dados que a página inicial usa (o status.json inteiro tem mais coisa, que fica nas outras telas). */
-export type DadosInicio = Pick<Status, "paises" | "atencao" | "pontos" | "terremotos" | "faixa" | "mercados" | "historias"
-  | "ultimos_documentos" | "contagem_historias" | "mais_citados" | "origem_fontes" | "totais" | "ultima_rodada" | "banco">;
+export type { DadosInicio };
+const ATUALIZAR_A_CADA_MS = 60_000;  // o robô publica a cada 15 minutos; a página pergunta a cada minuto
 
 function lerHash(): Selecao | null {
   const m = /^#(pais|ponto)=([A-Za-z_]{3,40})$/.exec(window.location.hash);
@@ -24,7 +25,10 @@ function lerHash(): Selecao | null {
 
 /** A página inicial (decisão 0014): o mapa no centro, as camadas à esquerda, o painel à direita e a faixa embaixo.
  * A seleção fica no endereço (#ponto=ormuz, #pais=BRA), para dar para voltar e compartilhar. */
-export default function Inicio({ dados, niveis }: { dados: DadosInicio; niveis: number[] }) {
+export default function Inicio({ inicial }: { inicial: DadosInicio }) {
+  const [dados, setDados] = useState(inicial);
+  const [novo, setNovo] = useState(false);  // acabou de chegar dado novo: um sinal discreto
+  const geradoRef = useRef(inicial.gerado_em);
   const [selecao, setSelecao] = useState<Selecao | null>(null);
   const [camadas, setCamadas] = useState<Camadas>({ pontos: true, rotas: true, citacoes: true, terremotos: true });
   const [lista, setLista] = useState<Pais[]>([]);
@@ -36,6 +40,27 @@ export default function Inicio({ dados, niveis }: { dados: DadosInicio; niveis: 
     const aoMudar = () => setSelecao(lerHash());
     window.addEventListener("hashchange", aoMudar);
     return () => window.removeEventListener("hashchange", aoMudar);
+  }, []);
+
+  // Atualização automática (decisão 0016): pergunta se o robô publicou dados novos; se sim, troca sem recarregar
+  useEffect(() => {
+    let parado = false;
+    async function buscar() {
+      if (document.hidden) return;
+      try {
+        const r = await fetch(`${BASE}/dados/status.json?t=${Date.now()}`, { cache: "no-store" });
+        if (!r.ok) return;
+        const s = (await r.json()) as Status;
+        if (parado || !s.gerado_em || s.gerado_em === geradoRef.current) return;
+        geradoRef.current = s.gerado_em;
+        setDados(escolherDados(s));
+        setNovo(true);
+        setTimeout(() => setNovo(false), 4000);
+      } catch { /* sem rede: fica com o que tem e tenta de novo */ }
+    }
+    const id = setInterval(buscar, ATUALIZAR_A_CADA_MS);
+    document.addEventListener("visibilitychange", buscar);
+    return () => { parado = true; clearInterval(id); document.removeEventListener("visibilitychange", buscar); };
   }, []);
   const porIso = useMemo(() => new Map(lista.map((p) => [p.iso, p])), [lista]);
 
@@ -58,12 +83,15 @@ export default function Inicio({ dados, niveis }: { dados: DadosInicio; niveis: 
   return (
     <div className="inicio">
       <section className="inicio-mapa" aria-label="Mapa global">
-        <MapaGlobal paises={dados.paises} niveis={niveis} janelaHoras={dados.atencao?.janela_horas ?? 24} semDado={!dados.atencao}
+        <MapaGlobal paises={dados.paises} niveis={dados.atencao?.niveis ?? NIVEIS_PADRAO} janelaHoras={dados.atencao?.janela_horas ?? 24} semDado={!dados.atencao}
                     pontos={pontos} terremotos={terremotos} lista={lista} camadas={camadas}
                     selecao={selecao} aoSelecionar={selecionar} />
         <CamadasMapa camadas={camadas} mudar={setCamadas} contagens={contagens} />
       </section>
-      <PainelLateral dados={dados} selecao={selecao} selecionar={selecionar} porIso={porIso} />
+      <PainelLateral dados={dados} selecao={selecao} selecionar={selecionar} porIso={porIso}
+                     atualizacao={<p className={`atualizacao ${novo ? "nova" : ""}`} aria-live="polite">
+                       <span className="ponto sit-rodando" aria-hidden /> {dados.gerado_em ? `Dados de ${hora(dados.gerado_em)}` : "Sem dado"}
+                       {" "}<small>· a página se atualiza sozinha</small></p>} />
       <Faixa itens={dados.faixa ?? []} selecionar={selecionar} />
     </div>
   );

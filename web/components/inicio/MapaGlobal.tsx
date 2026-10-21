@@ -96,16 +96,24 @@ export default function MapaGlobal({ paises, niveis, janelaHoras, semDado, ponto
     for (const m of marcadores.current) m.getElement().style.display = c.pontos ? "" : "none";
   }
 
+  // Os dados mudam a cada atualização automática (decisão 0016): o mapa é criado uma vez só e os dados entram por
+  // referência, sem recriar o mapa nem mexer na posição que a pessoa escolheu
+  const dadosRef = useRef({ paises, semDado, janelaHoras, pontos });
+  dadosRef.current = { paises, semDado, janelaHoras, pontos };
+  const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
+  const [carregado, setCarregado] = useState(false);
+
   useEffect(() => {
     let cancelado = false;
     import("maplibre-gl").then((maplibregl) => {
       if (cancelado || !caixa.current) return;
+      maplibreRef.current = maplibregl;
       maplibregl.setWorkerUrl(`${location.origin}${BASE}/maplibre/maplibre-gl-worker.mjs?v=${maplibregl.getVersion()}`);
       const plano = window.matchMedia("(max-width: 760px)").matches;
       setPlano(plano);
       const mapa = new maplibregl.Map({
         container: caixa.current,
-        style: estilo(plano, semDado, terremotos),
+        style: estilo(plano, dadosRef.current.semDado, terremotos),
         center: plano ? [35, 22] : [48, 22],
         zoom: plano ? Math.max(Math.log2(caixa.current.clientWidth / 512), 0) : 2,
         attributionControl: { compact: true, customAttribution: "Fronteiras: Natural Earth · Rotas: traçado esquemático" },
@@ -113,30 +121,17 @@ export default function MapaGlobal({ paises, niveis, janelaHoras, semDado, ponto
       mapaRef.current = mapa;
       mapa.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
       mapa.on("error", (e) => { if (String(e.error?.message ?? "").includes("paises")) setErro(true); });
-      mapa.on("load", () => {
-        for (const [iso, p] of Object.entries(paises)) mapa.setFeatureState({ source: "paises", id: iso }, { nivel: p.nivel });
-        aplicarCamadas(mapa, camadasRef.current);
-      });
-      // Pontos críticos: marcadores com o nome e a cor do estado medido pela regra (o robô decide o estado)
-      marcadores.current = pontos.map((p) => {
-        const el = document.createElement("button");
-        el.type = "button";
-        el.className = `marcador ${estadoPonto(p.estado).classe}`;
-        el.title = `${p.nome}: ${estadoPonto(p.estado).texto}`;
-        el.innerHTML = `<i></i><span></span>`;
-        (el.querySelector("span") as HTMLSpanElement).textContent = p.nome.split(" (")[0];
-        el.addEventListener("click", (ev) => { ev.stopPropagation(); aoSelecionarRef.current({ tipo: "ponto", id: p.id }); });
-        return new maplibregl.Marker({ element: el, anchor: "left" }).setLngLat([p.lon, p.lat]).addTo(mapa);
-      });
+      mapa.on("load", () => setCarregado(true));
       mapa.on("mousemove", (e) => {
         const f = mapa.queryRenderedFeatures(e.point, { layers: ["terremotos", "rotas", "paises"] })[0];
         mapa.getCanvas().style.cursor = f && f.layer.id === "paises" ? "pointer" : "";
         if (!f) return setSobre(null);
         if (f.layer.id === "terremotos") return setSobre(`${magnitude(Number(f.properties.magnitude))} · ${f.properties.titulo}`);
         if (f.layer.id === "rotas") return setSobre(`${f.properties.nome} (traçado esquemático)`);
+        const { paises: p, semDado: sd, janelaHoras: jh } = dadosRef.current;
         const iso = String(f.properties.iso ?? "");
-        const n = paises[iso]?.citacoes ?? 0;
-        setSobre(`${f.properties.nome}${semDado ? " · sem dado" : ` · ${n} ${n === 1 ? "notícia" : "notícias"} em ${janelaHoras} h`}`);
+        const n = p[iso]?.citacoes ?? 0;
+        setSobre(`${f.properties.nome}${sd ? " · sem dado" : ` · ${n} ${n === 1 ? "notícia" : "notícias"} em ${jh} h`}`);
       });
       mapa.on("mouseout", () => setSobre(null));
       mapa.on("click", (e) => {
@@ -152,7 +147,39 @@ export default function MapaGlobal({ paises, niveis, janelaHoras, semDado, ponto
       mapaRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paises, pontos, terremotos, semDado]);
+  }, []);
+
+  // Citações de cada país (o nível vem do robô)
+  useEffect(() => {
+    const mapa = mapaRef.current;
+    if (!mapa || !carregado) return;
+    mapa.removeFeatureState({ source: "paises" });
+    for (const [iso, p] of Object.entries(paises)) mapa.setFeatureState({ source: "paises", id: iso }, { nivel: p.nivel });
+    if (selecionadoRef.current) mapa.setFeatureState({ source: "paises", id: selecionadoRef.current }, { selecionado: true });
+    aplicarCamadas(mapa, camadasRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paises, semDado, carregado]);
+
+  // Pontos críticos: marcadores com o nome e a cor do estado medido pela regra (o robô decide o estado)
+  useEffect(() => {
+    const mapa = mapaRef.current;
+    const maplibregl = maplibreRef.current;
+    if (!mapa || !maplibregl || !carregado) return;
+    marcadores.current.forEach((m) => m.remove());
+    marcadores.current = pontos.map((p) => {
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = `marcador ${estadoPonto(p.estado).classe}`;
+      el.title = `${p.nome}: ${estadoPonto(p.estado).texto}`;
+      el.dataset.ponto = p.id;
+      el.innerHTML = `<i></i><span></span>`;
+      (el.querySelector("span") as HTMLSpanElement).textContent = p.nome.split(" (")[0];
+      el.addEventListener("click", (ev) => { ev.stopPropagation(); aoSelecionarRef.current({ tipo: "ponto", id: p.id }); });
+      return new maplibregl.Marker({ element: el, anchor: "left" }).setLngLat([p.lon, p.lat]).addTo(mapa);
+    });
+    aplicarCamadas(mapa, camadasRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pontos, carregado]);
 
   useEffect(() => {
     const mapa = mapaRef.current;
@@ -173,10 +200,10 @@ export default function MapaGlobal({ paises, niveis, janelaHoras, semDado, ponto
       : null;
     if (alvo) mapa.flyTo({ center: alvo as [number, number], zoom: Math.max(mapa.getZoom(), selecao?.tipo === "ponto" ? 3.2 : 2.6) });
     for (const m of marcadores.current) {
-      const ativo = selecao?.tipo === "ponto" && m.getElement().title.startsWith(pontos.find((p) => p.id === selecao.id)?.nome ?? "§");
-      m.getElement().classList.toggle("ativo", ativo);
+      m.getElement().classList.toggle("ativo", selecao?.tipo === "ponto" && m.getElement().dataset.ponto === selecao.id);
     }
-  }, [selecao, porIso, pontos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selecao, porIso]);
 
   // Dados novos de terremotos sem recriar o mapa
   useEffect(() => {

@@ -42,6 +42,8 @@ Já entregue:
   glossário curto.
 
 Também entregue: a retenção (decisão 0015, arquivo conferido). Banco medido em 21/10: 45,6 MB de 500 MB.
+Mercados a cada 15 minutos, com a página que se atualiza sozinha, nomes no padrão do mercado e só o fechamento do dia
+no banco (decisão 0016).
 
 Falta:
 
@@ -104,8 +106,6 @@ Já entregue:
 
 Falta:
 
-- Cotações: guardar só o fechamento de cada dia (as cópias de hora em hora do dia em andamento são o que mais cresce
-  depois do arquivo conferido, decisão 0015).
 - Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
 - A reação medida a cada evento.
 - Atores e incentivos de cada ponto crítico, com decisão própria (é análise, não dado).

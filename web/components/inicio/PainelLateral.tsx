@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import PainelPais, { type Pais } from "@/components/PainelPais";
 import Titulo from "@/components/Titulo";
@@ -14,8 +14,9 @@ type Aba = "agora" | "mercados" | "noticias";
 const ABAS: [Aba, string][] = [["agora", "Agora"], ["mercados", "Mercados"], ["noticias", "Notícias"]];
 
 /** O painel da direita: com algo selecionado, o contexto dele; sem seleção, as abas. */
-export default function PainelLateral({ dados, selecao, selecionar, porIso }: {
+export default function PainelLateral({ dados, selecao, selecionar, porIso, atualizacao }: {
   dados: DadosInicio; selecao: Selecao | null; selecionar: (s: Selecao | null) => void; porIso: Map<string, Pais>;
+  atualizacao?: ReactNode;
 }) {
   const [aba, setAba] = useState<Aba>("agora");
   const pontos = dados.pontos?.lista ?? [];
@@ -49,6 +50,7 @@ export default function PainelLateral({ dados, selecao, selecionar, porIso }: {
                   onClick={() => setAba(id)}>{nome}</button>
         ))}
       </div>
+      {atualizacao}
       <div className="aba-corpo">
         {aba === "agora" && (<>
           <Alertas dados={dados} />
