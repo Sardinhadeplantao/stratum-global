@@ -1,11 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { Conferencia, Mudanca } from "./formatar";
 
 /** Formato do public/dados/status.json gravado pelo robô (jobs/stratum/export.py, versão 2). */
 export type Coleta = { em: string | null; situacao: string; itens_lidos: number; itens_novos: number; erro: string | null };
 export type Fonte = {
   id: string; nome: string; tipo: string; pais: string | null; pais_nome?: string | null; idioma: string | null; url: string;
   criterio: string | null; ativa: boolean; ultima_coleta: Coleta | null; documentos: number; documentos_24h: number;
+  /** Fonte de dados (decisão 0011): quantas observações guardadas */
+  observacoes?: number;
   /** Ficha da fonte (decisão 0008) */
   nivel?: number | null; controle?: string | null; controlador_nome?: string | null; controlador_fontes?: string[];
 };
@@ -40,6 +43,26 @@ export type Historia = {
   id: number; titulo: string; titulo_original?: string | null; noticias: number; fontes: number; vozes: number; ultima: string | null;
   paises: PaisCitado[]; documentos: DocumentoHistoria[];
 };
+/** Séries de mercado lidas pela régua única (decisão 0011). Tudo vem calculado do robô; o site só mostra. */
+export type Serie = {
+  id: string; nome: string; unidade: string; pais: string | null; codigo: string; fonte: string; fonte_nome: string;
+  /** variacao_pct (preço, em %) ou diferenca (juros, em pontos percentuais) */
+  medida: string;
+  /** moedas | juros | bolsas | commodities | cripto (decisão 0013) */
+  grupo: string | null;
+  conhecido_em: string | null; situacao: "ok" | "nao_confere" | "parada" | "historico_curto" | "sem_dado"; data: string | null;
+  /** Dia em andamento (decisão 0012): a oscilação do dia, ainda não fechada */
+  parcial: boolean;
+  /** É verdade? Cotação de mercado comparada com a conta pela fonte oficial (decisão 0012) */
+  conferir: boolean; conferencia: Conferencia | null;
+  valor: number | null; variacao: number | null; percentil: number | null; extremo: "alta" | "baixa" | null;
+  pontuacao: number | null; faixa: [number, number] | null; historico: number; mudancas: Mudanca[];
+};
+export type Mercados = {
+  regua: { versao: string; janela_anos: number; minimo: Record<string, number>; extremo: number; persistencia: number;
+    ritmo_pontos: number; ritmo_extremo: number };
+  validade_dias: Record<string, number>; confere_ate_pct: number; series: Serie[]; fora_do_normal: number; nao_conferem: number;
+};
 export type Status = {
   versao_formato: number;
   versao_robo: string | null;
@@ -55,6 +78,7 @@ export type Status = {
   /** Tradução automática dos títulos (decisão 0010), com a contagem pronta */
   traducao?: { modelo: string; traduzidos: number; na_fila: number; por_rodada: number } | null;
   regra_historias?: { versao: string; limiar: number; janela_horas: number } | null;
+  mercados?: Mercados | null;
   ultima_rodada: { id: number; iniciada_em: string | null; terminada_em: string | null; situacao: string } | null;
   rodadas_recentes: { iniciada_em: string | null; situacao: string }[];
   totais: { documentos: number; documentos_24h: number; fontes: number; fontes_ok: number };
@@ -67,7 +91,7 @@ export type Status = {
 };
 
 const VAZIO: Status = {
-  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, copia: null, historias: [], contagem_historias: null, traducao: null, regra_historias: null, banco: null, erro_banco: null, ultima_rodada: null,
+  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, copia: null, historias: [], contagem_historias: null, traducao: null, regra_historias: null, mercados: null, banco: null, erro_banco: null, ultima_rodada: null,
   rodadas_recentes: [], totais: { documentos: 0, documentos_24h: 0, fontes: 0, fontes_ok: 0 }, fontes: [], ultimos_documentos: [],
   atencao: null, paises: {}, mais_citados: [], origem_fontes: [],
 };

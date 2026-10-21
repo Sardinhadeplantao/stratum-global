@@ -151,3 +151,128 @@ def test_rodada_completa_grava_o_status_do_site(tmp_path, monkeypatch, feed_rss)
     dados = json.loads(caminho.read_text(encoding="utf-8"))
     assert dados["banco"] == "temporario" and dados["totais"]["documentos"] == 2
     assert dados["agendador"]["situacao"] == "sem_banco"
+
+
+# Séries de mercado (decisão 0011)
+
+def _serie(n, escala=1.0, semente=1, inicio=None):
+    """Cotação sintética de n dias úteis, com variações sorteadas de tamanho `escala` (em %)."""
+    import random
+    from datetime import date
+    rnd, d, v, pontos = random.Random(semente), inicio or date(2020, 1, 1), 100.0, []
+    while len(pontos) < n:
+        if d.weekday() < 5:
+            v *= 1 + rnd.gauss(0, escala) / 100
+            pontos.append((d, v))
+        d += timedelta(days=1)
+    return pontos
+
+
+def _gravar_serie(engine, pontos, conhecido_em, serie_id="bce_brl", codigo="BRL"):
+    from stratum import fontes as catalogo, mercados
+    from stratum.connectors.series import Observacao
+    with engine.begin() as c:
+        db.gravar_fontes(c, [f for f in catalogo.FONTES if f["id"] == "bce_cambio"])
+        db.gravar_series(c, [s for s in catalogo.SERIES if s["id"] == serie_id])
+    serie = {"id": serie_id, "codigo": codigo}
+    return mercados.gravar(engine, [serie], [Observacao(codigo, d, v) for d, v in pontos], None, conhecido_em)
+
+
+def test_cotacao_repetida_nao_entra_duas_vezes_e_revisao_vira_registro_novo(engine):
+    from datetime import date, datetime
+    dia = date(2026, 10, 16)
+    assert _gravar_serie(engine, [(dia, 6.3345)], datetime(2026, 10, 16, 15)) == 1
+    assert _gravar_serie(engine, [(dia, 6.3345)], datetime(2026, 10, 16, 18)) == 0   # a mesma cotação de novo
+    assert _gravar_serie(engine, [(dia, 6.3400)], datetime(2026, 10, 17, 9)) == 1    # a fonte revisou o valor
+    with engine.connect() as c:
+        linhas = c.execute(select(db.observacao.c.valor, db.observacao.c.conhecido_em).order_by(db.observacao.c.id)).all()
+    assert [v for v, _ in linhas] == [6.3345, 6.3400]  # o valor antigo fica; o novo entra com a data em que soube
+
+
+def test_leitura_de_um_momento_so_usa_o_que_o_sistema_sabia(engine):
+    from datetime import datetime
+    from stratum import mercados
+    pontos = _serie(1300, escala=0.5)
+    _gravar_serie(engine, pontos, datetime(2026, 1, 1))
+    ultimo_dia, ultimo_valor = pontos[-1]
+    _gravar_serie(engine, [(ultimo_dia, ultimo_valor * 1.05)], datetime(2026, 2, 1))   # revisão: +5% no último dia
+    serie = {"id": "bce_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+    with engine.connect() as c:
+        antes = mercados.leitura(c, serie, None, datetime(2026, 1, 15))
+        depois = mercados.leitura(c, serie, None, datetime(2026, 2, 15))
+    assert antes["valor"] == ultimo_valor and antes["extremo"] is None
+    assert depois["valor"] == ultimo_valor * 1.05 and depois["extremo"] == "alta"
+
+
+def test_a_mesma_regua_para_todas_as_series():
+    # Fora do normal é contra o próprio histórico: 1% é extremo numa moeda calma e comum numa agitada.
+    # Os parâmetros são os mesmos, e a escala do preço não muda nada.
+    from stratum.domain import regua
+    calma, agitada = _serie(1300, escala=0.2, semente=2), _serie(1300, escala=2.0, semente=3)
+    for pontos in (calma, agitada):
+        dia, valor = pontos[-1]
+        pontos.append((dia + timedelta(days=3 if dia.weekday() == 4 else 1), valor * 1.01))
+    assert regua.ler(calma).extremo == "alta"
+    assert regua.ler(agitada).extremo is None
+    em_mil = [(d, v * 1000) for d, v in calma]
+    assert regua.ler(em_mil).percentil == regua.ler(calma).percentil
+
+
+def test_historico_curto_nao_gera_leitura():
+    from stratum.domain import regua
+    curto = regua.ler(_serie(200))
+    assert curto.situacao == "historico_curto" and curto.percentil is None and curto.extremo is None
+    assert regua.ler([]).situacao == "sem_dado"
+
+
+def test_serie_parada_fica_sem_cor(engine):
+    # Passou da validade da fonte, a leitura não pinta nada: cinza, mesmo que o último dado tenha sido extremo
+    from datetime import datetime
+    from stratum import mercados
+    pontos = _serie(1300, escala=0.2)
+    dia, valor = pontos[-1]
+    pontos.append((dia + timedelta(days=3 if dia.weekday() == 4 else 1), valor * 1.05))
+    ultimo = datetime.combine(pontos[-1][0], datetime.min.time())
+    _gravar_serie(engine, pontos, ultimo + timedelta(hours=16))
+    serie = {"id": "bce_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+    with engine.connect() as c:
+        em_dia = mercados.leitura(c, serie, 5, ultimo + timedelta(days=2))
+        parada = mercados.leitura(c, serie, 5, ultimo + timedelta(days=9))
+    assert em_dia["situacao"] == "ok" and em_dia["extremo"] == "alta"
+    assert parada["situacao"] == "parada" and parada["extremo"] is None and parada["mudancas"] == []
+
+
+def test_cotacao_de_mercado_que_nao_bate_com_o_bce_fica_sem_cor():
+    # É verdade? O dólar em reais do Yahoo é conferido com a conta pelo BCE no mesmo dia (decisão 0012)
+    from datetime import datetime
+    from stratum import mercados
+    euro_em_reais, euro_em_dolares = _serie(1300, escala=0.2, semente=4), _serie(1300, escala=0.2, semente=5)
+    dolar_em_reais = [(d, r / u) for (d, r), (_, u) in zip(euro_em_reais, euro_em_dolares)]
+    dia, valor = dolar_em_reais[-1]
+    dolar_em_reais[-1] = (dia, valor * 1.04)  # 4% fora da conta do BCE: dado errado ou dia anormal
+    momento = datetime.combine(dia, datetime.min.time()) + timedelta(days=1)
+    serie = {"id": "yahoo_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+
+    conferida = mercados.conferencia(dolar_em_reais, euro_em_reais, euro_em_dolares, antes_de=None)
+    assert conferida["data"] == dia.isoformat() and conferida["diferenca"] == 4.0 and not conferida["confere"]
+    lido = mercados._ler(dolar_em_reais, serie, 5, momento, conferida=conferida)
+    assert lido["situacao"] == "nao_confere" and lido["extremo"] is None and lido["mudancas"] == []
+
+    certo = dolar_em_reais[:-1] + [(dia, valor)]
+    assert mercados.conferencia(certo, euro_em_reais, euro_em_dolares, antes_de=None)["confere"]
+
+
+def test_dia_em_andamento_aparece_marcado_e_fica_fora_da_conferencia():
+    from datetime import datetime
+    from stratum import mercados
+    euro_em_reais, euro_em_dolares = _serie(1300, escala=0.2, semente=4), _serie(1300, escala=0.2, semente=5)
+    dolar_em_reais = [(d, r / u) for (d, r), (_, u) in zip(euro_em_reais, euro_em_dolares)]
+    hoje = dolar_em_reais[-1][0] + timedelta(days=3 if dolar_em_reais[-1][0].weekday() == 4 else 1)
+    dolar_em_reais.append((hoje, dolar_em_reais[-1][1] * 1.003))  # o dia de hoje, às 14h, ainda sem o BCE
+    momento = datetime.combine(hoje, datetime.min.time()) + timedelta(hours=14)
+    serie = {"id": "yahoo_brl", "medida": "variacao_pct", "frequencia": "diaria"}
+    conferida = mercados.conferencia(dolar_em_reais, euro_em_reais, euro_em_dolares, antes_de=hoje)
+    assert conferida["data"] == dolar_em_reais[-2][0].isoformat() and conferida["confere"]  # o último dia fechado
+    lido = mercados._ler(dolar_em_reais, serie, 5, momento, dia_em_andamento=True, conferida=conferida)
+    assert lido["parcial"] and lido["data"] == hoje.isoformat() and lido["situacao"] == "ok"
+    assert not mercados._ler(dolar_em_reais[:-1], serie, 5, momento, dia_em_andamento=True)["parcial"]

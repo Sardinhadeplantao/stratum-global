@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, diaHora, faixas, hora, plural, situacao, tipoFonte } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -59,4 +59,40 @@ test("faixas da legenda vêm dos limites do robô", () => {
 test("plural", () => {
   assert.equal(plural(1, "notícia", "notícias"), "1 notícia");
   assert.equal(plural(1200, "notícia", "notícias"), "1.200 notícias");
+});
+
+test("séries: dia sem fuso, valor e variação como o robô gravou", () => {
+  assert.equal(dia("2026-10-16"), "16/10/2026");
+  assert.equal(dia(null), "—");
+  assert.equal(valor(6.3345), "6,3345");
+  assert.equal(variacao(0.4512), "+0,45%");
+  assert.equal(variacao(-1.2), "-1,20%");
+  assert.equal(variacao(null), "—");
+  assert.equal(variacaoSerie(0.1, "diferenca"), "+0,10 p.p.");
+  assert.equal(variacaoSerie(0.45, "variacao_pct"), "+0,45%");
+});
+
+test("régua: a mesma cor para alta e queda fora do normal; sem leitura é cinza", () => {
+  assert.equal(leituraSerie("ok", "alta").classe, "sit-fora");
+  assert.equal(leituraSerie("ok", "baixa").texto, "Fora do normal: queda");
+  assert.equal(leituraSerie("ok", null).classe, "sit-normal");
+  assert.equal(leituraSerie("parada", null).classe, "sem-dado");
+  assert.equal(leituraSerie("historico_curto", null).classe, "sem-dado");
+  assert.equal(leituraSerie(undefined, null).texto, "Sem dado");
+  assert.equal(leituraSerie("nao_confere", null).classe, "sit-falhou");
+});
+
+test("conferência com a fonte oficial vem decidida do robô", () => {
+  const c = { com: "BCE", data: "2026-10-20", oficial: 5.0236, diferenca: -0.12, confere: true };
+  assert.equal(textoConferencia(c, true), "Confere com o BCE em 20/10/2026 (diferença de -0,12%).");
+  assert.equal(textoConferencia({ ...c, diferenca: 3.4, confere: false }, true), "Não confere com o BCE em 20/10/2026: diferença de +3,40%.");
+  assert.equal(textoConferencia(null, true), "Ainda sem dia em comum com a fonte oficial para conferir.");
+  assert.equal(textoConferencia(null, false), null);
+});
+
+test("mudança vem com a taxa-base", () => {
+  assert.equal(textoMudanca({ tipo: "extremo_persiste", sentido: "alta", desde: "2026-10-15", taxa_base: { vezes: 3, anos: 5 } }),
+    "Alta fora do normal por dias seguidos, desde 15/10/2026. Nos 5 anos anteriores: 3 vezes.");
+  assert.equal(textoMudanca({ tipo: "quebra_de_ritmo", sentido: "agitacao", desde: "2026-10-01", taxa_base: { vezes: 1, anos: 2.5 } }),
+    "Agitação fora do normal, desde 01/10/2026. Nos 2,5 anos anteriores: 1 vez.");
 });

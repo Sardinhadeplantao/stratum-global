@@ -37,6 +37,12 @@ jobs:
       - uses: actions/cache@v5
         with: { path: ~/.cache/stratum, key: modelo-argos-en_pb-1.9 }
 
+      # Cópia local das cotações já lidas: o banco só manda as linhas novas. Ler todas a cada rodada gastaria uns
+      # 17 GB/mês, e o Supabase gratuito dá 5 GB de saída (decisão 0013). Se o banco mudou, a cópia é descartada.
+      - uses: actions/cache@v5
+        with: { path: ~/.cache/stratum-observacoes, key: "observacoes-${{ github.ref_name }}-${{ github.run_id }}",
+                restore-keys: "observacoes-${{ github.ref_name }}-" }
+
       - name: Data da última cópia do banco (decisão 0007)
         if: github.ref == 'refs/heads/main'
         env: { GH_TOKEN: "${{ github.token }}" }
@@ -62,6 +68,7 @@ jobs:
           # Fora da main, imprime cada notícia com os países encontrados (para conferir a regra com dados reais)
           STRATUM_DIAGNOSTICO: ${{ github.ref != 'refs/heads/main' && '1' || '' }}
           STRATUM_TRADUCAO: "1"
+          STRATUM_CACHE_OBSERVACOES: ~/.cache/stratum-observacoes/observacoes.json.gz
         run: python -m stratum.robo --exportar ../web/public/dados/status.json || echo "::warning::A rodada terminou com falhas. Veja a tela Método do site."
 
       - name: Teste do Telegram
@@ -109,6 +116,12 @@ jobs:
           for w in robo.yml copia.yml; do
             gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$w/enable" || echo "não foi possível renovar o agendamento de $w"
           done
+
+      # Por último, para ficar no fim do log: os números reais desta rodada, para conferir cada etapa sem abrir o site
+      - name: Conferência da rodada
+        if: always()
+        working-directory: jobs
+        run: python scripts/conferir_status.py ../web/public/dados/status.json || true
 
   deploy:
     if: github.ref == 'refs/heads/main' && needs.build.outputs.site_ligado == 'true'

@@ -101,3 +101,63 @@ export function faixas(limites: number[]): string[] {
 export function plural(n: number, singular: string, plural: string): string {
   return `${numero(n)} ${n === 1 ? singular : plural}`;
 }
+
+/** "2026-10-16" (dia da cotação, sem hora) -> "16/10/2026", sem passar por fuso. */
+export function dia(iso: string | null | undefined): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso ?? "");
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : "—";
+}
+
+/** Valor como a fonte publicou, com até 4 casas. */
+export function valor(n: number | null | undefined): string {
+  return n === null || n === undefined ? "—" : n.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
+}
+
+/** Variação já calculada pelo robô: "+0,45%". */
+export function variacao(n: number | null | undefined): string {
+  if (n === null || n === undefined) return "—";
+  return `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+}
+
+/** Os grupos de séries, na ordem da tela (decisão 0013). */
+export const GRUPOS_SERIES: [string, string][] = [
+  ["moedas", "Moedas"], ["juros", "Juros de 10 anos"], ["bolsas", "Bolsas"], ["commodities", "Commodities"], ["cripto", "Cripto"],
+];
+
+/** Variação na unidade da medida: preço em % ("+0,45%"), juros em pontos percentuais ("+0,10 p.p."). */
+export function variacaoSerie(n: number | null | undefined, medida: string | null | undefined): string {
+  if (medida !== "diferenca" || n === null || n === undefined) return variacao(n);
+  return `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} p.p.`;
+}
+
+/** Leitura da régua (decisão 0011). Cor só para estado medido: fora do normal (os dois lados com a mesma cor),
+ *  dentro do normal; parada, histórico curto e sem dado ficam cinza. */
+export function leituraSerie(situacao: string | null | undefined, extremo: string | null | undefined): { texto: string; classe: string } {
+  if (situacao === "ok" && extremo === "alta") return { texto: "Fora do normal: alta", classe: "sit-fora" };
+  if (situacao === "ok" && extremo === "baixa") return { texto: "Fora do normal: queda", classe: "sit-fora" };
+  if (situacao === "ok") return { texto: "Dentro do normal", classe: "sit-normal" };
+  if (situacao === "nao_confere") return { texto: "Não confere com a fonte oficial", classe: "sit-falhou" };
+  if (situacao === "parada") return { texto: "Parada (dado velho)", classe: "sem-dado" };
+  if (situacao === "historico_curto") return { texto: "Histórico curto", classe: "sem-dado" };
+  return { texto: "Sem dado", classe: "sem-dado" };
+}
+
+export type Conferencia = { com: string; data: string; oficial: number; diferenca: number; confere: boolean };
+
+/** "Confere com o BCE em 20/10/2026 (diferença de -0,12%)". O robô já decidiu se confere. */
+export function textoConferencia(c: Conferencia | null | undefined, conferir: boolean | undefined): string | null {
+  if (!c) return conferir ? "Ainda sem dia em comum com a fonte oficial para conferir." : null;
+  const diferenca = variacao(c.diferenca);
+  return c.confere ? `Confere com o ${c.com} em ${dia(c.data)} (diferença de ${diferenca}).`
+    : `Não confere com o ${c.com} em ${dia(c.data)}: diferença de ${diferenca}.`;
+}
+
+export type Mudanca = { tipo: string; sentido: string; desde: string; taxa_base: { vezes: number; anos: number } };
+
+/** "Alta fora do normal por dias seguidos, desde 15/10/2026. Nos 5 anos anteriores: 3 vezes." */
+export function textoMudanca(m: Mudanca): string {
+  const oque = m.tipo === "quebra_de_ritmo" ? "Agitação fora do normal"
+    : `${m.sentido === "alta" ? "Alta" : "Queda"} fora do normal por dias seguidos`;
+  const anos = m.taxa_base.anos.toLocaleString("pt-BR");
+  return `${oque}, desde ${dia(m.desde)}. Nos ${anos} anos anteriores: ${plural(m.taxa_base.vezes, "vez", "vezes")}.`;
+}

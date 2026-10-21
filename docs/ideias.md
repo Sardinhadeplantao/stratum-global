@@ -2,6 +2,34 @@
 
 Ideia nova entra aqui e espera a fase dela. Nada daqui entra no código antes de ir para `docs/plano.md`.
 
+## Pedido do dono em 21/10: a página inicial em torno do mapa (próxima etapa, antes da tela Mercados)
+
+O dono achou a página inicial redundante, com dados soltos, sem ligação com o contexto geopolítico e com apresentação
+confusa. Pedido:
+
+- página inicial com o globo 3D interativo em destaque, com rotas marítimas, países e pontos críticos (estreitos);
+- notícia crítica acende a região no mapa (ex.: Ormuz, Bab el-Mandeb), sempre com o contexto geopolítico do lugar:
+  o que acontece, quem são os atores, seus objetivos e incentivos ("como uma teoria dos jogos"), não só notícias;
+- referência citada pelo dono: o OSIRIS (https://osirisai.live, código em https://github.com/simplifaisoul/osiris,
+  licença MIT). O link do X de antes não abre no ambiente do Claude.
+
+O que o OSIRIS ensina (análise de 21/10, pelo README e pelas capturas de tela do dono):
+
+- Mesma base técnica do nosso site (Next.js 16 e MapLibre). A licença MIT permite reaproveitar código com o aviso
+  de autoria. Diferença: o OSIRIS é um servidor que busca os dados ao vivo; o nosso é estático (o robô grava o
+  status.json a cada 15 minutos), o que mantém o custo zero.
+- Estrutura de tela que funciona: mapa em tela cheia; barra de ícones à esquerda com as camadas por categoria e a
+  contagem de cada uma; painel à direita com abas (alertas, notícias, mercados por grupo, com minigráfico);
+  barra de cima com hora e estado; faixa de baixo que passa as últimas informações; 3D/2D e mapa/satélite.
+- Camadas gratuitas e sem chave que cabem nas nossas regras: terremotos (USGS), desastres (NASA EONET, GDACS),
+  portos e pontos de passagem marítima (lista fixa), eventos com local (GDELT). Aviões (OpenSky) e navios ao vivo (AIS)
+  pedem servidor ou chave: só como contexto, se couberem. Câmeras de trânsito e ferramentas de invasão (RECON) ficam
+  fora: não servem ao propósito e têm risco de privacidade e de abuso.
+- O que fazemos diferente, e é o que dá valor: cada número tem fonte e duas datas; vozes independentes; a régua que
+  diz o que está fora do normal; conferência com a fonte oficial; contexto com fonte; IA só resume (regra 7). O
+  próprio OSIRIS mostrava o WTI a −4,93% em 21/10, o mesmo falso alarme de troca de contrato que a nossa
+  conferência pegou.
+
 - Lente Brasil: Comex Stat, empresas da B3 (dados abertos da CVM), câmbio pelo Banco Central.
 - Perguntas sobre o arquivo com citação (fase 5).
 - Pistas de rede social: Bluesky (API aberta) e canais públicos do Telegram via RSSHub. X só se houver caminho

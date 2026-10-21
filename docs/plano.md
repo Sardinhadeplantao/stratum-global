@@ -83,9 +83,27 @@ A meta por fato da decisão 0006 (90% de precisão e 60% de cobertura por evento
 
 ## Fase 2. Mercados (3 a 4 semanas)
 
-- Séries por lista: moedas (BCE, FRED), juros de 10 anos, bolsa por país, commodities (Banco Mundial, EIA), cripto.
-- A régua única (percentil contra o próprio histórico) e a reação medida a cada evento.
-  Os parâmetros da régua e do detector de mudança são fixados antes do primeiro dado (proposta em `docs/ideias.md`).
+Já entregue:
+
+- a régua única (`regua-1.0`) e o detector de mudança, com os parâmetros fixados antes do primeiro dado
+  (decisão 0011): percentil da variação contra os 5 anos anteriores, fora do normal até 5 ou a partir de 95, mínimo
+  de 250 cotações, extremo que persiste por 2 dias, quebra de ritmo e taxa-base;
+- moedas do G20 contra o euro (BCE, 13, oficial) e contra o dólar (Yahoo Finance, 12, e o DXY), lidas no ritmo de cada
+  fonte, com revisão gravada como registro novo e o dia em andamento marcado. O FRED saiu (uma semana de atraso) e o
+  Yahoo, que é de mercado e não oficial, é conferido com a conta pelo BCE (decisão 0012). A leitura de cada uma aparece
+  na tela Método;
+- conferência no fim de cada rodada: o log do GitHub mostra fontes com falha, notícias e a leitura de cada série
+  (`jobs/scripts/conferir_status.py`);
+- juros de 10 anos de fonte oficial (Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Ministério das Finanças do
+  Japão), em pontos percentuais; bolsas de 18 membros do G20 e da zona do euro, 11 commodities e 2 cripto pelo Yahoo
+  (decisão 0013). São 61 séries na mesma régua, separadas por grupo na tela Método.
+
+Falta:
+
+- Troca de contrato das commodities: guardar o contrato de cada dia e tirar da régua o dia da troca (decisão 0013;
+  o WTI de 20/10 foi um falso "fora do normal").
+- Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
+- A reação medida a cada evento.
 - Tela Mercados: o que se mexeu fora do normal e os eventos no mesmo período ("coincidência no tempo, não causa").
 
 **Pronto quando:** todo evento importante mostra se algum ativo ligado se mexeu fora do normal.
