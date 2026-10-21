@@ -54,3 +54,7 @@ andamento marcado. Não há fonte oficial para conferir a cotação delas: apare
 - Mais linhas no banco: cerca de 270 mil por ano, a maior parte da leitura a cada hora do dia em andamento. Entra na
   decisão de retenção da fase 1, que precisa sair antes da imprensa nova.
 - A tabela `serie` ganha a coluna `grupo` (migração 0007).
+- Saída do banco (achado da revisão de 21/10): a régua lê o histórico inteiro de cada série a cada rodada. Lido do
+  Supabase, seriam uns 6 MB por rodada, cerca de 17 GB por mês, e o plano gratuito dá 5 GB de saída. O robô guarda uma
+  cópia local das cotações no cache do GitHub e pede ao banco só as linhas novas; o resultado é idêntico (testado).
+  Se o banco for recriado, a cópia é descartada e tudo é lido de novo uma vez.

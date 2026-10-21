@@ -327,3 +327,68 @@ def test_yahoo_aceita_preco_negativo_que_aconteceu():
     nan = (FIXTURES / "yahoo_brl.json").read_text().replace("4.985899925231934", "NaN", 1)
     with pytest.raises(ValueError, match="ilegível"):
         conectores.interpretar_yahoo(nan, "BRL=X")
+
+
+# Cópia local das cotações (revisão de 21/10: ler tudo a cada rodada gastaria uns 17 GB/mês do Supabase gratuito)
+
+def _encher_cotacoes(engine, dias, inicio=date(2021, 6, 1), conhecido=datetime(2026, 10, 20, 12)):
+    from stratum import mercados
+    with engine.begin() as c:
+        db.gravar_fontes(c, [BCE])
+        db.gravar_series(c, [BRL])
+    obs = [Observacao("BRL", d, 6 + ((i * 7) % 11) / 1000) for i, d in enumerate(_dias_uteis(dias, inicio))]
+    mercados.gravar(engine, [BRL], obs, None, conhecido)
+
+
+def test_copia_local_so_pede_ao_banco_o_que_e_novo(engine, tmp_path):
+    from stratum import mercados
+    caminho = str(tmp_path / "cache" / "observacoes.json.gz")
+    _encher_cotacoes(engine, 300)
+    with engine.connect() as c:
+        _, origem = mercados.carregar(c, caminho)
+    assert origem == {"da_copia": 0, "do_banco": 300}
+    mercados.gravar(engine, [BRL], [Observacao("BRL", date(2026, 10, 21), 6.5)], None, datetime(2026, 10, 21, 15))
+    with engine.connect() as c:
+        com_copia, origem = mercados.carregar(c, caminho)
+        sem_copia, _ = mercados.carregar(c)
+    assert origem == {"da_copia": 300, "do_banco": 1}
+    assert com_copia == sem_copia  # o mesmo resultado, lendo só a linha nova
+
+
+def test_copia_local_e_descartada_se_o_banco_mudou(engine, tmp_path):
+    # Banco recriado (restauração, projeto novo): o último id da cópia não bate e tudo é lido de novo
+    from stratum import mercados
+    caminho = str(tmp_path / "observacoes.json.gz")
+    _encher_cotacoes(engine, 300)
+    with engine.connect() as c:
+        mercados.carregar(c, caminho)
+    outro = db.conectar(f"sqlite:///{tmp_path / 'outro.db'}")
+    db.preparar(outro)
+    _encher_cotacoes(outro, 200, inicio=date(2022, 1, 3))
+    with outro.connect() as c:
+        dados, origem = mercados.carregar(c, caminho)
+        sem_copia, _ = mercados.carregar(c)
+    assert origem == {"da_copia": 0, "do_banco": 200} and dados == sem_copia
+    (tmp_path / "observacoes.json.gz").write_bytes(b"estragada")
+    with outro.connect() as c:
+        assert mercados.carregar(c, caminho)[1] == {"da_copia": 0, "do_banco": 200}
+
+
+def test_status_igual_com_e_sem_copia_local(engine, cfg, tmp_path, monkeypatch):
+    _encher_cotacoes(engine, 1300)
+    momento = datetime(2026, 10, 21, 12)
+    sem = export.montar(engine, agora=lambda: momento)["mercados"]
+    monkeypatch.setenv("STRATUM_CACHE_OBSERVACOES", str(tmp_path / "observacoes.json.gz"))
+    export.montar(engine, agora=lambda: momento)                       # primeira rodada: cria a cópia
+    com = export.montar(engine, agora=lambda: momento)["mercados"]     # segunda: usa a cópia
+    assert com == sem
+
+
+def test_mesma_data_duas_vezes_na_mesma_leitura_entra_uma_vez(engine):
+    from stratum import mercados
+    with engine.begin() as c:
+        db.gravar_fontes(c, [BCE])
+        db.gravar_series(c, [BRL])
+    dupla = [Observacao("BRL", date(2026, 9, 30), 6.1), Observacao("BRL", date(2026, 9, 30), 6.2)]
+    assert mercados.gravar(engine, [BRL], dupla, None, datetime(2026, 10, 1)) == 1
+    assert mercados.gravar(engine, [BRL], dupla, None, datetime(2026, 10, 1, 1)) == 0  # e não volta a cada leitura
