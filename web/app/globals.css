@@ -311,7 +311,13 @@ h1, h2, h3 { line-height: 1.2; }
 }
 .faixa-conteudo { display: inline-flex; white-space: nowrap; animation: rolar linear infinite; will-change: transform; }
 .faixa-copia { display: inline-flex; }
-.faixa:hover .faixa-conteudo, .faixa:focus-within .faixa-conteudo { animation-play-state: paused; }
+/* para sob o mouse ou com um item da faixa selecionado (teclado); o botão de pausa fica fora dessa regra */
+.faixa-trilho:hover .faixa-conteudo, .faixa-trilho:focus-within .faixa-conteudo, .faixa.parada .faixa-conteudo { animation-play-state: paused; }
+.faixa-pausa {
+  flex: none; align-self: stretch; width: 30px; background: var(--superficie-2); border: 0; border-right: 1px solid var(--borda);
+  color: var(--texto-2); cursor: pointer; font-size: 10px; letter-spacing: -1px;
+}
+.faixa-pausa:hover, .faixa-pausa:focus-visible { color: var(--texto); background: var(--borda); outline: none; }
 .faixa-item { display: inline-flex; align-items: center; padding: 0 28px 0 0; }
 .faixa-item a, .faixa-item button { color: var(--texto); background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
 .faixa-item a:hover, .faixa-item button:hover { color: var(--destaque); text-decoration: none; }
@@ -391,11 +397,8 @@ td .erro { color: var(--falhou); font-size: 12px; max-width: 280px; overflow-wra
   .resumo dd { margin-bottom: 8px; }
 }
 
-/* Menos movimento: a faixa vira uma lista que se rola com o dedo; os pontos não pulsam */
+/* Menos movimento: os pontos não pulsam. A faixa corre sempre e tem botão de pausa (que fica lembrado) */
 @media (prefers-reduced-motion: reduce) {
-  .faixa-conteudo { animation: none; }
-  .faixa-copia { display: none; }
-  .faixa-trilho { overflow-x: auto; mask-image: none; }
   .marcador.estado-critico i { animation: none; }
 }
 
