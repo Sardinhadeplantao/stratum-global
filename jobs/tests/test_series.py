@@ -87,11 +87,14 @@ def test_bce_le_as_taxas_de_referencia():
     assert len(obs) == 11
 
 
-def test_bce_endereco_pede_todas_as_moedas_numa_chamada():
+def test_bce_pede_uma_moeda_por_vez():
+    # Na produção, as 13 moedas de 11 anos num pedido só passaram de 60 segundos (21/10)
     f = next(f for f in catalogo.FONTES if f["id"] == "bce_cambio")
-    url = conectores.url_bce(f, ["USD", "BRL"], date(2015, 1, 1))
-    assert url == ("https://data-api.ecb.europa.eu/service/data/EXR/D.USD+BRL.EUR.SP00.A"
-                   "?startPeriod=2015-01-01&format=csvdata&detail=dataonly")
+    sessao = SessaoCsv((FIXTURES / "bce_exr.csv").read_bytes())
+    conectores.ler_bce(f, [{"codigo": "USD"}, {"codigo": "JPY"}], sessao, "teste", date(2015, 1, 1))
+    assert sessao.chamadas == [
+        "https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?startPeriod=2015-01-01&format=csvdata&detail=dataonly",
+        "https://data-api.ecb.europa.eu/service/data/EXR/D.JPY.EUR.SP00.A?startPeriod=2015-01-01&format=csvdata&detail=dataonly"]
 
 
 def test_fred_le_o_csv():
