@@ -13,7 +13,7 @@ on:
     branches: ["claude/**"]
     paths: ["jobs/stratum/arquivo.py", ".github/workflows/arquivo.yml"]
 
-permissions: { contents: write }   # criar o release do arquivo; só este workflow pode
+permissions: {}   # cada job pede só o que usa
 concurrency: { group: "arquivo-${{ github.ref_name }}", cancel-in-progress: false }
 
 jobs:
@@ -21,26 +21,29 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
-      SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
-      SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
-      GH_TOKEN: ${{ github.token }}
+    permissions: { contents: write }   # criar o release do arquivo
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v6
         with: { python-version: "3.12", cache: pip, cache-dependency-path: jobs/requirements.txt }
 
+      - name: Instalar
+        working-directory: jobs
+        run: pip install -r requirements.txt
+
       - name: Separar o que passou do prazo (nada sai do banco)
         working-directory: jobs
-        run: |
-          pip install -r requirements.txt
-          python -m stratum.arquivo --separar ../arquivo
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
+        run: python -m stratum.arquivo --separar ../arquivo
 
       - name: Guardar no GitHub e baixar de volta
         if: hashFiles('arquivo/manifesto.json') != ''
+        env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           etiqueta=$(python3 -c "import json; print(json.load(open('arquivo/manifesto.json'))['etiqueta'])")
           gh release create "$etiqueta" arquivo/* --target "$GITHUB_SHA" --title "Arquivo do banco: $etiqueta" \
@@ -51,15 +54,20 @@ jobs:
       - name: Conferir o que voltou e só então tirar do banco
         if: env.ETIQUETA != ''
         working-directory: jobs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_SENHA: ${{ secrets.SUPABASE_SENHA }}
+          SUPABASE_HOST: aws-0-us-east-2.pooler.supabase.com
+          SUPABASE_USUARIO: postgres.ojtlxyfrcahhoifrcqbc
         run: python -m stratum.arquivo --conferir-e-tirar ../baixado --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$ETIQUETA"
 
   ensaio:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions: { contents: write }   # o release de ensaio, apagado no fim; nenhum segredo do banco aqui
     env:
       DATABASE_URL: sqlite:///ensaio.db   # banco temporário, dentro de jobs/
-      GH_TOKEN: ${{ github.token }}
       ETIQUETA: ensaio-${{ github.run_id }}
     steps:
       - uses: actions/checkout@v5
@@ -78,6 +86,7 @@ jobs:
         run: python -m stratum.arquivo --separar ../arquivo --ensaio
 
       - name: Guardar no GitHub (release de ensaio) e baixar de volta
+        env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh release create "$ETIQUETA" arquivo/* --target "$GITHUB_SHA" --prerelease \
             --title "Ensaio do arquivo (apagado no fim)" --notes-file arquivo/LEIAME.md
@@ -87,8 +96,9 @@ jobs:
         working-directory: jobs
         run: |
           python -m stratum.arquivo --conferir-e-tirar ../baixado --url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$ETIQUETA"
-          python -m stratum.arquivo --restaurar ../baixado
+          DATABASE_URL=sqlite:///pesquisa.db python -m stratum.arquivo --restaurar ../baixado   # num banco separado
 
       - name: Apagar o release de ensaio
         if: always()
+        env: { GH_TOKEN: "${{ github.token }}" }
         run: gh release delete "$ETIQUETA" --yes --cleanup-tag || true

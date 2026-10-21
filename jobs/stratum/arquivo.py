@@ -20,6 +20,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import Date, DateTime, func, select, text, tuple_
+from sqlalchemy.exc import SQLAlchemyError
 
 from stratum import VERSAO, config, db
 
@@ -163,7 +164,9 @@ def conferir(engine, pasta) -> list[str]:
                         problemas.append(f"{nome}: o manifesto diz {m['tabelas'][nome]['linhas']} linhas, "
                                          f"o arquivo tem {len(do_arquivo)}")
                         continue
-                    chaves = [tuple(json.loads(x)[k.name] for k in _chave(t)) for x in do_arquivo]
+                    ordem = lambda x: tuple(json.loads(x)[k.name] for k in _chave(t))  # noqa: E731
+                    do_arquivo = sorted(do_arquivo, key=ordem)
+                    chaves = [ordem(x) for x in do_arquivo]
                     restaurado = _linhas_por_chave(cv, t, chaves)
                     no_banco = _linhas_por_chave(cb, t, chaves)
                     if restaurado != do_arquivo:
@@ -186,12 +189,22 @@ def _linhas_por_chave(c, t, chaves: list[tuple]) -> list[str]:
     return sorted(saida, key=lambda x: tuple(json.loads(x)[k.name] for k in cols))
 
 
+def cortes_cedo_demais(m: dict, agora: datetime, prazos: dict = PRAZOS) -> list[str]:
+    """Tabelas cujo corte no manifesto é mais novo que o prazo permite (só o ensaio, em banco temporário, usa prazo
+    zero). Lista vazia = pode tirar."""
+    return [t for t, corte in m["cortes"].items()
+            if datetime.fromisoformat(corte.removesuffix("Z")) > agora - prazos[t] + timedelta(hours=1)]
+
+
 def tirar(engine, pasta, url: str) -> dict[str, int]:
     """Tira do banco o que o arquivo tem, numa transação só: registra o arquivamento, guarda a impressão curta das
-    notícias (regra 3) e apaga os filhos antes dos pais. Se uma contagem não bater, desfaz tudo."""
+    notícias (regra 3) e apaga os filhos antes dos pais. Se uma contagem não bater, desfaz tudo. Fora do banco
+    temporário, recusa arquivo com prazo mais curto que o da decisão 0015."""
     pasta = Path(pasta)
     m = json.loads((pasta / "manifesto.json").read_text(encoding="utf-8"))
     agora = db.agora()
+    if engine.dialect.name != "sqlite" and (cedo := cortes_cedo_demais(m, agora)):
+        raise ValueError(f"prazo mais curto que o da decisão 0015 em {', '.join(cedo)}; nada saiu do banco")
     tirados = {}
     with engine.begin() as c:
         chaves = {}
@@ -231,10 +244,15 @@ def conferir_e_tirar(engine, pasta, url: str) -> dict[str, int]:
 
 
 def restaurar(pasta, engine) -> dict[str, int]:
-    """Devolve um arquivo a um banco: entra só o que não está lá (pela chave). Devolve quantas linhas entraram."""
+    """Devolve um arquivo a um banco separado (pesquisa): entra só o que não está lá (pela chave). Devolve quantas
+    linhas entraram. Recusa banco com arquivamentos registrados (as contagens dobrariam)."""
     pasta = Path(pasta)
     entraram = {}
     with engine.begin() as c:
+        if c.execute(select(func.count()).select_from(db.arquivo)).scalar():
+            # o banco já conta essas notícias pelo registro do arquivo: devolvê-las dobraria as contagens e o próximo
+            # arquivamento as levaria de novo. Restaure num banco separado (pesquisa) ou só a cópia semanal.
+            raise ValueError("este banco tem arquivamentos registrados; restaure o arquivo num banco separado")
         for nome in TABELAS:
             t = _tabela(nome)
             antes = c.execute(select(func.count()).select_from(t)).scalar()
@@ -269,6 +287,17 @@ def main(argv=None) -> int:
     except Exception as exc:  # noqa: BLE001 - a mensagem pode ter dados da conexão (regra 12)
         print(f"Não foi possível abrir o banco ({type(exc).__name__}).")
         return 1
+    if args.ensaio and engine.dialect.name != "sqlite":
+        print("O ensaio (prazo zero) só roda em banco temporário, nunca no de produção.")
+        return 1
+    try:
+        return _executar(args, engine)
+    except SQLAlchemyError as exc:  # a mensagem pode ter dados da conexão: só o tipo (regra 12)
+        print(f"O banco falhou ({type(exc).__name__}); nada saiu do banco.")
+        return 1
+
+
+def _executar(args, engine) -> int:
     if args.separar:
         prazos = {t: timedelta(0) for t in PRAZOS} if args.ensaio else PRAZOS
         m = separar(engine, args.separar, prazos=prazos)
@@ -289,7 +318,11 @@ def main(argv=None) -> int:
             return 1
         print("Conferido e tirado do banco: " + ", ".join(f"{t} {n}" for t, n in tirados.items()) + f". Arquivo: {args.url}")
         return 0
-    entraram = restaurar(args.restaurar, engine)
+    try:
+        entraram = restaurar(args.restaurar, engine)
+    except ValueError as exc:
+        print(f"Restauração recusada: {exc}.")
+        return 1
     print("Restaurado: " + ", ".join(f"{t} {n}" for t, n in entraram.items()) + ".")
     return 0
 

@@ -101,10 +101,32 @@ def test_arquivo_diferente_do_banco_nada_sai(engine, tmp_path, estragar):
     assert _contar(engine, db.documento) == 4 and _contar(engine, db.coleta) == 2 and _contar(engine, db.arquivo) == 0
 
 
-def test_restaurar_devolve_o_arquivo_sem_repetir(engine, tmp_path):
+def test_restaurar_num_banco_separado_sem_repetir_e_nunca_no_que_ja_conta_o_arquivo(engine, tmp_path):
     _encher(engine)
     arquivo.separar(engine, tmp_path, agora=AGORA)
     arquivo.conferir_e_tirar(engine, tmp_path, url=URL)
-    assert arquivo.restaurar(tmp_path, engine) == {"documento": 2, "historia_documento": 1, "traducao": 2, "coleta": 1}
-    assert arquivo.restaurar(tmp_path, engine) == {"documento": 0, "historia_documento": 0, "traducao": 0, "coleta": 0}
-    assert _contar(engine, db.documento) == 4 and _contar(engine, db.coleta) == 2
+    separado = db.conectar(f"sqlite:///{tmp_path / 'pesquisa.db'}")
+    db.preparar(separado)
+    assert arquivo.restaurar(tmp_path, separado) == {"documento": 2, "historia_documento": 1, "traducao": 2, "coleta": 1}
+    assert arquivo.restaurar(tmp_path, separado) == {"documento": 0, "historia_documento": 0, "traducao": 0, "coleta": 0}
+    # no banco que já conta essas notícias pelo registro do arquivo, as contagens dobrariam
+    with pytest.raises(ValueError, match="banco separado"):
+        arquivo.restaurar(tmp_path, engine)
+
+
+def test_tirar_respeita_as_ligacoes_entre_tabelas(tmp_path):
+    # Com as chaves estrangeiras ligadas, como no PostgreSQL: a ordem de tirar e a regra da história que continua
+    from sqlalchemy import event
+    engine = db.conectar(f"sqlite:///{tmp_path / 'fk.db'}")
+    event.listen(engine, "connect", lambda conexao, _: conexao.execute("PRAGMA foreign_keys=ON"))
+    db.preparar(engine)
+    _encher(engine)
+    arquivo.separar(engine, tmp_path / "a", agora=AGORA)
+    assert arquivo.tirar(engine, tmp_path / "a", url=URL)["documento"] == 2
+
+
+def test_producao_recusa_prazo_mais_curto_que_o_da_decisao():
+    m = {"cortes": {"documento": "2026-10-21T10:00:00Z", "coleta": "2026-10-21T10:00:00Z"}}
+    assert arquivo.cortes_cedo_demais(m, datetime(2026, 10, 21, 11)) == ["documento", "coleta"]  # o ensaio, prazo zero
+    certo = {"cortes": {"documento": "2025-10-21T11:00:00Z", "coleta": "2026-09-21T11:00:00Z"}}
+    assert arquivo.cortes_cedo_demais(certo, datetime(2026, 10, 21, 11)) == []
