@@ -120,7 +120,8 @@ def interpretar_yahoo(texto: str, codigo: str) -> list[Observacao]:
         raise ValueError(f"formato inesperado: sem cotações ({str(motivo)[:80] if motivo else 'resposta vazia'})")
     r = chart["result"][0]
     meta = r.get("meta") or {}
-    if meta.get("symbol") != codigo:
+    # O Yahoo às vezes devolve o mesmo par com o dólar escrito na frente (CAD=X volta como USDCAD=X); nada além disso
+    if meta.get("symbol") not in (codigo, "USD" + codigo if codigo.endswith("=X") else codigo):
         raise ValueError(f"formato inesperado: veio {meta.get('symbol')!r}, esperado {codigo}")
     try:
         fuso = ZoneInfo(meta.get("exchangeTimezoneName") or "UTC")
@@ -139,7 +140,12 @@ def interpretar_yahoo(texto: str, codigo: str) -> list[Observacao]:
             continue
         if not isinstance(v, (int, float)) or v <= 0:
             raise ValueError(f"valor ilegível em {codigo}: {str(v)[:20]!r}")
-        por_dia[datetime.fromtimestamp(t, fuso).date()] = _significativos(v)  # o último valor do dia vale
+        por_dia[datetime.fromtimestamp(t, fuso).date()] = _significativos(v)
+    # O último preço negociado vale para o dia dele: a barra do dia demora a ser atualizada (em 20/10, a barra fechava
+    # em 5,0370 e o último preço era 5,0238; a conta pelo BCE dava 5,0236). É também a oscilação do dia em andamento.
+    preco, quando = meta.get("regularMarketPrice"), meta.get("regularMarketTime")
+    if isinstance(preco, (int, float)) and preco > 0 and isinstance(quando, int):
+        por_dia[datetime.fromtimestamp(quando, fuso).date()] = _significativos(preco)
     return [Observacao(codigo, d, v) for d, v in sorted(por_dia.items())]
 
 

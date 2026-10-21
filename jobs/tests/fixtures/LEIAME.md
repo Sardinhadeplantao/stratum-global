@@ -6,5 +6,6 @@ estes arquivos.
 
 - `bce_exr.csv`: BCE, taxas de referência do iene e do dólar, sonda de 20/10/2026.
 - `fred_dtwexbgs.csv`: FRED, índice amplo do dólar, sonda de 20/10/2026.
+- `yahoo_brl.json`: Yahoo Finance, dólar em reais, sonda de 21/10/2026 às 00:10 UTC (resposta inteira, sem cortes).
 - `feed_rss.xml` e `feed_atom.xml`: feeds de exemplo, montados para testar casos difíceis (artigo repetido, âncora,
   link perigoso); não são notícias reais.

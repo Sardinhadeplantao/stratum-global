@@ -21,6 +21,10 @@ Não há fonte oficial, gratuita e diária para as moedas do G20 contra o dólar
     dia, ainda não fechada. Ele passa pela mesma régua; como o dia está pela metade, a variação tende a ser menor.
   - Valores guardados com 6 algarismos significativos, para que diferenças de arredondamento da fonte não virem
     "revisão".
+  - O valor de cada dia é o último preço negociado nele, e não a barra diária do Yahoo, que demora a ser atualizada.
+    Medido na sonda de 21/10: em 20/10, a barra fechava o dólar em 5,0370 reais; o último preço era 5,0238; a conta
+    pelo BCE dava 5,0236.
+  - O Yahoo às vezes devolve o par com o dólar na frente (CAD=X volta como USDCAD=X). Só essas duas formas são aceitas.
   - Termos de uso: o Yahoo permite uso pessoal, não comercial. Ao abrir ao público, a fonte é trocada ou licenciada
     (já previsto no plano).
 - **Conferência com o BCE** (é verdade?): para cada moeda do Yahoo com par no BCE, o robô faz a conta pelo BCE no mesmo

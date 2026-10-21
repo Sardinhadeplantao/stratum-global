@@ -138,6 +138,21 @@ def test_fred_uma_chamada_por_serie():
     assert len(obs) == 4
 
 
+def test_yahoo_le_a_resposta_real():
+    # Resposta real do Yahoo para o dólar em reais (sonda de 21/10/2026, 00:10 UTC)
+    obs = conectores.interpretar_yahoo((FIXTURES / "yahoo_brl.json").read_text(), "BRL=X")
+    assert [o.data for o in obs] == [date(2026, 10, d) for d in (12, 13, 14, 15, 16, 19, 20)]  # 21/10 sem preço ainda
+    assert obs[0] == Observacao("BRL=X", date(2026, 10, 12), 4.9859)  # 4.985899925231934 com 6 algarismos
+    assert obs[-1].valor == 5.0238  # o último preço de 20/10, não a barra atrasada (5,0370); o BCE dava 5,0236
+
+
+def test_yahoo_aceita_o_par_com_o_dolar_na_frente():
+    real = (FIXTURES / "yahoo_brl.json").read_text()
+    assert conectores.interpretar_yahoo(real.replace('"symbol":"BRL=X"', '"symbol":"USDBRL=X"'), "BRL=X")
+    with pytest.raises(ValueError, match="esperado BRL=X"):
+        conectores.interpretar_yahoo(real.replace('"symbol":"BRL=X"', '"symbol":"EURBRL=X"'), "BRL=X")
+
+
 def test_yahoo_endereco_por_serie():
     f = next(f for f in catalogo.FONTES if f["id"] == "yahoo_cambio")
     assert conectores.url_yahoo(f, "BRL=X", date(2015, 1, 1), 1800000000) == (
