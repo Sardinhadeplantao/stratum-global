@@ -100,6 +100,8 @@ Já entregue:
 
 Falta:
 
+- Troca de contrato das commodities: guardar o contrato de cada dia e tirar da régua o dia da troca (decisão 0013;
+  o WTI de 20/10 foi um falso "fora do normal").
 - Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
 - A reação medida a cada evento.
 - Tela Mercados: o que se mexeu fora do normal e os eventos no mesmo período ("coincidência no tempo, não causa").

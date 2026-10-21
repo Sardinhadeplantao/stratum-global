@@ -39,7 +39,12 @@ andamento marcado. Não há fonte oficial para conferir a cotação delas: apare
   negativo; só número inválido é recusado. A variação em % a partir de um preço negativo ou zero não existe, e esse
   dia fica sem medida.
 - Commodities são o contrato futuro mais próximo. Na troca de contrato, o preço pode saltar sem que o mercado tenha
-  mudado. A régua não tem como separar isso, e a tela Método avisa.
+  mudado. A régua ainda não separa isso, e a tela Método avisa.
+  - Visto na primeira rodada (21/10): o WTI apareceu "fora do normal: queda de 5,0%" com o Brent parado. A sonda dos
+    contratos confirmou a troca: o contrato de novembro (CLX26) foi de 103,66 a 101,09 em 20/10 (−2,5%), e a série do
+    Yahoo passou de 103,66 (novembro) para 98,47 (dezembro, CLZ26). Metade da queda era a troca.
+  - Correção (próxima etapa): o Yahoo diz o mês do contrato no nome em 9 das 11 commodities ("Crude Oil Dec 26",
+    "Gold Dec 26"); Brent e TTF não dizem. O robô vai guardar o contrato de cada dia e tirar da régua o dia da troca.
 
 ## Consequências
 
