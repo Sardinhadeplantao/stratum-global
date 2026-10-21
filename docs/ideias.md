@@ -2,6 +2,17 @@
 
 Ideia nova entra aqui e espera a fase dela. Nada daqui entra no código antes de ir para `docs/plano.md`.
 
+## Pedido do dono em 21/10: a página inicial em torno do mapa (próxima etapa, antes da tela Mercados)
+
+O dono achou a página inicial redundante, com dados soltos, sem ligação com o contexto geopolítico e com apresentação
+confusa. Pedido:
+
+- página inicial com o globo 3D interativo em destaque, com rotas marítimas, países e pontos críticos (estreitos);
+- notícia crítica acende a região no mapa (ex.: Ormuz, Bab el-Mandeb), sempre com o contexto geopolítico do lugar:
+  o que acontece, quem são os atores, seus objetivos e incentivos ("como uma teoria dos jogos"), não só notícias;
+- referência citada pelo dono: um repositório no GitHub divulgado em https://x.com/liambraus/status/2108572469426823579
+  (o link do X não abre no ambiente do Claude; falta o endereço do repositório).
+
 - Lente Brasil: Comex Stat, empresas da B3 (dados abertos da CVM), câmbio pelo Banco Central.
 - Perguntas sobre o arquivo com citação (fase 5).
 - Pistas de rede social: Bluesky (API aberta) e canais públicos do Telegram via RSSHub. X só se houver caminho
