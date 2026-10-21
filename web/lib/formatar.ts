@@ -137,6 +137,7 @@ export function leituraSerie(situacao: string | null | undefined, extremo: strin
   if (situacao === "ok" && extremo === "baixa") return { texto: "Fora do normal: queda", classe: "sit-fora" };
   if (situacao === "ok") return { texto: "Dentro do normal", classe: "sit-normal" };
   if (situacao === "nao_confere") return { texto: "Não confere com a fonte oficial", classe: "sit-falhou" };
+  if (situacao === "troca_de_contrato") return { texto: "Troca de contrato: a variação de hoje não mede o mercado", classe: "sem-dado" };
   if (situacao === "parada") return { texto: "Parada (dado velho)", classe: "sem-dado" };
   if (situacao === "historico_curto") return { texto: "Histórico curto", classe: "sem-dado" };
   return { texto: "Sem dado", classe: "sem-dado" };
@@ -152,6 +153,22 @@ export function textoConferencia(c: Conferencia | null | undefined, conferir: bo
     : `Não confere com o ${c.com} em ${dia(c.data)}: diferença de ${diferenca}.`;
 }
 
+/** Estado de um ponto crítico (decisão 0014), decidido pelo robô. A cor é do estado medido pela regra. */
+export function estadoPonto(estado: string | null | undefined): { texto: string; classe: string; explica: string } {
+  if (estado === "critico") return { texto: "Crítico", classe: "estado-critico",
+    explica: "Notícias de pelo menos duas vozes independentes citam o ponto, e alguma fala de ação (ataque, míssil, mina, apreensão, bloqueio)." };
+  if (estado === "em_pauta") return { texto: "Em pauta", classe: "estado-pauta",
+    explica: "Alguma notícia das últimas 24 horas cita o ponto." };
+  if (estado === "sem_pauta") return { texto: "Sem pauta", classe: "estado-calmo",
+    explica: "Nenhuma notícia das últimas 24 horas cita o ponto." };
+  return { texto: "Sem dado", classe: "sem-dado", explica: "O robô não publicou o estado nesta atualização." };
+}
+
+/** "M 6,3" */
+export function magnitude(m: number | null | undefined): string {
+  return m === null || m === undefined ? "M ?" : `M ${m.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}`;
+}
+
 export type Mudanca = { tipo: string; sentido: string; desde: string; taxa_base: { vezes: number; anos: number } };
 
 /** "Alta fora do normal por dias seguidos, desde 15/10/2026. Nos 5 anos anteriores: 3 vezes." */
@@ -160,4 +177,30 @@ export function textoMudanca(m: Mudanca): string {
     : `${m.sentido === "alta" ? "Alta" : "Queda"} fora do normal por dias seguidos`;
   const anos = m.taxa_base.anos.toLocaleString("pt-BR");
   return `${oque}, desde ${dia(m.desde)}. Nos ${anos} anos anteriores: ${plural(m.taxa_base.vezes, "vez", "vezes")}.`;
+}
+
+/** As regiões das bolsas, na ordem da tela (decisão 0014; a região de cada bolsa vem do robô). */
+export const REGIOES_BOLSA: [string, string][] = [
+  ["americas", "Américas"], ["europa_africa", "Europa, Oriente Médio e África"], ["asia_pacifico", "Ásia e Pacífico"],
+];
+
+const DONO: Record<string, string> = { estatal: "estatal", publico: "pública", privado: "privada", multilateral: "multilateral" };
+
+/** Quem fala, ao lado de cada notícia: "imprensa estatal · Rússia", "oficial · EUA" (ficha da fonte, decisão 0008). */
+export function donoFonte(tipo: string | null | undefined, controle: string | null | undefined, pais: string | null | undefined): string {
+  const dono = controle ? DONO[controle] ?? controle : null;
+  const quem = tipo === "oficial" ? (controle === "multilateral" ? "oficial multilateral" : "oficial")
+    : dono ? `imprensa ${dono}` : tipo === "imprensa" ? "imprensa" : null;
+  return [quem, pais].filter(Boolean).join(" · ");
+}
+
+/** Os pontos do minigráfico (SVG). Só desenha os valores que o robô mandou; menos de 2, nada. */
+export function linhaMinigrafico(valores: number[] | null | undefined, largura: number, altura: number): string | null {
+  if (!valores || valores.length < 2) return null;
+  const min = Math.min(...valores), max = Math.max(...valores);
+  const passo = largura / (valores.length - 1);
+  return valores.map((v, i) => {
+    const y = max === min ? altura / 2 : altura - ((v - min) / (max - min)) * altura;
+    return `${(i * passo).toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
 }

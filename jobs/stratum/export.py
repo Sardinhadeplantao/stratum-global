@@ -11,7 +11,7 @@ from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
 VERSAO_FORMATO = 2
-ULTIMOS_DOCUMENTOS = 40
+ULTIMOS_DOCUMENTOS = 100  # a aba Notícias busca e filtra nestas (decisão 0014)
 RODADAS_RECENTES = 24
 
 # Citações de países: quantas notícias publicadas na janela citam cada país (regra em domain/paises.py)
@@ -105,6 +105,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "titulo": pt or d["titulo"], "titulo_original": d["titulo"] if pt else None,  # decisão 0010
             "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
             "fonte_tipo": f.get("tipo"), "fonte_pais": f.get("pais"), "fonte_pais_nome": dicionario.nome(f.get("pais")),
+            "fonte_controle": f.get("controle"),  # estatal | publico | privado | multilateral: quem é dono da fonte
             "publicado_em": _iso(d["publicado_em"]), "conhecido_em": _iso(d["conhecido_em"]),
             "paises": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in citados(d)],
         }

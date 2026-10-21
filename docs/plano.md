@@ -96,15 +96,19 @@ Já entregue:
   (`jobs/scripts/conferir_status.py`);
 - juros de 10 anos de fonte oficial (Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Ministério das Finanças do
   Japão), em pontos percentuais; bolsas de 18 membros do G20 e da zona do euro, 11 commodities e 2 cripto pelo Yahoo
-  (decisão 0013). São 61 séries na mesma régua, separadas por grupo na tela Método.
+  (decisão 0013). São 61 séries na mesma régua, separadas por grupo na tela Método;
+- a página inicial em torno do mapa (decisão 0014): pontos críticos que acendem por regra (`pontos-0.1`), contexto de
+  cada ponto com fonte, rotas esquemáticas, terremotos do USGS, o painel de cada país com os mercados dele, a aba
+  Mercados (destaques, quantas sobem e caem, último mês, bolsas por região) ao lado das notícias, e a troca de contrato
+  das commodities fora da régua (`regua-1.1`).
 
 Falta:
 
-- Troca de contrato das commodities: guardar o contrato de cada dia e tirar da régua o dia da troca (decisão 0013;
-  o WTI de 20/10 foi um falso "fora do normal").
+- Decisão de quanto guardar (urgente): cotações só com o fechamento do dia, registro das leituras resumido, e medir o
+  peso de cada notícia (banco em 45,6 MB de 500 MB em 21/10; as notícias e o registro das leituras são o que mais cresce).
 - Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
 - A reação medida a cada evento.
-- Tela Mercados: o que se mexeu fora do normal e os eventos no mesmo período ("coincidência no tempo, não causa").
+- Atores e incentivos de cada ponto crítico, com decisão própria (é análise, não dado).
 
 **Pronto quando:** todo evento importante mostra se algum ativo ligado se mexeu fora do normal.
 

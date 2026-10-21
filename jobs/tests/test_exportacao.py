@@ -60,10 +60,11 @@ def test_citacoes_por_pais_na_janela(engine, cfg):
 def test_ultimos_documentos_mais_recentes_primeiro_com_paises(engine, cfg):
     feed = _rss([("Older: China exports", "", AGORA - timedelta(hours=5)),
                  ("Newer: India election", "", AGORA - timedelta(minutes=30))])
-    s = _rodar(engine, cfg, {"a": (fonte("a", "https://a/feed", pais="IND"), feed)})
+    s = _rodar(engine, cfg, {"a": (fonte("a", "https://a/feed", pais="IND", controle="privado"), feed)})
     primeiro, segundo = s["ultimos_documentos"]
     assert primeiro["titulo"] == "Newer: India election" and primeiro["paises"] == [{"iso": "IND", "nome": "Índia"}]
     assert primeiro["fonte_pais_nome"] == "Índia" and primeiro["fonte_tipo"] == "imprensa"
+    assert primeiro["fonte_controle"] == "privado"  # quem é dono da fonte, ao lado de cada notícia (decisão 0014)
     assert segundo["paises"][0]["iso"] == "CHN"
 
 

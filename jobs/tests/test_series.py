@@ -252,6 +252,41 @@ def test_status_traz_a_conferencia_com_o_bce_e_o_dia_em_andamento(engine, cfg):
     assert m["confere_ate_pct"] == 2.0 and m["nao_conferem"] == 0
 
 
+def test_status_traz_o_ultimo_mes_quem_sobe_e_quem_cai_e_os_destaques(engine, cfg):
+    # Decisão 0014: o minigráfico, a contagem de altas e quedas e os quadros de destaque saem prontos do robô
+    from stratum import mercados
+    yahoo = next(f for f in catalogo.FONTES if f["id"] == "yahoo_cambio")
+    series = [s for s in catalogo.SERIES if s["id"] in ("bce_brl", "bce_usd", "yahoo_brl")]
+    dias = _dias_uteis(1300, date(2021, 6, 1))
+    reais = {d: 6 + ((i * 7) % 11) / 1000 for i, d in enumerate(dias)}
+    dolares = {d: 1.1 + ((i * 5) % 7) / 1000 for i, d in enumerate(dias)}
+    reais[dias[-1]] = reais[dias[-2]] + 0.004      # o real sobe no último dia
+    dolares[dias[-1]] = dolares[dias[-2]] - 0.004  # o dólar cai
+
+    def bce(f, ss, *_):
+        return [Observacao("BRL", d, v) for d, v in reais.items()] + [Observacao("USD", d, v) for d, v in dolares.items()]
+
+    def mercado(f, ss, *_):
+        return [Observacao("BRL=X", d, round(reais[d] / dolares[d], 4)) for d in dias]
+
+    relogio = Relogio(datetime.combine(dias[-1], datetime.min.time()) + timedelta(hours=18))
+    robo.rodar(engine, [BCE, yahoo], None, cfg, agora=relogio, series=series,
+               conectores_series={"bce": bce, "yahoo": mercado})
+    m = export.montar(engine, agora=relogio)["mercados"]
+    por_id = {x["id"]: x for x in m["series"]}
+    assert por_id["bce_brl"]["mes"] == [v for d, v in sorted(reais.items()) if (dias[-1] - d).days < 30]
+    assert len(por_id["bce_usd"]["mes"]) in (21, 22, 23)  # um mês de dias úteis
+    assert m["amplitude"] == {"sobem": 2, "caem": 1, "estaveis": 0, "proporcao_sobem": 0.667,
+                              "por_grupo": {"moedas": {"sobem": 2, "caem": 1, "estaveis": 0}}}
+    assert m["destaques"] == [{"id": "yahoo_brl", "rotulo": mercados.DESTAQUES["yahoo_brl"]}]  # só os da lista que existem
+
+
+def test_toda_bolsa_tem_regiao():
+    bolsas = [s for s in catalogo.SERIES if s["grupo"] == "bolsas"]
+    assert all(s.get("regiao") in catalogo.REGIOES for s in bolsas)
+    assert {s["regiao"] for s in bolsas} == set(catalogo.REGIOES)
+
+
 def test_juros_medem_a_diferenca_em_pontos():
     # Decisão 0011: taxa se mede em pontos percentuais; 4,00% -> 4,10% é +0,10 ponto, não +2,5%
     assert regua.diferenca([(date(2026, 10, 19), 4.0), (date(2026, 10, 20), 4.1)])[0][1] == pytest.approx(0.1)

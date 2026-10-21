@@ -189,6 +189,28 @@ def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, mome
     }
 
 
+# Quadros de destaque do painel de mercados (decisão 0014): um número por grande mercado, para quem lê do Brasil.
+# Bolsa e juro dos EUA, dólar no mundo, ouro, petróleo, cripto, e o dólar e a bolsa do Brasil. Escolha fixa, não muda
+# com o dia: o que se mexeu fora do normal aparece pela régua, não por estar aqui.
+DESTAQUES = {"bolsa_gspc": "S&P 500", "juros_usa_10a": "Juro EUA 10 anos", "yahoo_dxynyb": "Índice do dólar",
+             "commodity_gc": "Ouro", "commodity_bz": "Petróleo Brent", "cripto_btc": "Bitcoin", "yahoo_brl": "Dólar em reais",
+             "bolsa_bvsp": "Ibovespa"}
+DIAS_DO_MES = 30  # o minigráfico: as cotações dos últimos 30 dias corridos, como o sistema as conhecia
+
+
+def _amplitude(lista: list[dict]) -> dict:
+    """Quantas séries sobem, caem ou ficam iguais no último dia. Só conta leitura "ok": parada, troca de contrato e
+    cotação que não confere com a fonte oficial ficam de fora (a variação delas não é confiável)."""
+    def contar(xs):
+        ok = [x["variacao"] for x in xs if x["situacao"] == "ok" and x["variacao"] is not None]
+        return {"sobem": sum(v > 0 for v in ok), "caem": sum(v < 0 for v in ok), "estaveis": sum(v == 0 for v in ok)}
+    total = contar(lista)
+    medidas = total["sobem"] + total["caem"] + total["estaveis"]
+    grupos = sorted({x["grupo"] for x in lista})
+    return total | {"proporcao_sobem": round(total["sobem"] / medidas, 3) if medidas else None,
+                    "por_grupo": {g: contar([x for x in lista if x["grupo"] == g]) for g in grupos}}
+
+
 def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[dict], catalogo_series: list[dict],
            copia: str | None = None) -> dict:
     """Todas as séries ativas, ordenadas só pela pontuação (decisão 0011); sem leitura, no fim, pelo nome.
@@ -197,6 +219,8 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     validade = {f["id"]: f["validade_dias"] for f in catalogo_fontes if f.get("validade_dias") and f.get("ativa", True)}
     em_andamento = {f["id"] for f in catalogo_fontes if f.get("dia_em_andamento")}
     conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
+    regiao = {s["id"]: s["regiao"] for s in catalogo_series if s.get("regiao")}
+    inicio_mes = momento.date() - timedelta(days=DIAS_DO_MES)
     series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
     todas, origem = carregar(c, copia)
     trocas = trocas_de_contrato(c, momento)
@@ -217,7 +241,8 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
                 conferida["com"] = "BCE"
         lista.append({"id": s["id"], "nome": s["nome"], "unidade": s["unidade"], "pais": s["pais"], "codigo": s["codigo"],
                       "medida": s["medida"],  # variacao_pct (em %) ou diferenca (em pontos percentuais)
-                      "grupo": s["grupo"],
+                      "grupo": s["grupo"], "regiao": regiao.get(s["id"]),
+                      "mes": [v for d, v in pts[s["id"]] if d > inicio_mes],
                       "fonte": s["fonte_id"], "fonte_nome": f.get("nome", s["fonte_id"]),
                       "conhecido_em": ultima_coleta[s["id"]].isoformat(timespec="seconds") + "Z"
                       if s["id"] in ultima_coleta else None,
@@ -231,5 +256,7 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
             por_pais.setdefault(x["pais"], []).append(x["id"])
     return {"regua": regua.parametros(), "validade_dias": validade, "confere_ate_pct": CONFERE_ATE_PCT, "series": lista,
             "por_pais": por_pais,
+            "destaques": [{"id": i, "rotulo": r} for i, r in DESTAQUES.items() if any(x["id"] == i for x in lista)],
+            "amplitude": _amplitude(lista),
             "fora_do_normal": sum(1 for x in lista if x["extremo"]),
             "nao_conferem": sum(1 for x in lista if x["situacao"] == "nao_confere")}

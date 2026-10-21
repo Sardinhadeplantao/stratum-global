@@ -190,8 +190,16 @@ def _juros(fonte: str, codigo: str, nome: str, pais: str) -> dict:
     return _serie(fonte, codigo, nome, "% ao ano", pais, "juros", id=f"juros_{pais.lower()}_10a", medida="diferenca")
 
 
-def _bolsa(codigo: str, nome: str, pais: str | None) -> dict:
-    return _serie("yahoo_bolsas", codigo, nome, "pontos", pais, "bolsas", id=f"bolsa_{re.sub(r'[^a-z0-9]', '', codigo.lower())}")
+# Região de cada bolsa, só para agrupar o painel de mercados (decisão 0014): a do país do índice
+REGIOES = {"americas": "Américas", "europa_africa": "Europa, Oriente Médio e África", "asia_pacifico": "Ásia e Pacífico"}
+_REGIAO_DO_PAIS = {**dict.fromkeys(["USA", "BRA", "CAN", "MEX", "ARG"], "americas"),
+                   **dict.fromkeys(["GBR", "DEU", "FRA", "ITA", "TUR", "ZAF"], "europa_africa"),
+                   **dict.fromkeys(["CHN", "JPN", "IND", "AUS", "KOR", "IDN"], "asia_pacifico")}
+
+
+def _bolsa(codigo: str, nome: str, pais: str | None, regiao: str | None = None) -> dict:
+    return _serie("yahoo_bolsas", codigo, nome, "pontos", pais, "bolsas", id=f"bolsa_{re.sub(r'[^a-z0-9]', '', codigo.lower())}",
+                  regiao=regiao or _REGIAO_DO_PAIS[pais])
 
 
 def _commodity(codigo: str, nome: str, unidade: str) -> dict:
@@ -259,7 +267,7 @@ SERIES: list[dict] = [
     _bolsa("XU100.IS", "Turquia: BIST 100", "TUR"),
     _bolsa("^J203.JO", "África do Sul: JSE All Share", "ZAF"),
     _bolsa("^MERV", "Argentina: Merval (em pesos)", "ARG"),
-    _bolsa("^STOXX50E", "Zona do euro: EURO STOXX 50", None),
+    _bolsa("^STOXX50E", "Zona do euro: EURO STOXX 50", None, regiao="europa_africa"),
     # Commodities (decisão 0013): contrato futuro mais próximo
     _commodity("BZ=F", "Petróleo Brent", "US$ por barril"),
     _commodity("CL=F", "Petróleo WTI", "US$ por barril"),

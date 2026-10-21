@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { continente, datasDocumento, plural } from "@/lib/formatar";
-import type { PaisAtencao } from "@/lib/status";
+import { continente, datasDocumento, estadoPonto, plural } from "@/lib/formatar";
+import type { MercadoResumo, PaisAtencao, Ponto } from "@/lib/status";
 import Titulo from "@/components/Titulo";
+import type { Selecao } from "@/components/inicio/Inicio";
+import LinhaMercado from "@/components/inicio/LinhaMercado";
 
 /** Propriedades de cada país em public/geo/paises.geojson (gerado por jobs/scripts/preparar_paises.py). */
 export type Pais = {
@@ -9,31 +11,23 @@ export type Pais = {
   wikidata: string | null; continente: string | null; regiao: string | null; centro?: [number, number] | null;
 };
 
-type Props = { pais: Pais; atencao: PaisAtencao | null; janelaHoras: number; semDado: boolean; fechar: () => void };
+type Props = {
+  pais: Pais; atencao: PaisAtencao | null; janelaHoras: number; semDado: boolean; fechar: () => void;
+  mercados: MercadoResumo[]; pontos: Ponto[]; selecionar: (s: Selecao) => void;
+};
 
-export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar }: Props) {
+/** Contexto de um país no painel da direita: as notícias que o citam, as histórias, os mercados dele e os pontos
+ * críticos nas suas margens. Tudo vem pronto do robô. */
+export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar, mercados, pontos, selecionar }: Props) {
   return (
-    <aside className="painel" aria-label={`Painel de ${pais.nome}`}>
+    <div className="detalhe" aria-label={`Contexto: ${pais.nome}`}>
       <div className="painel-topo">
         <div>
+          <button type="button" className="link voltar" onClick={fechar}>← Voltar</button>
           <h2>{pais.nome}</h2>
           {pais.nome_en && pais.nome_en !== pais.nome && <p className="discreto">{pais.nome_en}</p>}
         </div>
-        <button onClick={fechar} className="fechar" aria-label="Fechar painel">×</button>
       </div>
-
-      <dl className="codigos">
-        <dt>{pais.iso_oficial ? "ISO 3166" : "Código"}</dt>
-        <dd>
-          {pais.iso}{pais.iso2 ? ` · ${pais.iso2}` : ""}
-          {!pais.iso_oficial && <span className="discreto"> (sem código ISO; código do Natural Earth)</span>}
-        </dd>
-        {pais.continente && (<><dt>Continente</dt><dd>{continente(pais.continente)}</dd></>)}
-        {pais.wikidata && (<>
-          <dt>Wikidata</dt>
-          <dd><a href={`https://www.wikidata.org/wiki/${pais.wikidata}`} target="_blank" rel="noreferrer">{pais.wikidata}</a></dd>
-        </>)}
-      </dl>
 
       <section>
         <h3>Nas últimas {janelaHoras} horas</h3>
@@ -56,6 +50,34 @@ export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar
           <p>Nenhuma notícia das fontes acompanhadas cita este país nas últimas {janelaHoras} horas.</p>
         )}
       </section>
+
+      {pontos.length > 0 && (
+        <section>
+          <h3>Pontos críticos nas margens</h3>
+          <ul className="lista-pontos">
+            {pontos.map((p) => {
+              const e = estadoPonto(p.estado);
+              return (
+                <li key={p.id}>
+                  <button type="button" onClick={() => selecionar({ tipo: "ponto", id: p.id })}>
+                    <span className={`selo-estado ${e.classe}`}>{e.texto}</span>
+                    <span className="lp-nome">{p.nome}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      <section>
+        <h3>Mercados do país</h3>
+        {mercados.length === 0 ? <p className="sem-dado-texto">Nenhuma série acompanhada deste país.</p> : (<>
+          <ul className="lista-mercados">{mercados.map((s) => <LinhaMercado key={s.id} s={s} />)}</ul>
+          <p className="discreto">Oscilação do dia ao lado das notícias do mesmo período: coincidência no tempo, não causa.</p>
+        </>)}
+      </section>
+
       {!semDado && atencao?.historias && atencao.historias.length > 0 && (
         <section>
           <h3>Histórias com este país</h3>
@@ -71,10 +93,19 @@ export default function PainelPais({ pais, atencao, janelaHoras, semDado, fechar
           </ul>
         </section>
       )}
-      <section>
-        <h3>Mercados</h3>
-        <p className="sem-dado-texto">Sem medição ainda. Moeda, juros e bolsa do país entram na fase 2.</p>
-      </section>
-    </aside>
+
+      <dl className="codigos">
+        <dt>{pais.iso_oficial ? "ISO 3166" : "Código"}</dt>
+        <dd>
+          {pais.iso}{pais.iso2 ? ` · ${pais.iso2}` : ""}
+          {!pais.iso_oficial && <span className="discreto"> (sem código ISO; código do Natural Earth)</span>}
+        </dd>
+        {pais.continente && (<><dt>Continente</dt><dd>{continente(pais.continente)}</dd></>)}
+        {pais.wikidata && (<>
+          <dt>Wikidata</dt>
+          <dd><a href={`https://www.wikidata.org/wiki/${pais.wikidata}`} target="_blank" rel="noreferrer">{pais.wikidata}</a></dd>
+        </>)}
+      </dl>
+    </div>
   );
 }

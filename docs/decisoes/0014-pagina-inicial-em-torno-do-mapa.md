@@ -11,10 +11,11 @@ os toca, sempre com o contexto do lugar, e citou o OSIRIS como referência de es
 
 ## Decisão
 
-1. **A página inicial é o mapa.** O globo ocupa a tela. À esquerda, as camadas, cada uma com a sua contagem. À direita,
-   um painel com abas: Agora (o que acendeu e as histórias com mais vozes), Mercados (as 61 séries, com a oscilação do
-   dia) e Notícias. Embaixo, uma faixa com as últimas notícias e os mercados fora do normal. Os cartões de contagem, "Mais
-   citados" e "Quem está falando" saem da página inicial (os números de saúde do robô seguem na tela Método).
+1. **A página inicial é o mapa.** O globo ocupa a tela, com botão para o mapa plano. À esquerda, as camadas, cada uma
+   com a sua contagem. À direita, um painel com abas: Agora (os alertas contados, o que acendeu e as histórias com mais
+   vozes), Mercados e Notícias. Embaixo, uma faixa com os pontos críticos, os mercados fora do normal, os terremotos
+   fortes e as últimas notícias. Os cartões de contagem saem; "Mais citados" e "Quem está falando" vão para o fim da aba
+   Notícias; a saúde do robô fica numa linha da aba Agora e, inteira, na tela Método.
 2. **Pontos críticos** (`pontos-0.1`, em `jobs/stratum/domain/pontos.py`):
    - critério da lista: os estreitos e canais da análise de pontos de passagem de petróleo do EIA (agência de energia
      dos EUA): Ormuz, Malaca, Suez e o oleoduto SUMED, Bab el-Mandeb (com o Mar Vermelho), estreitos turcos, estreitos
@@ -36,6 +37,19 @@ os toca, sempre com o contexto do lugar, e citou o OSIRIS como referência de es
 6. **Troca de contrato das commodities** (decisão 0013): o robô guarda o contrato de cada dia quando o Yahoo diz o mês
    no nome. No dia em que o contrato muda, a variação não mede o mercado: a série aparece como "troca de contrato", sem
    cor, e esse dia fica fora da régua. Brent e TTF não dizem o mês; neles o aviso geral continua.
+
+7. **Aba Mercados** (o que o OSIRIS faz bem, com a nossa régua):
+   - oito quadros de destaque, lista fixa escrita no robô (`mercados.DESTAQUES`): bolsa e juro de 10 anos dos EUA,
+     índice do dólar, ouro, Brent, bitcoin, dólar em reais e Ibovespa. Critério: um número por grande mercado, para quem
+     lê do Brasil. A lista não muda com o dia; o que se mexeu fora do normal aparece pela régua;
+   - quantas séries sobem, caem ou ficam iguais no último dia, no total e por grupo, contadas pelo robô só entre as de
+     leitura "ok" (troca de contrato, dado parado e cotação que não confere ficam de fora);
+   - o último mês de cada série (30 dias corridos, como o sistema os conhecia), num minigráfico;
+   - as bolsas agrupadas por região (Américas; Europa, Oriente Médio e África; Ásia e Pacífico), a do país do índice;
+   - sem verde para alta e vermelho para queda: subir não é bom nem ruim. O dourado marca só o fora do normal.
+8. **Aba Notícias**: as 100 últimas manchetes, cada uma com quem fala (a ficha da fonte: imprensa estatal, pública ou
+   privada, oficial, e o país), filtro por tipo de fonte e busca. Busca e filtro só escondem itens da lista que o robô
+   mandou; não contam nem ordenam.
 
 ## Consequências
 

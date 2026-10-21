@@ -57,7 +57,7 @@ def pontos(contaveis: list[dict], por_fonte: dict, resumo_documento, series: dic
 def _mercado(s: dict) -> dict:
     """O resumo de uma série para os painéis (a leitura completa fica em mercados.series)."""
     return {k: s.get(k) for k in ("id", "nome", "unidade", "medida", "data", "valor", "variacao", "percentil", "extremo",
-                                  "situacao", "parcial", "conhecido_em")}
+                                  "situacao", "parcial", "conhecido_em", "mes")}
 
 
 def faixa(ultimos: list[dict], estado_pontos: dict, series: list[dict], eventos: list[dict]) -> list[dict]:
