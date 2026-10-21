@@ -9,7 +9,7 @@ import json
 import sys
 
 LEITURA = {"ok": "dentro do normal", "nao_confere": "NÃO CONFERE com a fonte oficial", "parada": "parada (dado velho)",
-           "historico_curto": "histórico curto", "sem_dado": "sem dado"}
+           "historico_curto": "histórico curto", "sem_dado": "sem dado", "troca_de_contrato": "troca de contrato (fora da régua)"}
 
 
 def _n(x, casas=2, sinal=False):
@@ -38,12 +38,28 @@ def main(caminho: str) -> int:
     h = s.get("contagem_historias") or {}
     print(f"Notícias: {t.get('documentos')} no total, {t.get('documentos_24h')} nas últimas 24h · "
           f"histórias: {h.get('total')} ({h.get('varias_vozes')} com 2 ou mais vozes)")
+    p = s.get("pontos")
+    if p:
+        print(f"Pontos críticos ({p['regra']}): críticos {p['criticos']}, em pauta {p['em_pauta']}")
+        for x in p["lista"]:
+            if x["estado"] != "sem_pauta":
+                print(f"  {x['nome']}: {x['estado']} · notícias {x['noticias']}, vozes {x['vozes']}, com ação {x['com_acao']}")
+                for d in x["documentos"]:
+                    print(f"    {'[ação] ' if d.get('acao') else ''}{d['fonte_nome']}: {d['titulo_original'] or d['titulo']}")
+    else:
+        print("Pontos críticos: sem dado")
+    tr = s.get("terremotos") or []
+    print(f"Terremotos 4,5+ em 24 h: {len(tr)}" + (f" · o mais forte: M {tr[0]['magnitude']} · {tr[0]['titulo']}" if tr else ""))
+    print(f"Faixa de baixo: {len(s.get('faixa') or [])} itens")
     m = s.get("mercados")
     if not m:
         print("Mercados: sem dado")
         return 0
     print(f"Mercados ({m['regua']['versao']}): {len(m['series'])} séries, {m['fora_do_normal']} fora do normal, "
           f"{m.get('nao_conferem', 0)} não conferem")
+    a = m.get("amplitude") or {}
+    print(f"  Sobem {a.get('sobem')}, caem {a.get('caem')}, iguais {a.get('estaveis')} (só leitura ok) · "
+          f"destaques: {', '.join(d['rotulo'] for d in m.get('destaques') or [])}")
     grupo_atual = None
     for x in sorted(m["series"], key=lambda x: ["moedas", "juros", "bolsas", "commodities", "cripto"].index(
             x.get("grupo") or "moedas")):  # a ordem da lista (pontuação) se mantém dentro de cada grupo

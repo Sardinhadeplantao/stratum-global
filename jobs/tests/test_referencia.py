@@ -276,3 +276,71 @@ def test_dia_em_andamento_aparece_marcado_e_fica_fora_da_conferencia():
     lido = mercados._ler(dolar_em_reais, serie, 5, momento, dia_em_andamento=True, conferida=conferida)
     assert lido["parcial"] and lido["data"] == hoje.isoformat() and lido["situacao"] == "ok"
     assert not mercados._ler(dolar_em_reais[:-1], serie, 5, momento, dia_em_andamento=True)["parcial"]
+
+
+# Pontos críticos (decisão 0014): regra de palavras, sem IA; mede atenção das fontes, não gravidade
+
+def _noticia(titulo, controlador, resumo=""):
+    return {"titulo": titulo, "resumo": resumo, "controlador": controlador}
+
+
+def test_ponto_fica_critico_com_acao_e_duas_vozes():
+    from stratum.domain import pontos
+    manchete = "Oil tanker on fire after hitting mine in Hormuz: Iran's Guards"  # manchete real de 20/10
+    uma_voz = pontos.estados([_noticia(manchete, "estado:QAT")])
+    assert uma_voz["ormuz"]["estado"] == "em_pauta"            # uma voz só: em pauta, ainda não crítico
+    duas_vozes = pontos.estados([_noticia(manchete, "estado:QAT"),
+                                 _noticia("Iran warns ships in the Strait of Hormuz", "estado:GBR")])
+    assert duas_vozes["ormuz"] == {"estado": "critico", "noticias": 2, "vozes": 2, "com_acao": 1}
+
+
+def test_ponto_citado_sem_acao_fica_em_pauta():
+    from stratum.domain import pontos
+    e = pontos.estados([_noticia("Panama Canal traffic returns to normal", "estado:GBR"),
+                        _noticia("Canal do Panamá amplia calado", "grupo:folha")])
+    assert e["panama"]["estado"] == "em_pauta" and e["panama"]["vozes"] == 2 and e["panama"]["com_acao"] == 0
+    assert e["ormuz"]["estado"] == "sem_pauta" and e["ormuz"]["noticias"] == 0
+
+
+def test_nome_do_ponto_so_conta_como_palavra_inteira():
+    from stratum.domain import pontos
+    e = pontos.estados([_noticia("Suezmax tanker rates hit record after attack", "estado:QAT")])
+    assert e["suez"]["noticias"] == 0  # "Suezmax" é tipo de navio, não o canal
+
+
+def test_mar_vermelho_conta_para_bab_el_mandeb():
+    from stratum.domain import pontos
+    e = pontos.estados([_noticia("Houthis claim missile attack on ship in the Red Sea", "estado:QAT"),
+                        _noticia("Navio é atacado no Mar Vermelho", "grupo:folha")])
+    assert e["bab_el_mandeb"]["estado"] == "critico"
+
+
+def test_dia_da_troca_de_contrato_nao_entra_na_regua(engine):
+    # O WTI de 20/10/2026: a série do Yahoo passou do contrato de novembro (103,66) para o de dezembro (98,47), uma
+    # falsa queda de 5%. Com o contrato de cada dia guardado, o dia da troca fica sem cor e fora da régua.
+    from datetime import datetime
+    from stratum import fontes as catalogo, mercados
+    from stratum.connectors.series import Observacao
+    wti = next(s for s in catalogo.SERIES if s["id"] == "commodity_cl")
+    with engine.begin() as c:
+        db.gravar_fontes(c, [f for f in catalogo.FONTES if f["id"] == "yahoo_commodities"])
+        db.gravar_series(c, [wti])
+    pontos = _serie(1300, escala=1.0, semente=9)
+    pontos[-2] = (pontos[-2][0], 103.66)
+    pontos[-1] = (pontos[-1][0], 98.47)
+    dia_19, dia_20 = pontos[-2][0], pontos[-1][0]
+    obs = [Observacao("CL=F", d, v) for d, v in pontos[:-2]]
+    noite_19 = datetime.combine(dia_19, datetime.min.time()) + timedelta(hours=22)
+    noite_20 = datetime.combine(dia_20, datetime.min.time()) + timedelta(hours=22)
+    mercados.gravar(engine, [wti], obs + [Observacao("CL=F", dia_19, 103.66, "Nov 26")], None, noite_19)
+    mercados.gravar(engine, [wti], [Observacao("CL=F", dia_20, 98.47, "Dec 26")], None, noite_20)
+    serie = {"id": "commodity_cl", "medida": "variacao_pct", "frequencia": "diaria"}
+    momento = noite_20 + timedelta(hours=1)
+    with engine.connect() as c:
+        trocas = mercados.trocas_de_contrato(c, momento)
+        lido = mercados._ler(mercados.pontos(c, "commodity_cl", momento), serie, 5, momento, trocas=trocas["commodity_cl"])
+    assert trocas["commodity_cl"] == {dia_20}
+    assert lido["situacao"] == "troca_de_contrato" and lido["extremo"] is None and lido["valor"] == 98.47
+    # Sem saber o contrato, a mesma queda apareceria como fora do normal
+    sem_contrato = mercados._ler(pontos, serie, 5, momento)
+    assert sem_contrato["extremo"] == "baixa"

@@ -56,7 +56,28 @@ def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em
             linhas.append(dict(serie_id=chave[0], data=o.data, valor=o.valor, rodada_id=rodada_id, conhecido_em=conhecido_em))
         for i in range(0, len(linhas), LOTE):
             c.execute(db.observacao.insert(), linhas[i:i + LOTE])
+        # Contrato futuro do dia (decisão 0014): entra quando é novo para a data; o mesmo de novo é ignorado
+        contratos = [dict(serie_id=por_codigo[o.codigo], data=o.data, contrato=o.contrato, conhecido_em=conhecido_em)
+                     for o in obs if o.contrato]
+        db.inserir_ignorando_repetidos(c, db.contrato_futuro, contratos, ["serie_id", "data", "contrato"])
     return len(linhas)
+
+
+def trocas_de_contrato(c, ate: datetime) -> dict[str, set[date]]:
+    """Por série, os dias em que o contrato futuro mudou em relação ao dia anterior com contrato conhecido, com o que
+    o sistema sabia em `ate`. Dia sem contrato conhecido não marca troca (não dá para saber).
+
+    A conta é feita no banco e só os dias da troca voltam (uns 100 por ano): ler a tabela inteira a cada rodada
+    cresceria sem parar e gastaria a cota de tráfego do Supabase gratuito (revisão de 21/10)."""
+    t = db.contrato_futuro.c
+    ultimo = select(t.serie_id, t.data, t.contrato, func.row_number().over(  # o último registro de cada dia vale
+        partition_by=(t.serie_id, t.data), order_by=t.conhecido_em.desc()).label("n")).where(t.conhecido_em <= ate).subquery()
+    dia = select(ultimo.c.serie_id, ultimo.c.data, ultimo.c.contrato, func.lag(ultimo.c.contrato).over(
+        partition_by=ultimo.c.serie_id, order_by=ultimo.c.data).label("antes")).where(ultimo.c.n == 1).subquery()
+    trocas: dict[str, set[date]] = {}
+    for sid, d in c.execute(select(dia.c.serie_id, dia.c.data).where(dia.c.antes.is_not(None), dia.c.antes != dia.c.contrato)):
+        trocas.setdefault(sid, set()).add(d)
+    return trocas
 
 
 def pontos(c, serie_id: str, ate: datetime) -> list[tuple[date, float]]:
@@ -150,9 +171,9 @@ def leitura(c, s: dict, validade_dias: int | None, momento: datetime) -> dict:
 
 
 def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, momento: datetime,
-         dia_em_andamento: bool = False, conferida: dict | None = None) -> dict:
-    """Situação: ok | nao_confere | parada | historico_curto | sem_dado. Só "ok" tem cor de leitura."""
-    lido = regua.ler(pts, s["medida"], s["frequencia"])
+         dia_em_andamento: bool = False, conferida: dict | None = None, trocas: set[date] = frozenset()) -> dict:
+    """Situação: ok | nao_confere | troca_de_contrato | parada | historico_curto | sem_dado. Só "ok" tem cor."""
+    lido = regua.ler(pts, s["medida"], s["frequencia"], trocas)
     situacao = lido.situacao
     if lido.data and validade_dias is not None and (momento.date() - lido.data).days > validade_dias:
         situacao = "parada"  # o dado ficou velho: cinza, mesmo com leitura
@@ -169,6 +190,28 @@ def _ler(pts: list[tuple[date, float]], s: dict, validade_dias: int | None, mome
     }
 
 
+# Quadros de destaque do painel de mercados (decisão 0014): um número por grande mercado, para quem lê do Brasil.
+# Bolsa e juro dos EUA, dólar no mundo, ouro, petróleo, cripto, e o dólar e a bolsa do Brasil. Escolha fixa, não muda
+# com o dia: o que se mexeu fora do normal aparece pela régua, não por estar aqui.
+DESTAQUES = {"bolsa_gspc": "S&P 500", "juros_usa_10a": "Juro EUA 10 anos", "yahoo_dxynyb": "Índice do dólar",
+             "commodity_gc": "Ouro", "commodity_bz": "Petróleo Brent", "cripto_btc": "Bitcoin", "yahoo_brl": "Dólar em reais",
+             "bolsa_bvsp": "Ibovespa"}
+DIAS_DO_MES = 30  # o minigráfico: as cotações dos últimos 30 dias corridos, como o sistema as conhecia
+
+
+def _amplitude(lista: list[dict]) -> dict:
+    """Quantas séries sobem, caem ou ficam iguais no último dia. Só conta leitura "ok": parada, troca de contrato e
+    cotação que não confere com a fonte oficial ficam de fora (a variação delas não é confiável)."""
+    def contar(xs):
+        ok = [x["variacao"] for x in xs if x["situacao"] == "ok" and x["variacao"] is not None]
+        return {"sobem": sum(v > 0 for v in ok), "caem": sum(v < 0 for v in ok), "estaveis": sum(v == 0 for v in ok)}
+    total = contar(lista)
+    medidas = total["sobem"] + total["caem"] + total["estaveis"]
+    grupos = sorted({x["grupo"] for x in lista})
+    return total | {"proporcao_sobem": round(total["sobem"] / medidas, 3) if medidas else None,
+                    "por_grupo": {g: contar([x for x in lista if x["grupo"] == g]) for g in grupos}}
+
+
 def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[dict], catalogo_series: list[dict],
            copia: str | None = None) -> dict:
     """Todas as séries ativas, ordenadas só pela pontuação (decisão 0011); sem leitura, no fim, pelo nome.
@@ -177,8 +220,11 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
     validade = {f["id"]: f["validade_dias"] for f in catalogo_fontes if f.get("validade_dias") and f.get("ativa", True)}
     em_andamento = {f["id"] for f in catalogo_fontes if f.get("dia_em_andamento")}
     conferir = {s["id"]: s["conferir"] for s in catalogo_series if s.get("conferir")}
+    regiao = {s["id"]: s["regiao"] for s in catalogo_series if s.get("regiao")}
+    inicio_mes = momento.date() - timedelta(days=DIAS_DO_MES)
     series = c.execute(select(db.serie).where(db.serie.c.ativa).order_by(db.serie.c.nome)).mappings().all()
     todas, origem = carregar(c, copia)
+    trocas = trocas_de_contrato(c, momento)
     print(f"Cotações: {origem['da_copia']} da cópia local, {origem['do_banco']} lidas do banco.", flush=True)
     ultima_coleta = {sid: max(l[4] for l in linhas) for sid, linhas in todas.items()}
     pts = {sid: _pontos(todas.get(sid, []), momento)
@@ -196,13 +242,22 @@ def montar(c, fontes: dict[str, dict], momento: datetime, catalogo_fontes: list[
                 conferida["com"] = "BCE"
         lista.append({"id": s["id"], "nome": s["nome"], "unidade": s["unidade"], "pais": s["pais"], "codigo": s["codigo"],
                       "medida": s["medida"],  # variacao_pct (em %) ou diferenca (em pontos percentuais)
-                      "grupo": s["grupo"],
+                      "grupo": s["grupo"], "regiao": regiao.get(s["id"]),
+                      "mes": [v for d, v in pts[s["id"]] if d > inicio_mes],
                       "fonte": s["fonte_id"], "fonte_nome": f.get("nome", s["fonte_id"]),
                       "conhecido_em": ultima_coleta[s["id"]].isoformat(timespec="seconds") + "Z"
                       if s["id"] in ultima_coleta else None,
                       "conferir": s["id"] in conferir}
-                     | _ler(pts[s["id"]], dict(s), validade.get(s["fonte_id"]), momento, andamento, conferida))
+                     | _ler(pts[s["id"]], dict(s), validade.get(s["fonte_id"]), momento, andamento, conferida,
+                            trocas.get(s["id"], set())))
     lista.sort(key=lambda x: (x["situacao"] != "ok" or x["pontuacao"] is None, -abs(x["pontuacao"] or 0)))
+    por_pais: dict[str, list[str]] = {}
+    for x in lista:  # moeda, juros e bolsa de cada país, para o painel do país (decisão 0014)
+        if x["pais"]:
+            por_pais.setdefault(x["pais"], []).append(x["id"])
     return {"regua": regua.parametros(), "validade_dias": validade, "confere_ate_pct": CONFERE_ATE_PCT, "series": lista,
+            "por_pais": por_pais,
+            "destaques": [{"id": i, "rotulo": r} for i, r in DESTAQUES.items() if any(x["id"] == i for x in lista)],
+            "amplitude": _amplitude(lista),
             "fora_do_normal": sum(1 for x in lista if x["extremo"]),
             "nao_conferem": sum(1 for x in lista if x["situacao"] == "nao_confere")}

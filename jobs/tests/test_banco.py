@@ -25,6 +25,8 @@ def test_toda_fonte_tem_criterio_e_ids_unicos():
     for f in fontes.FONTES:
         assert f["criterio"] and f["tipo"] in {"oficial", "imprensa", "dados", "social"}
         assert (f["conector"] == "rss") == (f["tipo"] != "dados") and f["url"].startswith("https://")
+        from stratum import robo
+        assert f["conector"] in {"rss"} | set(robo.CONECTORES_SERIES) | set(robo.CONECTORES_EVENTOS)
 
 
 def test_toda_serie_tem_fonte_de_dados_e_medida_da_regua():

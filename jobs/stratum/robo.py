@@ -14,11 +14,12 @@ from sqlalchemy import exc as erros_sql, select
 
 from stratum import VERSAO, agendador, avisos, config, copia, db, export, historias, mercados, resumo, traducao
 from stratum import fontes as catalogo
-from stratum.connectors import rss, series as conectores_series
+from stratum.connectors import eventos as conectores_eventos, rss, series as conectores_series
 from stratum.domain.documento import hash_documento
 
 CONECTORES = {"rss": rss.ler}
 CONECTORES_SERIES = conectores_series.CONECTORES
+CONECTORES_EVENTOS = conectores_eventos.CONECTORES
 
 
 @dataclass
@@ -30,7 +31,8 @@ class Resultado:
 
 
 def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agora, conectores=CONECTORES,
-          series: list[dict] | None = None, conectores_series=CONECTORES_SERIES) -> Resultado:
+          series: list[dict] | None = None, conectores_series=CONECTORES_SERIES,
+          conectores_eventos=CONECTORES_EVENTOS) -> Resultado:
     banco = "permanente" if cfg.banco_permanente else "temporario"
     ids = {f["id"] for f in fontes}
     series = [s for s in (catalogo.SERIES if series is None else series) if s["fonte"] in ids]
@@ -51,6 +53,9 @@ def rodar(engine, fontes: list[dict], session, cfg: config.Config, agora=db.agor
                     primeira = mercados.desde(c, da_fonte)
                 itens = conectores_series[f["conector"]](f, da_fonte, session, cfg.user_agent, primeira)
                 novos = mercados.gravar(engine, da_fonte, itens, rid, agora())
+            elif f["conector"] in conectores_eventos:
+                itens = conectores_eventos[f["conector"]](f, session, cfg.user_agent)
+                novos = _gravar_eventos(engine, f["id"], itens, rid, agora())
             else:
                 itens = conectores[f["conector"]](f, session, cfg.user_agent)
                 novos = _gravar(engine, f["id"], itens, rid, agora())
@@ -122,6 +127,29 @@ def _gravar(engine, fonte_id: str, itens, rodada_id: int, conhecido_em) -> int:
                        publicado_em=it.publicado_em, conhecido_em=conhecido_em)
                   for h, it in por_hash.items() if h not in existentes]
         db.inserir_ignorando_repetidos(c, db.documento, linhas, "hash")
+    return len(linhas)
+
+
+def _gravar_eventos(engine, fonte_id: str, eventos, rodada_id: int, conhecido_em) -> int:
+    """Revisão da fonte vira registro novo (regra 2), mas só quando muda o que se vê: título, magnitude, local ou hora.
+    O USGS muda a data de atualização sem mudar nada disso (revisão de 21/10); gravar cada uma encheria o banco à toa.
+    Devolve quantas versões entraram."""
+    unicos = {e.ext_id: e for e in eventos}  # na mesma leitura, vale a última versão de cada evento
+    if not unicos:
+        return 0
+    def visivel(e):
+        return (e.titulo, e.magnitude, e.lat, e.lon, e.ocorreu_em)
+    with engine.begin() as c:
+        t = db.evento_local.c
+        atual = {}
+        for ext_id, titulo, mag, lat, lon, ocorreu in c.execute(
+                select(t.ext_id, t.titulo, t.magnitude, t.lat, t.lon, t.ocorreu_em)
+                .where(t.fonte_id == fonte_id, t.ext_id.in_(list(unicos))).order_by(t.id)):
+            atual[ext_id] = (titulo, mag, lat, lon, ocorreu)  # a última versão gravada de cada evento
+        linhas = [dict(fonte_id=fonte_id, ext_id=e.ext_id, versao=e.versao, titulo=e.titulo, url=e.url,
+                       magnitude=e.magnitude, lat=e.lat, lon=e.lon, ocorreu_em=e.ocorreu_em, conhecido_em=conhecido_em,
+                       rodada_id=rodada_id) for e in unicos.values() if atual.get(e.ext_id) != visivel(e)]
+        db.inserir_ignorando_repetidos(c, db.evento_local, linhas, ["fonte_id", "ext_id", "versao"])
     return len(linhas)
 
 

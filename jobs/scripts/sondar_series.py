@@ -8,6 +8,7 @@ histórico têm e o formato bruto. Nada entra em fontes.py sem passar por aqui.
 
 Uso:  python scripts/sondar_series.py
 """
+import json
 import sys
 import time
 from datetime import date, datetime, timedelta, timezone
@@ -52,7 +53,6 @@ def sondar_candidatas(sessao, ua) -> None:
         for codigo in codigos:
             url = conectores.url_yahoo(f, codigo, date(2015, 1, 1), ate)
             try:
-                import json
                 bruto = conectores._baixar(sessao, url, ua)
                 meta = json.loads(bruto)["chart"]["result"][0]["meta"]
                 obs = conectores.interpretar_yahoo(bruto.replace(f'"symbol":"{meta["symbol"]}"', f'"symbol":"{codigo}"'),
@@ -62,8 +62,20 @@ def sondar_candidatas(sessao, ua) -> None:
                       f"{obs[0].data if obs else '-'} a {obs[-1].data if obs else '-'} = {obs[-1].valor if obs else '-'}")
             except Exception as exc:  # noqa: BLE001 - a sonda só relata
                 print(f"FALHOU {codigo}: {type(exc).__name__}: {str(exc)[:120]}")
+    print("== Terremotos (USGS, decisão 0014): resposta bruta e o que o leitor entende")
+    from stratum.connectors import eventos
+    usgs = next(x for x in fontes.FONTES if x["id"] == "usgs_terremotos")
+    try:
+        bruto = conectores._baixar(sessao, usgs["url"], ua)
+        dados = json.loads(bruto)
+        print(f"::group::Bruto do USGS [{usgs['url']}]\n" + json.dumps({**dados, "features": dados["features"][:2]})[:5000]
+              + "\n::endgroup::")
+        lidos = eventos.interpretar_usgs(bruto)
+        print(f"OK usgs_terremotos: {len(lidos)} terremotos; mais forte: "
+              f"{max(lidos, key=lambda e: e.magnitude or 0) if lidos else '-'}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"FALHOU usgs_terremotos: {type(exc).__name__}: {str(exc)[:160]}")
     print("== Contratos futuros: o Yahoo diz qual contrato vale? (troca de contrato, decisão 0013)")
-    import json
     for codigo in ["CL=F", "BZ=F", "NG=F", "TTF=F", "GC=F", "ZW=F", "CLX26.NYM", "CLZ26.NYM", "BZZ26.NYM", "BZF27.NYM"]:
         url = conectores.url_yahoo(f, codigo, date.today() - timedelta(days=8), ate)
         try:
@@ -72,7 +84,7 @@ def sondar_candidatas(sessao, ua) -> None:
             dias = [str(datetime.fromtimestamp(t, timezone.utc).date()) for t in r.get("timestamp") or []]
             print(f"{codigo}: chaves={sorted(meta)}")
             print(f"  nomes: short={meta.get('shortName')!r} long={meta.get('longName')!r} "
-                  f"expira={meta.get('expireDate')} contrato={meta.get('underlyingSymbol')}")
+                  f"tipo={meta.get('instrumentType')} contrato que o robô entende={conectores.contrato_futuro(meta)}")
             print(f"  preço {meta.get('regularMarketPrice')} em {meta.get('regularMarketTime')}; "
                   f"anterior {meta.get('chartPreviousClose')}/{meta.get('previousClose')}; "
                   f"fechamentos {list(zip(dias, q))[-4:]}")

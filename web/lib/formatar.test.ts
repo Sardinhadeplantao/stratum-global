@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie, estadoPonto, magnitude, donoFonte, linhaMinigrafico } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -95,4 +95,27 @@ test("mudança vem com a taxa-base", () => {
     "Alta fora do normal por dias seguidos, desde 15/10/2026. Nos 5 anos anteriores: 3 vezes.");
   assert.equal(textoMudanca({ tipo: "quebra_de_ritmo", sentido: "agitacao", desde: "2026-10-01", taxa_base: { vezes: 1, anos: 2.5 } }),
     "Agitação fora do normal, desde 01/10/2026. Nos 2,5 anos anteriores: 1 vez.");
+});
+
+test("ponto crítico: o estado vem do robô, com a explicação da regra", () => {
+  assert.equal(estadoPonto("critico").texto, "Crítico");
+  assert.equal(estadoPonto("em_pauta").classe, "estado-pauta");
+  assert.equal(estadoPonto(undefined).classe, "sem-dado");
+  assert.equal(magnitude(6.3), "M 6,3");
+  assert.equal(magnitude(null), "M ?");
+  assert.equal(leituraSerie("troca_de_contrato", null).classe, "sem-dado");
+});
+
+test("quem fala: dono e país da fonte, sem inventar quando falta a ficha", () => {
+  assert.equal(donoFonte("imprensa", "estatal", "Rússia"), "imprensa estatal · Rússia");
+  assert.equal(donoFonte("imprensa", "publico", "Reino Unido"), "imprensa pública · Reino Unido");
+  assert.equal(donoFonte("oficial", "estatal", "Estados Unidos"), "oficial · Estados Unidos");
+  assert.equal(donoFonte("oficial", "multilateral", null), "oficial multilateral");
+  assert.equal(donoFonte("imprensa", null, null), "imprensa");
+});
+
+test("minigráfico: do menor ao maior valor na altura; série parada fica no meio; um ponto só não desenha", () => {
+  assert.equal(linhaMinigrafico([1, 3, 2], 10, 4), "0.0,4.0 5.0,0.0 10.0,2.0");
+  assert.equal(linhaMinigrafico([5, 5], 10, 4), "0.0,2.0 10.0,2.0");
+  assert.equal(linhaMinigrafico([5], 10, 4), null);
 });

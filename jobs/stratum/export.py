@@ -6,12 +6,12 @@ from datetime import timedelta
 
 from sqlalchemy import func, or_, select
 
-from stratum import VERSAO, db, fontes as catalogo, historias, mercados, traducao
+from stratum import VERSAO, db, fontes as catalogo, historias, mapa, mercados, traducao
 from stratum.domain import historias as regra_historias
 from stratum.domain import paises
 
 VERSAO_FORMATO = 2
-ULTIMOS_DOCUMENTOS = 40
+ULTIMOS_DOCUMENTOS = 100  # a aba Notícias busca e filtra nestas (decisão 0014)
 RODADAS_RECENTES = 24
 
 # Citações de países: quantas notícias publicadas na janela citam cada país (regra em domain/paises.py)
@@ -88,6 +88,9 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             db.observacao.join(db.serie)).group_by(db.serie.c.fonte_id)).all())
         estado_mercados = mercados.montar(c, {f["id"]: f for f in fontes}, momento, catalogo.FONTES, catalogo.SERIES,
                                           copia=os.environ.get("STRATUM_CACHE_OBSERVACOES"))
+        eventos = mapa.terremotos(c, momento)
+        eventos_por_fonte = dict(c.execute(select(db.evento_local.c.fonte_id, func.count(func.distinct(db.evento_local.c.ext_id)))
+                                           .group_by(db.evento_local.c.fonte_id)).all())
 
     dicionario = paises.carregar()
     por_fonte = {f["id"]: f for f in fontes}
@@ -102,6 +105,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "titulo": pt or d["titulo"], "titulo_original": d["titulo"] if pt else None,  # decisão 0010
             "url": d["url"], "fonte": d["fonte_id"], "fonte_nome": f.get("nome", d["fonte_id"]),
             "fonte_tipo": f.get("tipo"), "fonte_pais": f.get("pais"), "fonte_pais_nome": dicionario.nome(f.get("pais")),
+            "fonte_controle": f.get("controle"),  # estatal | publico | privado | multilateral: quem é dono da fonte
             "publicado_em": _iso(d["publicado_em"]), "conhecido_em": _iso(d["conhecido_em"]),
             "paises": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in citados(d)],
         }
@@ -139,7 +143,12 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "documentos": total_por_fonte.get(f["id"], 0),
             "documentos_24h": dia_por_fonte.get(f["id"], 0),
             "observacoes": obs_por_fonte.get(f["id"], 0),  # fonte de dados (decisão 0011)
+            "eventos": eventos_por_fonte.get(f["id"], 0),  # terremotos (decisão 0014)
         })
+
+    series_por_id = {s["id"]: s for s in estado_mercados["series"]}
+    estado_pontos = mapa.pontos(contaveis, por_fonte, resumo_documento, series_por_id, dicionario)
+    ultimos_resumidos = [resumo_documento(d) for d in ultimos]
 
     todas_historias = historias.recentes(engine, momento, limite=None)
     lista_historias = todas_historias[:historias.MAX_HISTORIAS]
@@ -164,6 +173,9 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
         "historias": lista_historias,
         "traducao": estado_traducao,
         "mercados": estado_mercados,
+        "pontos": estado_pontos,          # pontos críticos e o contexto de cada um (decisão 0014)
+        "terremotos": eventos,
+        "faixa": mapa.faixa(ultimos_resumidos, estado_pontos, estado_mercados["series"], eventos),
         "contagem_historias": {"total": len(todas_historias),
                                "varias_vozes": sum(1 for h in todas_historias if h["vozes"] >= 2)},
         "regra_historias": {"versao": regra_historias.REGRA, "limiar": regra_historias.CONFIG["limiar"],
@@ -176,7 +188,7 @@ def montar(engine, agora=db.agora, agendador: dict | None = None, copia: dict | 
             "fontes_ok": len([f for f in lista_fontes if f["ativa"] and f["ultima_coleta"] and f["ultima_coleta"]["situacao"] == "ok"]),
         },
         "fontes": lista_fontes,
-        "ultimos_documentos": [resumo_documento(d) for d in ultimos],
+        "ultimos_documentos": ultimos_resumidos,
         "atencao": {
             "regra": dicionario.versao,
             "janela_horas": JANELA_HORAS,
@@ -241,7 +253,7 @@ def escrever_falha_banco(caminho: str, tipo_erro: str) -> None:
     _gravar_json(caminho, {
         "versao_formato": VERSAO_FORMATO, "versao_robo": VERSAO, "gerado_em": _iso(db.agora()),
         "avisar_atraso_apos": _iso(db.agora() + AVISAR_ATRASO_APOS), "banco": "erro",
-        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None,
+        "erro_banco": f"Não foi possível abrir o banco ({tipo_erro}).", "ultima_rodada": None, "agendador": None, "copia": None, "historias": [], "contagem_historias": None, "traducao": None, "mercados": None, "pontos": None, "terremotos": [], "faixa": [],
         "regra_historias": None,
         "rodadas_recentes": [],
         "totais": {"documentos": 0, "documentos_24h": 0, "fontes": 0, "fontes_ok": 0}, "fontes": [], "ultimos_documentos": [],

@@ -16,6 +16,8 @@ export type PaisCitado = { iso: string; nome: string };
 export type Documento = {
   titulo: string; titulo_original?: string | null; url: string | null; fonte: string; fonte_nome: string;
   fonte_tipo?: string | null; fonte_pais?: string | null;
+  /** Quem é dono da fonte (ficha, decisão 0008): estatal | publico | privado | multilateral */
+  fonte_controle?: string | null;
   fonte_pais_nome?: string | null; publicado_em: string | null; conhecido_em: string | null; paises?: PaisCitado[];
 };
 export type Atencao = {
@@ -50,7 +52,12 @@ export type Serie = {
   medida: string;
   /** moedas | juros | bolsas | commodities | cripto (decisão 0013) */
   grupo: string | null;
-  conhecido_em: string | null; situacao: "ok" | "nao_confere" | "parada" | "historico_curto" | "sem_dado"; data: string | null;
+  /** Só bolsas: americas | europa_africa | asia_pacifico (decisão 0014) */
+  regiao?: string | null;
+  /** Cotações dos últimos 30 dias, para o minigráfico (decisão 0014) */
+  mes?: number[];
+  conhecido_em: string | null; situacao: "ok" | "nao_confere" | "troca_de_contrato" | "parada" | "historico_curto" | "sem_dado";
+  data: string | null;
   /** Dia em andamento (decisão 0012): a oscilação do dia, ainda não fechada */
   parcial: boolean;
   /** É verdade? Cotação de mercado comparada com a conta pela fonte oficial (decisão 0012) */
@@ -62,6 +69,33 @@ export type Mercados = {
   regua: { versao: string; janela_anos: number; minimo: Record<string, number>; extremo: number; persistencia: number;
     ritmo_pontos: number; ritmo_extremo: number };
   validade_dias: Record<string, number>; confere_ate_pct: number; series: Serie[]; fora_do_normal: number; nao_conferem: number;
+  /** Ids das séries de cada país (moeda, juros, bolsa), para o painel do país */
+  por_pais?: Record<string, string[]>;
+  /** Quadros de destaque: lista fixa, escrita no robô (decisão 0014) */
+  destaques?: { id: string; rotulo: string }[];
+  /** Quantas sobem, caem ou ficam iguais no último dia (só leitura ok), com a proporção pronta */
+  amplitude?: Amplitude;
+};
+export type Contagem = { sobem: number; caem: number; estaveis: number };
+export type Amplitude = Contagem & { proporcao_sobem: number | null; por_grupo: Record<string, Contagem> };
+/** Resumo de uma série nos painéis (a leitura completa está em mercados.series). */
+export type MercadoResumo = Pick<Serie, "id" | "nome" | "unidade" | "medida" | "data" | "valor" | "variacao" | "percentil"
+  | "extremo" | "situacao" | "parcial" | "conhecido_em" | "mes">;
+/** Ponto crítico do mapa (decisão 0014): estado por regra, com o contexto e as fontes. */
+export type Ponto = {
+  id: string; nome: string; lon: number; lat: number; estado: "critico" | "em_pauta" | "sem_pauta";
+  noticias: number; vozes: number; com_acao: number;
+  margens: PaisCitado[]; fatos: { texto: string; periodo: string; fonte: string; url: string }[];
+  mercados: MercadoResumo[]; documentos: (Documento & { acao: boolean })[];
+};
+export type Terremoto = {
+  id: string; titulo: string; url: string | null; magnitude: number | null; lat: number; lon: number;
+  ocorreu_em: string | null; conhecido_em: string | null; fonte: string;
+};
+/** Item da faixa de baixo: o robô escolhe e ordena; o site só mostra. */
+export type ItemFaixa = {
+  tipo: "ponto" | "mercado" | "terremoto" | "noticia"; texto: string; id?: string; detalhe?: string; url?: string | null;
+  fonte?: string; quando?: string | null; variacao?: number | null; medida?: string; extremo?: string | null; parcial?: boolean;
 };
 export type Status = {
   versao_formato: number;
@@ -79,6 +113,9 @@ export type Status = {
   traducao?: { modelo: string; traduzidos: number; na_fila: number; por_rodada: number } | null;
   regra_historias?: { versao: string; limiar: number; janela_horas: number } | null;
   mercados?: Mercados | null;
+  pontos?: { regra: string; lista: Ponto[]; criticos: number; em_pauta: number } | null;
+  terremotos?: Terremoto[];
+  faixa?: ItemFaixa[];
   ultima_rodada: { id: number; iniciada_em: string | null; terminada_em: string | null; situacao: string } | null;
   rodadas_recentes: { iniciada_em: string | null; situacao: string }[];
   totais: { documentos: number; documentos_24h: number; fontes: number; fontes_ok: number };
@@ -91,7 +128,7 @@ export type Status = {
 };
 
 const VAZIO: Status = {
-  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, copia: null, historias: [], contagem_historias: null, traducao: null, regra_historias: null, mercados: null, banco: null, erro_banco: null, ultima_rodada: null,
+  versao_formato: 2, versao_robo: null, gerado_em: null, avisar_atraso_apos: null, agendador: null, copia: null, historias: [], contagem_historias: null, traducao: null, regra_historias: null, mercados: null, pontos: null, terremotos: [], faixa: [], banco: null, erro_banco: null, ultima_rodada: null,
   rodadas_recentes: [], totais: { documentos: 0, documentos_24h: 0, fontes: 0, fontes_ok: 0 }, fontes: [], ultimos_documentos: [],
   atencao: null, paises: {}, mais_citados: [], origem_fontes: [],
 };

@@ -26,6 +26,11 @@ def _encher(engine):
         c.execute(db.observacao.insert(), [  # data sem hora e número com muitas casas
             dict(serie_id="bce_brl", data=date(2026, 10, 16), valor=6.1234, rodada_id=rid, conhecido_em=agora),
             dict(serie_id="bce_brl", data=date(2026, 10, 16), valor=1 / 3, rodada_id=rid, conhecido_em=agora)])
+        c.execute(db.contrato_futuro.insert().values(serie_id="commodity_cl", data=date(2026, 10, 20), contrato="Dec 26",
+                                                     conhecido_em=agora))
+        c.execute(db.evento_local.insert().values(fonte_id="x", ext_id="us7000abcd", versao="1792500000000",
+                                                  titulo="M 4.9 - south of the Fiji Islands", url=None, magnitude=4.9,
+                                                  lat=-23.5, lon=179.1, ocorreu_em=agora, conhecido_em=agora))
         c.execute(db.resumo.insert().values(horario=agora, enviado_em=agora, situacao="enviado", texto="Resumo\ncom linha"))
 
 
@@ -36,7 +41,8 @@ def test_copia_so_as_tabelas_do_projeto():
     assert {t.name for t in copia.tabelas()} == {"fonte", "rodada", "coleta", "documento", "resumo",
                                                   "historia_documento",  # só ids, datas e a versão da regra
                                                   "traducao",            # títulos de notícia traduzidos
-                                                  "serie", "observacao"}  # câmbio oficial, dado público (decisão 0011)
+                                                  "serie", "observacao",  # câmbio oficial, dado público (decisão 0011)
+                                                  "contrato_futuro", "evento_local"}  # contratos e terremotos, públicos
     assert not {"secrets", "decrypted_secrets", "job", "job_run_details", "_http_response"} & set(db.md.tables)
 
 
@@ -172,7 +178,7 @@ def _copia_editada(engine, pasta, editar_manifesto=None, editar_linha=None, tira
 def test_copia_de_antes_de_uma_migracao_continua_restauravel(engine, tmp_path):
     # Uma cópia feita pelo código da versão 0001 do esquema: sem a tabela resumo (0002) e sem a ficha da fonte (0003)
     ficha = {"nivel", "controle", "controlador", "controlador_nome", "controlador_fonte"}
-    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo", "historia_documento", "traducao", "serie", "observacao"],
+    _copia_editada(engine, tmp_path / "velha", lambda m: m.update(migracao="0001"), tirar=["resumo", "historia_documento", "traducao", "serie", "observacao", "contrato_futuro", "evento_local"],
                    editar_linha=("fonte", lambda r: {k: v for k, v in r.items() if k not in ficha}))
     destino = db.conectar(f"sqlite:///{tmp_path / 'novo.db'}")
     contagens = copia.restaurar(tmp_path / "velha", destino)

@@ -11,5 +11,7 @@ estes arquivos.
   `tesouro_2026.csv` (Tesouro dos EUA), `bundesbank_10a.csv`, `boe_iudmnpy.csv` (Banco da Inglaterra),
   `japao_mes.csv` e `japao_historico.csv` (Ministério das Finanças do Japão; a nota do fim do arquivo do mês perdeu dois
   caracteres japoneses na cópia do log).
+- `usgs_4.5_day.geojson`: USGS, terremotos 4,5+ do dia, sonda de 21/10/2026 às 01:30 UTC (os 2 primeiros terremotos
+  que a sonda imprime; o resto da resposta ficou de fora).
 - `feed_rss.xml` e `feed_atom.xml`: feeds de exemplo, montados para testar casos difíceis (artigo repetido, âncora,
   link perigoso); não são notícias reais.
