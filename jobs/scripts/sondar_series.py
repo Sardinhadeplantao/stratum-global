@@ -84,7 +84,7 @@ def sondar_candidatas(sessao, ua) -> None:
             dias = [str(datetime.fromtimestamp(t, timezone.utc).date()) for t in r.get("timestamp") or []]
             print(f"{codigo}: chaves={sorted(meta)}")
             print(f"  nomes: short={meta.get('shortName')!r} long={meta.get('longName')!r} "
-                  f"expira={meta.get('expireDate')} contrato={meta.get('underlyingSymbol')}")
+                  f"tipo={meta.get('instrumentType')} contrato que o robô entende={conectores.contrato_futuro(meta)}")
             print(f"  preço {meta.get('regularMarketPrice')} em {meta.get('regularMarketTime')}; "
                   f"anterior {meta.get('chartPreviousClose')}/{meta.get('previousClose')}; "
                   f"fechamentos {list(zip(dias, q))[-4:]}")

@@ -69,6 +69,16 @@ def test_terremoto_revisado_vira_registro_novo_e_o_site_mostra_o_mais_recente(en
     assert any(i["tipo"] == "terremoto" for i in s["faixa"])  # 6 ou mais vai para a faixa de baixo
 
 
+def test_usgs_le_a_resposta_real():
+    # Trecho real do feed (sonda de 21/10/2026, os 2 primeiros terremotos da resposta)
+    from conftest import FIXTURES
+    fiji, paquistao = conectores.interpretar_usgs((FIXTURES / "usgs_4.5_day.geojson").read_text(encoding="utf-8"))
+    assert (fiji.ext_id, fiji.versao, fiji.magnitude) == ("us6000u3r3", "1792542098040", 4.9)
+    assert fiji.titulo == "M 4.9 - south of the Fiji Islands" and (fiji.lat, fiji.lon) == (-25.502, 179.592)
+    assert fiji.url == "https://earthquake.usgs.gov/earthquakes/eventpage/us6000u3r3"
+    assert paquistao.ocorreu_em == datetime(2026, 10, 20, 23, 16, 43, 934000)  # "time" em milissegundos, UTC
+
+
 @pytest.mark.parametrize("texto, motivo", [
     ("<html>erro</html>", "não é JSON"),
     ('{"type": "Feature"}', "não é uma coleção"),
