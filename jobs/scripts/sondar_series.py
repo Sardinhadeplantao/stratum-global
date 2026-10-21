@@ -3,6 +3,9 @@
 Roda no GitHub Actions (workflow sondar.yml), porque a máquina do Claude não alcança o BCE nem o FRED. O trecho
 bruto impresso vira a amostra real guardada em tests/fixtures (regra de fonte nova). Nada é gravado.
 
+Também sonda candidatas a série nova (fase 2: juros, bolsas, commodities e cripto): se respondem, quantos anos de
+histórico têm e o formato bruto. Nada entra em fontes.py sem passar por aqui.
+
 Uso:  python scripts/sondar_series.py
 """
 import sys
@@ -14,6 +17,66 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from stratum import config, fontes  # noqa: E402
 from stratum.connectors import rss, series as conectores  # noqa: E402
+
+
+# Candidatas no Yahoo (decisão 0012): índice principal da bolsa de cada membro do G20, commodities e cripto
+YAHOO = {
+    "bolsas": ["^GSPC", "^BVSP", "000001.SS", "^N225", "^NSEI", "^FTSE", "^GDAXI", "^FCHI", "FTSEMIB.MI", "^GSPTSE",
+               "^AXJO", "^KS11", "^MXX", "^JKSE", "XU100.IS", "^J203.JO", "^TASI.SR", "^MERV", "IMOEX.ME", "^STOXX50E"],
+    "commodities": ["BZ=F", "CL=F", "NG=F", "TTF=F", "GC=F", "SI=F", "HG=F", "ALI=F", "ZW=F", "ZC=F", "ZS=F"],
+    "cripto": ["BTC-USD", "ETH-USD"],
+    "juros": ["^TNX"],
+}
+# Candidatas oficiais de juros de 10 anos (plano da fase 2: Tesouro dos EUA, BCE, Bundesbank, Banco da Inglaterra, Japão)
+OFICIAIS = {
+    "tesouro_eua": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/"
+                   "{ano}/all?type=daily_treasury_yield_curve&field_tdr_date_value={ano}&page&_format=csv",
+    "bce_curva_aaa": "https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_10Y"
+                     "?startPeriod={inicio}&format=csvdata&detail=dataonly",
+    "bce_curva_todos": "https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_C.SV_C_YM.SR_10Y"
+                       "?startPeriod={inicio}&format=csvdata&detail=dataonly",
+    "bundesbank": "https://api.statistiken.bundesbank.de/rest/data/BBSIS/D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A"
+                  "?format=csv&lang=en&startPeriod={inicio}",
+    "boe": "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp?csv.x=yes&Datefrom={inicio_boe}"
+           "&Dateto=now&SeriesCodes=IUDMNPY&CSVF=TN&UsingCodes=Y&VPD=Y&VFD=N",
+    "japao_mes": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/jgbcme.csv",
+    "japao_historico": "https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/historical/jgbcme_all.csv",
+}
+
+
+def sondar_candidatas(sessao, ua) -> None:
+    f = {"url": "https://query1.finance.yahoo.com/v8/finance/chart/"}
+    ate = int(time.time()) + 86400
+    for grupo, codigos in YAHOO.items():
+        print(f"== Candidatas no Yahoo: {grupo}")
+        for codigo in codigos:
+            url = conectores.url_yahoo(f, codigo, date(2015, 1, 1), ate)
+            try:
+                import json
+                bruto = conectores._baixar(sessao, url, ua)
+                meta = json.loads(bruto)["chart"]["result"][0]["meta"]
+                obs = conectores.interpretar_yahoo(bruto.replace(f'"symbol":"{meta["symbol"]}"', f'"symbol":"{codigo}"'),
+                                                   codigo)
+                print(f"OK {codigo}: volta como {meta['symbol']}, {meta.get('longName') or meta.get('shortName')}, "
+                      f"{meta.get('currency')}, {meta.get('exchangeTimezoneName')}; {len(obs)} dias de "
+                      f"{obs[0].data if obs else '-'} a {obs[-1].data if obs else '-'} = {obs[-1].valor if obs else '-'}")
+            except Exception as exc:  # noqa: BLE001 - a sonda só relata
+                print(f"FALHOU {codigo}: {type(exc).__name__}: {str(exc)[:120]}")
+    hoje = date.today()
+    inicio = hoje - timedelta(days=12)
+    print("== Candidatas oficiais de juros de 10 anos")
+    for nome, modelo in OFICIAIS.items():
+        url = modelo.format(ano=hoje.year, inicio=inicio.isoformat(), inicio_boe=inicio.strftime("%d/%b/%Y"))
+        try:
+            r = sessao.get(url, headers={"User-Agent": ua}, timeout=60)
+            linhas = r.content.decode("utf-8-sig", errors="replace").splitlines()
+            print(f"::group::{nome}: HTTP {r.status_code}, {len(linhas)} linhas [{url}]")
+            print("\n".join(l[:400] for l in linhas[:6]))
+            if len(linhas) > 9:
+                print("...\n" + "\n".join(l[:400] for l in linhas[-3:]))
+            print("::endgroup::")
+        except Exception as exc:  # noqa: BLE001
+            print(f"FALHOU {nome}: {type(exc).__name__}: {str(exc)[:120]}  [{url}]")
 
 
 def main() -> None:
@@ -49,3 +112,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    sondar_candidatas(rss.nova_sessao(), config.ler().user_agent)
