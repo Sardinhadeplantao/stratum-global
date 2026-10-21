@@ -65,17 +65,18 @@ def gravar(engine, series: list[dict], observacoes, rodada_id: int, conhecido_em
 
 def trocas_de_contrato(c, ate: datetime) -> dict[str, set[date]]:
     """Por série, os dias em que o contrato futuro mudou em relação ao dia anterior com contrato conhecido, com o que
-    o sistema sabia em `ate`. Dia sem contrato conhecido não marca troca (não dá para saber)."""
-    por_serie: dict[str, dict[date, str]] = {}
-    for sid, d, contrato in c.execute(select(db.contrato_futuro.c.serie_id, db.contrato_futuro.c.data,
-                                             db.contrato_futuro.c.contrato)
-                                      .where(db.contrato_futuro.c.conhecido_em <= ate)
-                                      .order_by(db.contrato_futuro.c.conhecido_em)):
-        por_serie.setdefault(sid, {})[d] = contrato  # o último registro de cada dia vale
-    trocas = {}
-    for sid, dias in por_serie.items():
-        ordenados = sorted(dias.items())
-        trocas[sid] = {d for (_, antes), (d, agora) in zip(ordenados, ordenados[1:]) if agora != antes}
+    o sistema sabia em `ate`. Dia sem contrato conhecido não marca troca (não dá para saber).
+
+    A conta é feita no banco e só os dias da troca voltam (uns 100 por ano): ler a tabela inteira a cada rodada
+    cresceria sem parar e gastaria a cota de tráfego do Supabase gratuito (revisão de 21/10)."""
+    t = db.contrato_futuro.c
+    ultimo = select(t.serie_id, t.data, t.contrato, func.row_number().over(  # o último registro de cada dia vale
+        partition_by=(t.serie_id, t.data), order_by=t.conhecido_em.desc()).label("n")).where(t.conhecido_em <= ate).subquery()
+    dia = select(ultimo.c.serie_id, ultimo.c.data, ultimo.c.contrato, func.lag(ultimo.c.contrato).over(
+        partition_by=ultimo.c.serie_id, order_by=ultimo.c.data).label("antes")).where(ultimo.c.n == 1).subquery()
+    trocas: dict[str, set[date]] = {}
+    for sid, d in c.execute(select(dia.c.serie_id, dia.c.data).where(dia.c.antes.is_not(None), dia.c.antes != dia.c.contrato)):
+        trocas.setdefault(sid, set()).add(d)
     return trocas
 
 

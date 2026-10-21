@@ -131,17 +131,24 @@ def _gravar(engine, fonte_id: str, itens, rodada_id: int, conhecido_em) -> int:
 
 
 def _gravar_eventos(engine, fonte_id: str, eventos, rodada_id: int, conhecido_em) -> int:
-    """Cada versão de cada evento entra uma vez (regra 2: revisão da fonte vira registro novo). Devolve as novas."""
-    unicos = {(e.ext_id, e.versao): e for e in eventos}
+    """Revisão da fonte vira registro novo (regra 2), mas só quando muda o que se vê: título, magnitude, local ou hora.
+    O USGS muda a data de atualização sem mudar nada disso (revisão de 21/10); gravar cada uma encheria o banco à toa.
+    Devolve quantas versões entraram."""
+    unicos = {e.ext_id: e for e in eventos}  # na mesma leitura, vale a última versão de cada evento
     if not unicos:
         return 0
+    def visivel(e):
+        return (e.titulo, e.magnitude, e.lat, e.lon, e.ocorreu_em)
     with engine.begin() as c:
         t = db.evento_local.c
-        existentes = set(c.execute(select(t.ext_id, t.versao).where(
-            t.fonte_id == fonte_id, t.ext_id.in_([k[0] for k in unicos]))).all())
+        atual = {}
+        for ext_id, titulo, mag, lat, lon, ocorreu in c.execute(
+                select(t.ext_id, t.titulo, t.magnitude, t.lat, t.lon, t.ocorreu_em)
+                .where(t.fonte_id == fonte_id, t.ext_id.in_(list(unicos))).order_by(t.id)):
+            atual[ext_id] = (titulo, mag, lat, lon, ocorreu)  # a última versão gravada de cada evento
         linhas = [dict(fonte_id=fonte_id, ext_id=e.ext_id, versao=e.versao, titulo=e.titulo, url=e.url,
                        magnitude=e.magnitude, lat=e.lat, lon=e.lon, ocorreu_em=e.ocorreu_em, conhecido_em=conhecido_em,
-                       rodada_id=rodada_id) for k, e in unicos.items() if k not in existentes]
+                       rodada_id=rodada_id) for e in unicos.values() if atual.get(e.ext_id) != visivel(e)]
         db.inserir_ignorando_repetidos(c, db.evento_local, linhas, ["fonte_id", "ext_id", "versao"])
     return len(linhas)
 

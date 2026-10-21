@@ -281,6 +281,28 @@ def test_status_traz_o_ultimo_mes_quem_sobe_e_quem_cai_e_os_destaques(engine, cf
     assert m["destaques"] == [{"id": "yahoo_brl", "rotulo": mercados.DESTAQUES["yahoo_brl"]}]  # só os da lista que existem
 
 
+def test_trocas_de_contrato_so_os_dias_da_troca(engine):
+    # O banco devolve só os dias da troca (revisão de 21/10: ler a tabela inteira a cada rodada cresceria sem parar)
+    from stratum import mercados
+    commodities = next(f for f in catalogo.FONTES if f["id"] == "yahoo_commodities")
+    wti = next(s for s in catalogo.SERIES if s["id"] == "commodity_cl")
+    t0 = datetime(2026, 10, 20, 12)
+    with engine.begin() as c:
+        db.gravar_fontes(c, [commodities])
+        db.gravar_series(c, [wti])
+        c.execute(db.contrato_futuro.insert(), [
+            dict(serie_id="commodity_cl", data=d, contrato=k, conhecido_em=t) for d, k, t in [
+                (date(2026, 10, 15), "Nov 26", t0), (date(2026, 10, 16), "Nov 26", t0),
+                (date(2026, 10, 19), "Dec 26", t0),                                        # troca
+                (date(2026, 10, 20), "Dec 26", t0), (date(2026, 10, 20), "Jan 27", t0 + timedelta(hours=1))]])
+    with engine.connect() as c:
+        # no mesmo dia vale o último contrato conhecido; antes dele, o sistema não sabia da segunda troca
+        assert mercados.trocas_de_contrato(c, t0 + timedelta(hours=2)) == {
+            "commodity_cl": {date(2026, 10, 19), date(2026, 10, 20)}}
+        assert mercados.trocas_de_contrato(c, t0 + timedelta(minutes=30)) == {"commodity_cl": {date(2026, 10, 19)}}
+        assert mercados.trocas_de_contrato(c, t0 - timedelta(minutes=1)) == {}
+
+
 def test_toda_bolsa_tem_regiao():
     bolsas = [s for s in catalogo.SERIES if s["grupo"] == "bolsas"]
     assert all(s.get("regiao") in catalogo.REGIOES for s in bolsas)

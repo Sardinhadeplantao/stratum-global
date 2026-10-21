@@ -59,9 +59,12 @@ def test_terremoto_revisado_vira_registro_novo_e_o_site_mostra_o_mais_recente(en
     primeira = [_evento("us1", "100", 6.1), _evento("us2", "100", 4.6, horas_atras=30)]  # us2: fora das 24 h
     r1 = robo.rodar(engine, [USGS], None, cfg, agora=relogio, conectores_eventos={"usgs": lambda *_: primeira})
     r2 = robo.rodar(engine, [USGS], None, cfg, agora=relogio, conectores_eventos={"usgs": lambda *_: primeira})
+    # O USGS muda a data de atualização sem mudar nada que se vê (revisão de 21/10): não é registro novo
+    so_data = robo.rodar(engine, [USGS], None, cfg, agora=relogio,
+                         conectores_eventos={"usgs": lambda *_: [_evento("us1", "150", 6.1)]})
     r3 = robo.rodar(engine, [USGS], None, cfg, agora=relogio,
                     conectores_eventos={"usgs": lambda *_: [_evento("us1", "200", 6.3)]})
-    assert (r1.novos, r2.novos, r3.novos) == (2, 0, 1)
+    assert (r1.novos, r2.novos, so_data.novos, r3.novos) == (2, 0, 0, 1)
     with engine.connect() as c:
         assert len(c.execute(db.evento_local.select()).all()) == 3  # a versão antiga fica (regra 2)
     s = export.montar(engine, agora=lambda: AGORA)
