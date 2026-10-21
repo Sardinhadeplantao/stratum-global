@@ -70,8 +70,12 @@ def interpretar_bce(texto: str) -> list[Observacao]:
 
 
 def ler_bce(fonte: dict, series: list[dict], session, user_agent: str, desde: date) -> list[Observacao]:
-    """Uma chamada só para todas as moedas."""
-    return interpretar_bce(_baixar(session, url_bce(fonte, [s["codigo"] for s in series], desde), user_agent))
+    """Uma chamada por moeda: na primeira rodada da produção (21/10), as 13 moedas de 11 anos num pedido só passaram
+    de 60 segundos e o BCE não respondeu a tempo."""
+    saida = []
+    for s in series:
+        saida += interpretar_bce(_baixar(session, url_bce(fonte, [s["codigo"]], desde), user_agent))
+    return saida
 
 
 # FRED: um arquivo CSV por série (fredgraph.csv, sem chave)
