@@ -78,12 +78,15 @@ class Medidor:
                          "extremo": extremo if situacao == "ok" else None, "situacao": situacao,
                          "parcial": bool(e_o_ultimo and ultimo.get("parcial"))})
         desde = None
-        if base and i < len(pts):
+        # Troca de contrato futuro entre a base e o último valor: os preços são de contratos diferentes e a conta
+        # mediria o salto da troca, não o mercado
+        troca = bool(base and i < len(pts) and any(base[0] < d <= pts[-1][0] for d in trocas))
+        if base and i < len(pts) and not troca:
             medidas = regua.MEDIDAS[medida]([base, pts[-1]])
             desde = _r(medidas[0][1], 2) if medidas else None
         return {"base": {"data": base[0].isoformat(), "valor": base[1]} if base else None, "dias": dias,
                 "extremo": next((x["extremo"] for x in dias if x["extremo"]), None),
-                "desde": desde, "ate": pts[-1][0].isoformat() if i < len(pts) else None,
+                "desde": desde, "troca_de_contrato": troca, "ate": pts[-1][0].isoformat() if i < len(pts) else None,
                 # o último valor é o do dia em andamento: o "desde o evento" ainda muda
                 "parcial": bool(i < len(pts) and ultimo.get("parcial") and ultimo.get("data") == pts[-1][0])}
 

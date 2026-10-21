@@ -34,7 +34,8 @@ def _reacao(r: dict | None, recuo: str) -> None:
         dias = ", ".join(f"{d['data']} {_n(d['variacao'], sinal=True)}{unidade} p{_n(d['percentil'], 0)}"
                          f"{' parcial' if d.get('parcial') else ''}{' FORA' if d['extremo'] else ''}" for d in a["dias"])
         print(f"{recuo}  {a['simbolo']} (por {a['por']['nome']}): base {(a['base'] or {}).get('data')} · "
-              f"desde o evento {_n(a['desde'], sinal=True)}{unidade} · {dias or 'sem pregão'}")
+              f"desde o evento {'(troca de contrato)' if a.get('troca_de_contrato') else _n(a['desde'], sinal=True) + unidade} · "
+              f"{dias or 'sem pregão'}")
 
 
 def main(caminho: str) -> int:

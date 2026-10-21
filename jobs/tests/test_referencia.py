@@ -421,3 +421,17 @@ def test_ativos_ligados_por_lista_escrita():
                                        "yahoo_dxynyb", "bolsa_gspc", "juros_usa_10a", "yahoo_brl", "bolsa_bvsp"]
     assert ligados[0][1] == {"tipo": "ponto", "id": "ormuz", "nome": "Estreito de Ormuz"}
     assert reacao.ligados([{"iso": "KEN", "nome": "Quênia"}], [], catalogo.SERIES) == []
+
+
+def test_reacao_nao_mede_desde_o_evento_por_cima_da_troca_de_contrato():
+    # WTI de 20/10/2026: o contrato de novembro (103,66) virou o de dezembro (98,47). "Desde o evento" compararia
+    # contratos diferentes: fica sem número, e o dia da troca fica fora da régua
+    from stratum.domain import reacao
+    pontos = _serie(1300, escala=1.0, semente=9)
+    vespera = pontos[-1][0]
+    dia = _pregao_seguinte(vespera)
+    pontos[-1] = (vespera, 103.66)
+    pontos.append((dia, 98.47))
+    r = reacao.Medidor({"wti": {"pts": pontos, "medida": "variacao_pct", "trocas": {dia}}}).ativo("wti", dia)
+    assert r["desde"] is None and r["troca_de_contrato"]
+    assert r["dias"][0]["situacao"] == "troca_de_contrato" and r["extremo"] is None

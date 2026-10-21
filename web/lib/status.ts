@@ -60,6 +60,8 @@ export type AtivoReacao = {
   por: { tipo: "ponto" | "pais"; id: string; nome: string };
   base: { data: string; valor: number } | null; dias: DiaReacao[]; extremo: "alta" | "baixa" | null;
   desde: number | null; ate: string | null; parcial: boolean;
+  /** Troca de contrato futuro entre a base e o último valor: sem "desde o evento" (contratos diferentes) */
+  troca_de_contrato?: boolean;
 };
 export type Reacao = {
   regra: string; inicio: string; dia: string; situacao: "fora_do_normal" | "normal" | "aguardando" | "sem_ativo";

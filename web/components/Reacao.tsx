@@ -41,8 +41,9 @@ export default function Reacao({ r, compacta = false }: { r: TipoReacao | null |
                     </span>
                   ))}
                 </span>
-                <span className="ra-desde numero" title={a.base ? `Do fechamento de ${dia(a.base.data)} até o último valor${a.parcial ? " (dia em andamento)" : ""}` : "Sem fechamento antes do evento"}>
-                  {variacaoSerie(a.desde, a.medida)}
+                <span className="ra-desde numero" title={a.troca_de_contrato ? "Troca de contrato futuro no período: os preços são de contratos diferentes"
+                  : a.base ? `Do fechamento de ${dia(a.base.data)} até o último valor${a.parcial ? " (dia em andamento)" : ""}` : "Sem fechamento antes do evento"}>
+                  {a.troca_de_contrato ? <small className="discreto">troca de contrato</small> : variacaoSerie(a.desde, a.medida)}
                 </span>
               </li>
             ))}
