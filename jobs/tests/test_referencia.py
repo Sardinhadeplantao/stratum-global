@@ -435,3 +435,42 @@ def test_reacao_nao_mede_desde_o_evento_por_cima_da_troca_de_contrato():
     r = reacao.Medidor({"wti": {"pts": pontos, "medida": "variacao_pct", "trocas": {dia}}}).ativo("wti", dia)
     assert r["desde"] is None and r["troca_de_contrato"]
     assert r["dias"][0]["situacao"] == "troca_de_contrato" and r["extremo"] is None
+
+
+# Navios nos estreitos (decisão 0018): a mesma régua, com a média de 7 dias como medida de contagem
+
+def _contagem(dias, media, semente=3, inicio=None):
+    """Navios por dia, todos os dias (o PortWatch conta fim de semana), em torno de `media`."""
+    import random
+    from datetime import date
+    rnd, d = random.Random(semente), inicio or date(2019, 1, 1)
+    saida = []
+    for _ in range(dias):
+        saida.append((d, float(max(0, round(rnd.gauss(media, media * 0.15))))))
+        d += timedelta(days=1)
+    return saida
+
+
+def test_navios_comparados_pela_media_de_7_dias_contra_o_proprio_historico():
+    # Ormuz em outubro de 2026: de 0 a 8 navios por dia (sonda de 21/10), quando o normal eram ~100.
+    # Contagem não tem variação de um dia para o outro que sirva (de 0 para 4 não é +400%): vale o nível da semana.
+    from stratum.domain import regua
+    pontos = _contagem(2000, 100)
+    ultimo = pontos[-1][0]
+    pontos += [(ultimo + timedelta(days=i + 1), float(v)) for i, v in enumerate([4, 0, 7, 2, 3, 7, 3])]
+    lido = regua.ler(pontos, medida="media_7d")
+    assert lido.situacao == "ok" and abs(lido.medida - 26 / 7) < 1e-9  # a média dos 7 dias da sonda
+    assert lido.extremo == "baixa" and lido.faixa[0] > 50
+    normal = regua.ler(_contagem(2000, 100), medida="media_7d")
+    assert normal.extremo is None
+
+
+def test_todo_ponto_critico_tem_o_estreito_do_portwatch():
+    from stratum import fontes as catalogo
+    from stratum.domain import pontos
+    assert all(p.get("portwatch", "").startswith("chokepoint") for p in pontos.PONTOS)
+    navios = [s for s in catalogo.SERIES if s["grupo"] == "navios"]
+    assert len(navios) == 2 * len(pontos.PONTOS)
+    assert all(s["fonte"] == "portwatch" and s["medida"] == "media_7d" for s in navios)
+    ormuz = {s["id"]: s["codigo"] for s in navios if s["id"].endswith("_ormuz")}
+    assert ormuz == {"navios_ormuz": "chokepoint6:n_total", "petroleiros_ormuz": "chokepoint6:n_tanker"}

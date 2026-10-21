@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacaoSerie, GRUPOS_SERIES } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, media, numero, percentualInteiro, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacaoSerie, GRUPOS_SERIES } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 import Titulo from "@/components/Titulo";
 
@@ -158,7 +158,8 @@ export default function Metodo() {
           <dl className="resumo">
             <dt>Versão</dt><dd>{m.regua.versao}</dd>
             <dt>Medida</dt><dd>Preço (moeda, bolsa, commodity, cripto): variação em % desde a cotação anterior. Juros: diferença em
-              pontos percentuais (p.p.). Fim de semana e feriado não contam</dd>
+              pontos percentuais (p.p.). Fim de semana e feriado não contam. Contagem (navios por dia): a média dos últimos{" "}
+              {m.regua.media_dias ?? 7} dias, comparada com as médias de 7 dias do histórico (decisão 0018)</dd>
             <dt>Histórico</dt><dd>As variações dos {m.regua.janela_anos} anos anteriores, sem o próprio dia e sem nada depois dele</dd>
             <dt>Fora do normal</dt><dd>Percentil até {m.regua.extremo} (queda) ou a partir de {100 - m.regua.extremo} (alta)</dd>
             <dt>Mínimo</dt><dd>{numero(m.regua.minimo.diaria)} cotações no histórico; abaixo disso, &quot;histórico curto&quot;, sem leitura</dd>
@@ -253,6 +254,49 @@ export default function Metodo() {
           <li><b>Movimento dentro do dia não é medido:</b> as séries são diárias. País sem série acompanhada fica sem ativo
             ligado.</li>
         </ul>
+      </section>
+
+      <section id="navios">
+        <h2>Navios nos estreitos</h2>
+        <p>
+          Em cada ponto crítico, quantos navios passaram por dia, de todos os tipos e só petroleiros, pela base pública{" "}
+          <a href="https://portwatch.imf.org/" target="_blank" rel="noreferrer">PortWatch</a> do FMI com a Universidade de Oxford
+          (decisão 0018). A média dos últimos 7 dias passa pela régua acima e é comparada com a mesma média um ano antes.
+        </p>
+        <ul className="regras">
+          <li><b>Conta pelo sinal dos navios.</b> O PortWatch conta os navios pelo sinal (AIS) que eles transmitem. Navio com o
+            sinal desligado não aparece; perto de Ormuz, o EIA avisa que esses sinais ficaram pouco confiáveis desde o fim de
+            fevereiro de 2026.</li>
+          <li><b>Chega com atraso.</b> A base é atualizada uma vez por semana: o último dia medido aparece ao lado do número.
+            Passou de 12 dias, a leitura fica cinza.</li>
+          <li><b>Queda longa vira histórico.</b> Um nível baixo que dura meses entra aos poucos nos 5 anos da régua e deixa de
+            ser &quot;fora do normal&quot;. A comparação com um ano antes continua mostrando a diferença.</li>
+          <li><b>Cobertura.</b> Nos estreitos turcos, só o Bósforo; nos dinamarqueses, só o Øresund; em Suez, só o canal (o
+            oleoduto SUMED não aparece).</li>
+        </ul>
+        {(s.pontos?.lista ?? []).some((p) => (p.navios ?? []).length > 0) ? (
+          <div className="tabela-rolagem">
+            <table>
+              <thead>
+                <tr><th>Ponto</th><th>Série</th><th className="numero">Média de 7 dias</th><th className="numero">Um ano antes</th>
+                  <th>Até</th><th>Leitura</th></tr>
+              </thead>
+              <tbody>
+                {(s.pontos?.lista ?? []).flatMap((p) => (p.navios ?? []).map((n) => {
+                  const l = leituraSerie(n.situacao, n.extremo);
+                  return (
+                    <tr key={n.id}>
+                      <td>{p.nome}</td><td>{n.simbolo}</td><td className="numero">{media(n.media_7d)}</td>
+                      <td className="numero">{media(n.um_ano_antes)} ({percentualInteiro(n.contra_um_ano)})</td>
+                      <td>{dia(n.data)}</td>
+                      <td><span className={`ponto ${l.classe}`} aria-hidden /> {l.texto}</td>
+                    </tr>
+                  );
+                }))}
+              </tbody>
+            </table>
+          </div>
+        ) : <p className="sem-dado-texto">Sem dado do PortWatch nesta atualização.</p>}
       </section>
 
       <section>
@@ -414,7 +458,8 @@ export default function Metodo() {
           <li>Redes sociais (X e outras): ainda não são lidas. Quando entrarem, serão pista, nunca fato.</li>
           <li>Mercados: juro de 10 anos do Brasil (não há série oficial diária e gratuita num arquivo simples) e
             movimento dentro do dia.</li>
-          <li>Comércio, navios nos estreitos, sanções e conflito como séries: fase 4.</li>
+          <li>Comércio, sanções e conflito como séries: fase 4. Navios com o sinal (AIS) desligado não entram na conta do
+            PortWatch.</li>
           <li>Cadeias, exposição e hipóteses: fase 5.</li>
         </ul>
       </section>

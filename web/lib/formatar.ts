@@ -113,6 +113,16 @@ export function valor(n: number | null | undefined): string {
   return n === null || n === undefined ? "—" : n.toLocaleString("pt-BR", { maximumFractionDigits: 4 });
 }
 
+/** Contagem média (navios por dia, decisão 0018): uma casa decimal, "3,7". */
+export function media(n: number | null | undefined): string {
+  return n === null || n === undefined ? "—" : n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+}
+
+/** Diferença inteira já calculada pelo robô: "-96%". */
+export function percentualInteiro(n: number | null | undefined): string {
+  return n === null || n === undefined ? "—" : `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}%`;
+}
+
 /** Variação já calculada pelo robô: "+0,45%". */
 export function variacao(n: number | null | undefined): string {
   if (n === null || n === undefined) return "—";

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie, estadoPonto, magnitude, donoFonte, linhaMinigrafico, situacaoReacao, textoTaxaBase } from "./formatar.ts";
+import { classeAgendador, classeCopia, continente, controleFonte, dataHora, datasDocumento, dia, diaHora, faixas, hora, leituraSerie, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacao, variacaoSerie, estadoPonto, magnitude, donoFonte, linhaMinigrafico, situacaoReacao, textoTaxaBase, media, percentualInteiro } from "./formatar.ts";
 
 test("datas em horário de Brasília", () => {
   assert.equal(dataHora("2026-10-16T10:30:00Z"), "16/10/2026, 07:30");
@@ -128,4 +128,12 @@ test("reação do mercado: cor só para estado medido e a taxa-base em texto (de
     "Num período qualquer de 2 pregões, este ativo sai do normal em 22% das vezes (últimos 5 anos).");
   assert.match(textoTaxaBase({ pct: 49, dias: 2, anos: 5 }, 3), /pelo menos um destes 3 ativos sai do normal em 49%/);
   assert.match(textoTaxaBase(null, 2), /Sem histórico/);
+});
+
+test("navios por dia: média com uma casa e diferença inteira (decisão 0018)", () => {
+  assert.equal(media(3.7), "3,7");
+  assert.equal(media(104), "104,0");
+  assert.equal(media(null), "—");
+  assert.equal(percentualInteiro(-96), "-96%");
+  assert.equal(percentualInteiro(12), "+12%");
 });

@@ -15,6 +15,8 @@ Ficha de cada fonte (decisão 0008):
 
 import re
 
+from stratum.domain.pontos import PONTOS
+
 _FR = "https://www.federalregister.gov/api/v1/documents.rss?order=newest&conditions%5Bagencies%5D%5B%5D="
 _CRITERIO_IMPRENSA = "Veículo com feed público, publicando do próprio país; a lista cobre blocos diferentes para comparar versões."
 _CRITERIO_CHANCELARIA = ("Chancelaria (ou o órgão equivalente de um bloco) com feed público: posição oficial sobre política "
@@ -110,6 +112,17 @@ FONTES: list[dict] = [
          nivel=1, controle="estatal", controlador="estado:USA",
          controlador_nome="Governo federal dos EUA (U.S. Geological Survey, Departamento do Interior)",
          controlador_fonte="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php ; https://www.usgs.gov/about/about-us"),
+    # Navios por dia nos estreitos (decisão 0018)
+    dict(id="portwatch", nome="FMI PortWatch: navios por dia nos estreitos", tipo="dados", pais=None, idioma="en",
+         conector="portwatch",
+         url="https://services9.arcgis.com/weJ1QsnbMYJlCHdG/arcgis/rest/services/Daily_Chokepoints_Data/FeatureServer",
+         a_cada_horas=24, validade_dias=12,
+         criterio="Navios por dia nos estreitos dos pontos críticos, contados pelo sinal AIS que os navios transmitem "
+                  "(base pública do FMI com a Universidade de Oxford, sem chave, atualizada uma vez por semana). Navio "
+                  "com o sinal desligado não entra na conta. Reuso permitido citando \"FMI, PortWatch\".",
+         nivel=2, controle="multilateral", controlador="org:FMI",
+         controlador_nome="Fundo Monetário Internacional (FMI), com a Universidade de Oxford",
+         controlador_fonte="https://portwatch.imf.org/ ; https://www.imf.org/en/about/copyright-and-terms"),
     # Juros de 10 anos, oficiais (decisão 0013)
     dict(id="tesouro_eua", nome="Tesouro dos EUA: curva de juros diária", tipo="dados", pais="USA", idioma="en",
          conector="tesouro", url="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/",
@@ -297,6 +310,14 @@ SERIES: list[dict] = [
 ]
 
 
+# Navios por dia em cada ponto crítico (decisão 0018): todos os tipos e só os petroleiros, pela média de 7 dias
+for _p in PONTOS:
+    for _campo, _quem, _simb in (("n_total", "navios", "Navios"), ("n_tanker", "petroleiros", "Petroleiros")):
+        SERIES.append(dict(id=f"{_quem}_{_p['id']}", fonte="portwatch", codigo=f"{_p['portwatch']}:{_campo}",
+                           nome=f"{_p['nome']}: {_quem} por dia", unidade=f"{_quem} por dia", pais=None, grupo="navios",
+                           frequencia="diaria", medida="media_7d", simbolo=_simb, ponto=_p["id"]))
+
+
 def ativas(fontes: list[dict] = FONTES) -> list[dict]:
     return [f for f in fontes if f.get("ativa", True)]
 
@@ -331,4 +352,5 @@ def _simbolo(s: dict) -> str:
 
 
 for _s in SERIES:
-    _s.setdefault("simbolo", _simbolo(_s))
+    if "simbolo" not in _s:
+        _s["simbolo"] = _simbolo(_s)

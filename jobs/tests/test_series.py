@@ -498,3 +498,41 @@ def test_mesma_data_duas_vezes_na_mesma_leitura_entra_uma_vez(engine):
     dupla = [Observacao("BRL", date(2026, 9, 30), 6.1), Observacao("BRL", date(2026, 9, 30), 6.2)]
     assert mercados.gravar(engine, [BRL], dupla, None, datetime(2026, 10, 1)) == 1
     assert mercados.gravar(engine, [BRL], dupla, None, datetime(2026, 10, 1, 1)) == 0  # e não volta a cada leitura
+
+
+# Navios nos estreitos (decisão 0018): PortWatch, do FMI
+
+def test_portwatch_le_a_resposta_real():
+    # Ormuz, de 29/9 a 18/10/2026, como a sonda de 21/10 trouxe (tests/fixtures/portwatch_ormuz.json)
+    texto = (FIXTURES / "portwatch_ormuz.json").read_text(encoding="utf-8")
+    obs, mais = conectores.interpretar_portwatch(texto)
+    assert len(obs) == 40 and not mais
+    por = {(o.codigo, o.data): o.valor for o in obs}
+    assert por[("chokepoint6:n_total", date(2026, 10, 18))] == 4.0
+    assert por[("chokepoint6:n_tanker", date(2026, 10, 18))] == 2.0
+    assert por[("chokepoint6:n_total", date(2026, 10, 17))] == 0.0  # dia sem navio é zero, não falta de dado
+
+
+@pytest.mark.parametrize("texto", ['{"error": {"code": 400, "message": "Invalid query"}}', '{"campos": []}',
+                                   '{"features": [{"attributes": {"date": "18/10/2026", "portid": "chokepoint6"}}]}'])
+def test_portwatch_resposta_inesperada_e_erro(texto):
+    with pytest.raises(ValueError):
+        conectores.interpretar_portwatch(texto)
+
+
+def test_portwatch_pede_as_paginas_ate_acabar():
+    import json as _json
+    linha = {"date": "2026-10-18", "portid": "chokepoint6", "n_total": 4, "n_tanker": 2}
+    paginas = [{"features": [{"attributes": linha}], "exceededTransferLimit": True}, {"features": [{"attributes": linha}]}]
+    pedidos = []
+
+    class Sessao:
+        def get(self, url, headers=None, timeout=None):
+            pedidos.append(url)
+            return Resposta(_json.dumps(paginas[len(pedidos) - 1]).encode())
+
+    f = next(x for x in catalogo.FONTES if x["id"] == "portwatch")
+    series = [s for s in catalogo.SERIES if s["id"] == "navios_ormuz"]
+    obs = conectores.ler_portwatch(f, series, Sessao(), "ua", date(2026, 9, 20))
+    assert len(pedidos) == 2 and "resultOffset=1000" in pedidos[1] and "chokepoint6" in pedidos[0]
+    assert [o.codigo for o in obs] == ["chokepoint6:n_total"] * 2  # só a série pedida

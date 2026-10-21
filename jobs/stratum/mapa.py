@@ -29,9 +29,11 @@ def terremotos(c, momento) -> list[dict]:
     return sorted(saida, key=lambda e: (-(e["magnitude"] or 0), e["ocorreu_em"] or ""))
 
 
-def pontos(contaveis: list[dict], por_fonte: dict, resumo_documento, series: dict[str, dict], dicionario) -> dict:
-    """Estado de cada ponto (regra em domain/pontos.py), com o contexto: fatos com fonte, margens, mercados ligados e
-    as notícias que o citam (das mais recentes). `contaveis`: notícias da janela, sem rede social."""
+def pontos(contaveis: list[dict], por_fonte: dict, resumo_documento, series: dict[str, dict], dicionario,
+           navios: dict[str, list[dict]] | None = None) -> dict:
+    """Estado de cada ponto (regra em domain/pontos.py), com o contexto: fatos com fonte, margens, mercados ligados,
+    navios por dia (decisão 0018) e as notícias que o citam (das mais recentes). `contaveis`: notícias da janela, sem
+    rede social."""
     noticias = [{"titulo": d["titulo"], "resumo": d["resumo"],
                  "controlador": (por_fonte.get(d["fonte_id"]) or {}).get("controlador") or d["fonte_id"]}
                 for d in contaveis]
@@ -45,6 +47,7 @@ def pontos(contaveis: list[dict], por_fonte: dict, resumo_documento, series: dic
             "margens": [{"iso": iso, "nome": dicionario.nome(iso) or iso} for iso in p["margens"]],
             "fatos": p["fatos"],
             "mercados": [_mercado(series[sid]) for sid in p["mercados"] if sid in series],
+            "navios": (navios or {}).get(p["id"], []), "portwatch_nota": p.get("portwatch_nota"),
             "documentos": [resumo_documento(d) | {"acao": regra_pontos.tem_acao(f"{d['titulo']}\n{d['resumo'] or ''}")}
                            for d in citam[:NOTICIAS_POR_PONTO]],
         })
@@ -69,6 +72,14 @@ def faixa(ultimos: list[dict], estado_pontos: dict, series: list[dict], eventos:
         if p["estado"] == "critico":
             itens.append({"tipo": "ponto", "id": p["id"], "texto": f"{p['nome']}: crítico",
                           "detalhe": f"{p['noticias']} notícias, {p['vozes']} vozes independentes"})
+    for p in estado_pontos["lista"]:  # navios por dia fora do normal (decisão 0018): dado físico, não preço
+        for n in p.get("navios") or []:
+            if n["extremo"]:
+                itens.append({"tipo": "navios", "id": p["id"], "texto": f"{p['nome']}: {n['unidade']} fora do normal",
+                              "detalhe": f"média de 7 dias {n['media_7d']:.1f}".replace(".", ",")
+                                         + (f"; um ano antes {n['um_ano_antes']:.1f}".replace(".", ",")
+                                            if n["um_ano_antes"] is not None else ""),
+                              "extremo": n["extremo"]})
     for s in series:
         if s.get("extremo"):
             itens.append({"tipo": "mercado", "id": s["id"], "texto": s["nome"], "variacao": s["variacao"],

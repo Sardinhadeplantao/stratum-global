@@ -90,7 +90,7 @@ export type Serie = {
 };
 export type Mercados = {
   regua: { versao: string; janela_anos: number; minimo: Record<string, number>; extremo: number; persistencia: number;
-    ritmo_pontos: number; ritmo_extremo: number };
+    ritmo_pontos: number; ritmo_extremo: number; media_dias?: number };
   validade_dias: Record<string, number>; confere_ate_pct: number; series: Serie[]; fora_do_normal: number; nao_conferem: number;
   /** Ids das séries de cada país (moeda, juros, bolsa), para o painel do país */
   por_pais?: Record<string, string[]>;
@@ -112,6 +112,17 @@ export type Ponto = {
   mercados: MercadoResumo[]; documentos: (Documento & { acao: boolean })[];
   /** A primeira notícia das últimas 24 horas que cita o ponto, e a reação do mercado desde ela (decisão 0017) */
   inicio?: string | null; reacao?: Reacao | null;
+  /** Navios por dia (decisão 0018) e o que a conta do PortWatch não cobre neste ponto */
+  navios?: Navios[]; portwatch_nota?: string | null;
+};
+/** Navios por dia num ponto crítico (decisão 0018): PortWatch do FMI, contados pelo sinal AIS; a média de 7 dias é
+ * lida pela régua e comparada com a mesma média um ano antes. Tudo calculado pelo robô. */
+export type Navios = {
+  id: string; simbolo: string; nome: string; unidade: string; situacao: Serie["situacao"]; data: string | null;
+  valor_dia: number | null; media_7d: number | null; percentil: number | null; extremo: "alta" | "baixa" | null;
+  faixa: [number, number] | null; mudancas: Mudanca[]; um_ano_antes: number | null; contra_um_ano: number | null;
+  /** A média de 7 dias do último ano, uma por semana, para o minigráfico */
+  ano: number[]; fonte_nome: string; conhecido_em: string | null;
 };
 export type Terremoto = {
   id: string; titulo: string; url: string | null; magnitude: number | null; lat: number; lon: number;
@@ -119,7 +130,7 @@ export type Terremoto = {
 };
 /** Item da faixa de baixo: o robô escolhe e ordena; o site só mostra. */
 export type ItemFaixa = {
-  tipo: "ponto" | "mercado" | "terremoto" | "noticia"; texto: string; id?: string; detalhe?: string; url?: string | null;
+  tipo: "ponto" | "mercado" | "navios" | "terremoto" | "noticia"; texto: string; id?: string; detalhe?: string; url?: string | null;
   fonte?: string; quando?: string | null; variacao?: number | null; medida?: string; extremo?: string | null; parcial?: boolean;
 };
 export type Status = {

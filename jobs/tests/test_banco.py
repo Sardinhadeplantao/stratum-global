@@ -38,12 +38,13 @@ def test_toda_serie_tem_fonte_de_dados_e_medida_da_regua():
     assert len(ids) == len(set(ids))
     ativas = {s["id"]: s for s in fontes.SERIES if s.get("ativa", True)}
     # 13 moedas contra o euro (BCE), 12 contra o dólar e o DXY (Yahoo, decisão 0012); juros, bolsas, commodities e
-    # cripto (decisão 0013)
+    # cripto (decisão 0013); navios e petroleiros por dia em cada ponto crítico (decisão 0018)
     grupos = {}
     for x in ativas.values():
         grupos[x["grupo"]] = grupos.get(x["grupo"], 0) + 1
-    assert grupos == {"moedas": 26, "juros": 4, "bolsas": 18, "commodities": 11, "cripto": 2}
-    assert all(x["medida"] == ("diferenca" if x["grupo"] == "juros" else "variacao_pct") for x in ativas.values())
+    assert grupos == {"moedas": 26, "juros": 4, "bolsas": 18, "commodities": 11, "cripto": 2, "navios": 16}
+    medida = {"juros": "diferenca", "navios": "media_7d"}
+    assert all(x["medida"] == medida.get(x["grupo"], "variacao_pct") for x in ativas.values())
     for s in fontes.SERIES:
         f = por_id[s["fonte"]]
         assert f["tipo"] == "dados" and f["conector"] in robo.CONECTORES_SERIES

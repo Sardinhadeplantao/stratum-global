@@ -126,7 +126,10 @@ Falta:
 
 ## Fase 4. Medição física (4 a 6 semanas)
 
-PortWatch (navios nos estreitos), comércio (BACI, UN Comtrade), sanções e conflito (UCDP, ACLED) como séries,
+Já entregue, adiantado a pedido do dono: navios nos estreitos (PortWatch do FMI, decisão 0018), navios e petroleiros
+por dia em cada ponto crítico, pela média de 7 dias na régua, com a comparação com um ano antes.
+
+Falta: comércio (BACI, UN Comtrade), sanções e conflito (UCDP, ACLED) como séries,
 calendário geopolítico, picos de cobertura, comparação entre imprensas de blocos diferentes.
 Os atos oficiais, que já são eventos na fase 1, viram série. Conflito tem estado por limiar escrito, sem "potencial".
 

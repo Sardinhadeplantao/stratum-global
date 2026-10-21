@@ -67,6 +67,15 @@ def main(caminho: str) -> int:
                 for d in x["documentos"]:
                     print(f"    {'[ação] ' if d.get('acao') else ''}{d['fonte_nome']}: {d['titulo_original'] or d['titulo']}")
                 _reacao(x.get("reacao"), "    ")
+        print("Navios por dia (decisão 0018), média de 7 dias:")
+        for x in p["lista"]:
+            for n in x.get("navios") or []:
+                leitura = {"alta": "FORA DO NORMAL: alta", "baixa": "FORA DO NORMAL: queda"}.get(n["extremo"]) \
+                    or LEITURA.get(n["situacao"], n["situacao"])
+                faixa = f" · normal {_n(n['faixa'][0], 1)} a {_n(n['faixa'][1], 1)}" if n.get("faixa") else ""
+                print(f"  {x['nome']}: {n['unidade']} até {n['data']} = {_n(n['media_7d'], 1)} (último dia {n['valor_dia']})"
+                      f" · um ano antes {_n(n['um_ano_antes'], 1)} ({_n(n['contra_um_ano'], 0, sinal=True)}%)"
+                      f" · percentil {_n(n['percentil'], 1)}{faixa} · {leitura}")
     else:
         print("Pontos críticos: sem dado")
     for hi in (s.get("historias") or [])[:8]:  # as com mais vozes, com a reação do mercado

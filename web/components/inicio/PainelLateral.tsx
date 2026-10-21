@@ -61,12 +61,16 @@ export default function PainelLateral({ dados, selecao, selecionar, porIso, atua
               <ul className="lista-pontos">
                 {pontos.map((p) => {
                   const e = estadoPonto(p.estado);
+                  const navioFora = (p.navios ?? []).find((n) => n.extremo);
                   return (
                     <li key={p.id}>
                       <button type="button" onClick={() => selecionar({ tipo: "ponto", id: p.id })}>
                         <span className={`selo-estado ${e.classe}`}>{e.texto}</span>
                         <span className="lp-nome">{p.nome}</span>
-                        <small className="discreto">{p.noticias > 0 ? `${plural(p.noticias, "notícia", "notícias")} · ${plural(p.vozes, "voz", "vozes")}` : "—"}</small>
+                        <small className="discreto">
+                          {navioFora && <span className="selo-navios" title="Navios por dia fora do normal (PortWatch)">navios {navioFora.extremo === "baixa" ? "▼" : "▲"} · </span>}
+                          {p.noticias > 0 ? `${plural(p.noticias, "notícia", "notícias")} · ${plural(p.vozes, "voz", "vozes")}` : "—"}
+                        </small>
                       </button>
                     </li>
                   );
