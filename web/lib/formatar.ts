@@ -119,6 +119,11 @@ export function variacao(n: number | null | undefined): string {
   return `${n > 0 ? "+" : ""}${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
 }
 
+/** Os grupos de séries, na ordem da tela (decisão 0013). */
+export const GRUPOS_SERIES: [string, string][] = [
+  ["moedas", "Moedas"], ["juros", "Juros de 10 anos"], ["bolsas", "Bolsas"], ["commodities", "Commodities"], ["cripto", "Cripto"],
+];
+
 /** Variação na unidade da medida: preço em % ("+0,45%"), juros em pontos percentuais ("+0,10 p.p."). */
 export function variacaoSerie(n: number | null | undefined, medida: string | null | undefined): string {
   if (medida !== "diferenca" || n === null || n === undefined) return variacao(n);

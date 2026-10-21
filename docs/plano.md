@@ -93,12 +93,14 @@ Já entregue:
   Yahoo, que é de mercado e não oficial, é conferido com a conta pelo BCE (decisão 0012). A leitura de cada uma aparece
   na tela Método;
 - conferência no fim de cada rodada: o log do GitHub mostra fontes com falha, notícias e a leitura de cada série
-  (`jobs/scripts/conferir_status.py`).
+  (`jobs/scripts/conferir_status.py`);
+- juros de 10 anos de fonte oficial (Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Ministério das Finanças do
+  Japão), em pontos percentuais; bolsas de 18 membros do G20 e da zona do euro, 11 commodities e 2 cripto pelo Yahoo
+  (decisão 0013). São 61 séries na mesma régua, separadas por grupo na tela Método.
 
 Falta:
 
-- Séries por lista: juros de 10 anos (série diária oficial: Tesouro dos EUA, Bundesbank, Banco da Inglaterra, Japão),
-  bolsa por país, commodities (Banco Mundial, EIA), cripto. Cada tipo usa a medida já escrita na decisão 0011.
+- Juros do Brasil: não há série oficial diária e gratuita do título de 10 anos num arquivo simples.
 - A reação medida a cada evento.
 - Tela Mercados: o que se mexeu fora do normal e os eventos no mesmo período ("coincidência no tempo, não causa").
 

@@ -44,14 +44,20 @@ def main(caminho: str) -> int:
         return 0
     print(f"Mercados ({m['regua']['versao']}): {len(m['series'])} séries, {m['fora_do_normal']} fora do normal, "
           f"{m.get('nao_conferem', 0)} não conferem")
-    for x in m["series"]:
+    grupo_atual = None
+    for x in sorted(m["series"], key=lambda x: ["moedas", "juros", "bolsas", "commodities", "cripto"].index(
+            x.get("grupo") or "moedas")):  # a ordem da lista (pontuação) se mantém dentro de cada grupo
+        if x.get("grupo") != grupo_atual:
+            grupo_atual = x.get("grupo")
+            print(f" [{grupo_atual}]")
+        unidade = " p.p." if x.get("medida") == "diferenca" else "%"
         leitura = {"alta": "FORA DO NORMAL: alta", "baixa": "FORA DO NORMAL: queda"}.get(x.get("extremo")) \
             or LEITURA.get(x["situacao"], x["situacao"])
         conf = x.get("conferencia")
         conferida = (f" · {conf['com']} {conf['data']}: {_n(conf['diferenca'], sinal=True)}% "
                      f"{'confere' if conf['confere'] else 'NÃO CONFERE'}") if conf else ""
         print(f"  {x['nome']}: {x.get('data')}{' (em andamento)' if x.get('parcial') else ''} = {x.get('valor')}"
-              f" · {_n(x.get('variacao'), sinal=True)}% · percentil {_n(x.get('percentil'), 1)} · {leitura}{conferida}")
+              f" · {_n(x.get('variacao'), sinal=True)}{unidade} · percentil {_n(x.get('percentil'), 1)} · {leitura}{conferida}")
         for mu in x.get("mudancas") or []:
             print(f"    mudança: {mu['tipo']} ({mu['sentido']}) desde {mu['desde']}, "
                   f"{mu['taxa_base']['vezes']} vezes em {mu['taxa_base']['anos']} anos")

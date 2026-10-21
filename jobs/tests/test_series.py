@@ -260,3 +260,70 @@ def test_juros_medem_a_diferenca_em_pontos():
         pontos.append((d, taxa))
     lido = regua.ler(pontos, medida="diferenca")
     assert lido.medida == pytest.approx(0.25) and lido.extremo == "alta"
+
+
+# Juros oficiais (decisão 0013): amostras reais da sonda de 21/10/2026
+
+def test_tesouro_le_a_coluna_de_10_anos():
+    obs = conectores.interpretar_tesouro((FIXTURES / "tesouro_2026.csv").read_text(), "10 Yr")
+    assert obs[-1] == Observacao("10 Yr", date(2026, 10, 20), 5.12) and obs[0].data == date(2026, 10, 14)
+    assert len(obs) == 5
+
+
+def test_tesouro_pede_um_arquivo_por_ano():
+    f = next(f for f in catalogo.FONTES if f["id"] == "tesouro_eua")
+    assert conectores.url_tesouro(f, 2015).endswith("/2015/all?type=daily_treasury_yield_curve"
+                                                    "&field_tdr_date_value=2015&page&_format=csv")
+
+
+def test_bundesbank_pula_a_descricao_e_o_dia_sem_valor():
+    codigo = "BBSIS.D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A"
+    obs = conectores.interpretar_bundesbank((FIXTURES / "bundesbank_10a.csv").read_text(), codigo)
+    assert obs == [Observacao(codigo, date(2026, 10, 19), 3.46), Observacao(codigo, date(2026, 10, 20), 3.45)]
+    f = next(f for f in catalogo.FONTES if f["id"] == "bundesbank")
+    assert conectores.url_bundesbank(f, codigo, date(2026, 10, 9)) == (
+        "https://api.statistiken.bundesbank.de/rest/data/BBSIS/D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A"
+        "?format=csv&lang=en&startPeriod=2026-10-09")
+    with pytest.raises(ValueError, match="não traz a série"):
+        conectores.interpretar_bundesbank((FIXTURES / "bundesbank_10a.csv").read_text(), "BBSIS.OUTRA")
+
+
+def test_banco_da_inglaterra_le_a_data_em_ingles():
+    obs = conectores.interpretar_boe((FIXTURES / "boe_iudmnpy.csv").read_text(), "IUDMNPY")
+    assert obs[0] == Observacao("IUDMNPY", date(2026, 10, 9), 5.3993) and obs[-1].valor == 5.3092
+    f = next(f for f in catalogo.FONTES if f["id"] == "boe")
+    assert "Datefrom=09/Oct/2026&Dateto=now&SeriesCodes=IUDMNPY" in conectores.url_boe(f, "IUDMNPY", date(2026, 10, 9))
+
+
+def test_japao_le_o_mes_e_o_historico():
+    mes = conectores.interpretar_japao((FIXTURES / "japao_mes.csv").read_text(), "10Y")
+    assert mes[-1] == Observacao("10Y", date(2026, 10, 19), 2.935) and len(mes) == 5  # as notas do fim não entram
+    historico = conectores.interpretar_japao((FIXTURES / "japao_historico.csv").read_text(), "10Y")
+    assert [o.data for o in historico] == [date(2026, 9, 28), date(2026, 9, 29), date(2026, 9, 30)]  # 1974 não tinha 10Y
+
+
+def test_japao_so_le_o_historico_quando_precisa():
+    f = next(f for f in catalogo.FONTES if f["id"] == "japao_mof")
+    mes, historico = (FIXTURES / "japao_mes.csv").read_bytes(), (FIXTURES / "japao_historico.csv").read_bytes()
+
+    class Sessao:
+        chamadas = []
+
+        def get(self, url, headers=None, timeout=None):
+            self.chamadas.append(url.rsplit("/", 1)[1])
+            return Resposta(historico if "historical" in url else mes)
+
+    s = Sessao()
+    conectores.ler_japao(f, [{"codigo": "10Y"}], s, "teste", date.today().replace(day=1))
+    assert s.chamadas == ["jgbcme.csv"]
+    obs = conectores.ler_japao(f, [{"codigo": "10Y"}], s, "teste", date(2026, 9, 29))
+    assert s.chamadas[1:] == ["jgbcme.csv", "jgbcme_all.csv"] and obs[0].data == date(2026, 9, 29)
+
+
+def test_yahoo_aceita_preco_negativo_que_aconteceu():
+    # O WTI fechou a -37,63 dólares em 20/04/2020 (sonda de 21/10: a recusa derrubava a série inteira)
+    real = (FIXTURES / "yahoo_brl.json").read_text().replace("4.985899925231934", "-37.630001068115234", 1)
+    assert conectores.interpretar_yahoo(real, "BRL=X")[0].valor == -37.63
+    nan = (FIXTURES / "yahoo_brl.json").read_text().replace("4.985899925231934", "NaN", 1)
+    with pytest.raises(ValueError, match="ilegível"):
+        conectores.interpretar_yahoo(nan, "BRL=X")

@@ -13,12 +13,21 @@ Ficha de cada fonte (decisão 0008):
 - controlador_nome e controlador_fonte: quem é e onde isso está escrito.
 """
 
+import re
+
 _FR = "https://www.federalregister.gov/api/v1/documents.rss?order=newest&conditions%5Bagencies%5D%5B%5D="
 _CRITERIO_IMPRENSA = "Veículo com feed público, publicando do próprio país; a lista cobre blocos diferentes para comparar versões."
 _CRITERIO_CHANCELARIA = ("Chancelaria (ou o órgão equivalente de um bloco) com feed público: posição oficial sobre política "
                          "externa e sanções; a lista cobre blocos diferentes. Testada pela sonda (scripts/sondar_fontes.py).")
 _CRITERIO_MOEDAS = ("Moedas do G20, de fonte oficial gratuita e sem chave: o câmbio reage primeiro a choque político "
                     "e mostra quem está sob pressão.")
+_CRITERIO_JUROS = ("Juros do título de 10 anos, de fonte oficial: o preço do dinheiro de cada governo reage a guerra, "
+                   "sanção e eleição. Os títulos de referência listados no plano da fase 2 (decisão 0013).")
+_CRITERIO_YAHOO = " Cotação de mercado do mesmo dia, com o dia em andamento (decisões 0012 e 0013). Uso pessoal, não comercial."
+_YAHOO = dict(tipo="dados", pais="USA", idioma="en", url="https://query1.finance.yahoo.com/v8/finance/chart/", conector="yahoo",
+              a_cada_horas=1, validade_dias=5, dia_em_andamento=True, nivel=3, controle="privado", controlador="grupo:yahoo",
+              controlador_nome="Yahoo Inc., controlada por fundos da Apollo Global Management desde 2021 (a Verizon ficou com 10%)",
+              controlador_fonte="https://en.wikipedia.org/wiki/Yahoo ; https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html")
 _GOVUK = "https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D="
 
 FONTES: list[dict] = [
@@ -86,6 +95,34 @@ FONTES: list[dict] = [
          nivel=3, controle="privado", controlador="grupo:yahoo",
          controlador_nome="Yahoo Inc., controlada por fundos da Apollo Global Management desde 2021 (a Verizon ficou com 10%)",
          controlador_fonte="https://en.wikipedia.org/wiki/Yahoo ; https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html"),
+    dict(_YAHOO, id="yahoo_bolsas", nome="Yahoo Finance: bolsas (não oficial)",
+         criterio="Índice principal da bolsa de cada membro do G20 com histórico, e o da zona do euro." + _CRITERIO_YAHOO),
+    dict(_YAHOO, id="yahoo_commodities", nome="Yahoo Finance: commodities (não oficial)",
+         criterio="Contratos futuros de referência mundial de energia, metais e grãos, que pesam em conflitos e sanções; "
+                  "na troca de contrato, o preço pode saltar." + _CRITERIO_YAHOO),
+    dict(_YAHOO, id="yahoo_cripto", nome="Yahoo Finance: cripto (não oficial)",
+         criterio="As duas maiores criptomoedas por valor de mercado." + _CRITERIO_YAHOO),
+    # Juros de 10 anos, oficiais (decisão 0013)
+    dict(id="tesouro_eua", nome="Tesouro dos EUA: curva de juros diária", tipo="dados", pais="USA", idioma="en",
+         conector="tesouro", url="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/",
+         a_cada_horas=6, validade_dias=5, criterio=_CRITERIO_JUROS,
+         nivel=1, controle="estatal", controlador="estado:USA", controlador_nome="Governo federal dos EUA (Departamento do Tesouro)",
+         controlador_fonte="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics"),
+    dict(id="bundesbank", nome="Bundesbank: juros dos títulos federais alemães", tipo="dados", pais="DEU", idioma="en",
+         conector="bundesbank", url="https://api.statistiken.bundesbank.de/rest/data/", a_cada_horas=6, validade_dias=5,
+         criterio=_CRITERIO_JUROS, nivel=1, controle="publico", controlador="estado:DEU",
+         controlador_nome="Deutsche Bundesbank, banco central da Alemanha, independente por lei (Lei do Bundesbank) e parte do Eurosistema",
+         controlador_fonte="https://www.bundesbank.de/en/bundesbank/organisation ; https://www.bundesbank.de/en/statistics/time-series-databases"),
+    dict(id="boe", nome="Banco da Inglaterra: juros dos títulos do governo", tipo="dados", pais="GBR", idioma="en",
+         conector="boe", url="https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp", a_cada_horas=6,
+         validade_dias=5, criterio=_CRITERIO_JUROS, nivel=1, controle="publico", controlador="estado:GBR",
+         controlador_nome="Bank of England, banco central do Reino Unido, independente na política monetária desde 1998 (Bank of England Act)",
+         controlador_fonte="https://www.bankofengland.co.uk/about ; https://www.bankofengland.co.uk/boeapps/database/"),
+    dict(id="japao_mof", nome="Ministério das Finanças do Japão: juros dos títulos do governo", tipo="dados", pais="JPN",
+         idioma="en", conector="japao", url="https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/",
+         a_cada_horas=6, validade_dias=5, criterio=_CRITERIO_JUROS, nivel=1, controle="estatal", controlador="estado:JPN",
+         controlador_nome="Governo do Japão (Ministério das Finanças)",
+         controlador_fonte="https://www.mof.go.jp/english/policy/jgbs/reference/interest_rate/index.htm"),
     # Imprensa, um veículo por bloco
     dict(id="bbc_mundo", nome="BBC News: World", tipo="imprensa", pais="GBR", idioma="en", conector="rss",
          url="https://feeds.bbci.co.uk/news/world/rss.xml", criterio=_CRITERIO_IMPRENSA,
@@ -131,10 +168,27 @@ FONTES: list[dict] = [
 
 
 
+def _serie(fonte: str, codigo: str, nome: str, unidade: str, pais: str | None, grupo: str, **extra) -> dict:
+    ident = f"{fonte.split('_')[0]}_{re.sub(r'[^a-z0-9]', '', codigo.lower().replace('=x', '').replace('=f', ''))}"
+    return dict(id=ident, fonte=fonte, codigo=codigo, nome=nome, unidade=unidade, pais=pais, grupo=grupo,
+                frequencia="diaria", medida="variacao_pct") | extra
+
+
 def _moeda(fonte: str, codigo: str, nome: str, unidade: str, pais: str | None, **extra) -> dict:
-    ident = f"{fonte.split('_')[0]}_{codigo.lower().replace('=x', '').replace('-', '').replace('.', '')}"
-    return dict(id=ident, fonte=fonte, codigo=codigo, nome=nome, unidade=unidade, pais=pais, frequencia="diaria",
-                medida="variacao_pct") | extra
+    return _serie(fonte, codigo, nome, unidade, pais, "moedas", **extra)
+
+
+def _juros(fonte: str, codigo: str, nome: str, pais: str) -> dict:
+    return _serie(fonte, codigo, nome, "% ao ano", pais, "juros", id=f"juros_{pais.lower()}_10a", medida="diferenca")
+
+
+def _bolsa(codigo: str, nome: str, pais: str | None) -> dict:
+    return _serie("yahoo_bolsas", codigo, nome, "pontos", pais, "bolsas", id=f"bolsa_{re.sub(r'[^a-z0-9]', '', codigo.lower())}")
+
+
+def _commodity(codigo: str, nome: str, unidade: str) -> dict:
+    return _serie("yahoo_commodities", codigo, nome, unidade, None, "commodities",
+                  id=f"commodity_{codigo.lower().replace('=f', '')}")
 
 
 def _dolar(codigo: str, nome: str, unidade: str, pais: str, conferir: tuple[str, str] | None) -> dict:
@@ -174,6 +228,45 @@ SERIES: list[dict] = [
     _dolar("AUDUSD=X", "Dólar australiano em dólares americanos", "US$ por A$", "AUS", ("bce_usd", "bce_aud")),
     _dolar("CAD=X", "Dólar em dólares canadenses", "C$ por US$", "CAN", ("bce_cad", "bce_usd")),
     _dolar("DX-Y.NYB", "Índice do dólar (DXY)", "índice (mar/1973 = 100)", "USA", None),
+    # Juros de 10 anos (decisão 0013); medida: diferença em pontos percentuais
+    _juros("tesouro_eua", "10 Yr", "EUA: título de 10 anos", "USA"),
+    _juros("bundesbank", "BBSIS.D.I.ZAR.ZI.EUR.S1311.B.A604.R10XX.R.A.A._Z._Z.A", "Alemanha: título de 10 anos", "DEU"),
+    _juros("boe", "IUDMNPY", "Reino Unido: título de 10 anos", "GBR"),
+    _juros("japao_mof", "10Y", "Japão: título de 10 anos", "JPN"),
+    # Bolsas (decisão 0013): índice principal de cada membro do G20 com histórico, e o da zona do euro
+    _bolsa("^GSPC", "EUA: S&P 500", "USA"),
+    _bolsa("^BVSP", "Brasil: Ibovespa", "BRA"),
+    _bolsa("000001.SS", "China: Xangai (SSE Composite)", "CHN"),
+    _bolsa("^N225", "Japão: Nikkei 225", "JPN"),
+    _bolsa("^NSEI", "Índia: Nifty 50", "IND"),
+    _bolsa("^FTSE", "Reino Unido: FTSE 100", "GBR"),
+    _bolsa("^GDAXI", "Alemanha: DAX", "DEU"),
+    _bolsa("^FCHI", "França: CAC 40", "FRA"),
+    _bolsa("FTSEMIB.MI", "Itália: FTSE MIB", "ITA"),
+    _bolsa("^GSPTSE", "Canadá: S&P/TSX", "CAN"),
+    _bolsa("^AXJO", "Austrália: S&P/ASX 200", "AUS"),
+    _bolsa("^KS11", "Coreia do Sul: KOSPI", "KOR"),
+    _bolsa("^MXX", "México: IPC", "MEX"),
+    _bolsa("^JKSE", "Indonésia: IDX Composite", "IDN"),
+    _bolsa("XU100.IS", "Turquia: BIST 100", "TUR"),
+    _bolsa("^J203.JO", "África do Sul: JSE All Share", "ZAF"),
+    _bolsa("^MERV", "Argentina: Merval (em pesos)", "ARG"),
+    _bolsa("^STOXX50E", "Zona do euro: EURO STOXX 50", None),
+    # Commodities (decisão 0013): contrato futuro mais próximo
+    _commodity("BZ=F", "Petróleo Brent", "US$ por barril"),
+    _commodity("CL=F", "Petróleo WTI", "US$ por barril"),
+    _commodity("NG=F", "Gás natural nos EUA (Henry Hub)", "US$ por milhão de BTU"),
+    _commodity("TTF=F", "Gás natural na Europa (TTF)", "€ por MWh"),
+    _commodity("GC=F", "Ouro", "US$ por onça troy"),
+    _commodity("SI=F", "Prata", "US$ por onça troy"),
+    _commodity("HG=F", "Cobre", "US$ por libra-peso"),
+    _commodity("ALI=F", "Alumínio", "US$ por tonelada"),
+    _commodity("ZW=F", "Trigo", "centavos de US$ por bushel"),
+    _commodity("ZC=F", "Milho", "centavos de US$ por bushel"),
+    _commodity("ZS=F", "Soja", "centavos de US$ por bushel"),
+    # Cripto (decisão 0013)
+    _serie("yahoo_cripto", "BTC-USD", "Bitcoin", "US$", None, "cripto", id="cripto_btc"),
+    _serie("yahoo_cripto", "ETH-USD", "Ether", "US$", None, "cripto", id="cripto_eth"),
     _fred("DTWEXBGS", "Índice amplo do dólar", "índice (jan/2006 = 100)", "USA"),
     _fred("DEXBZUS", "Dólar em reais", "R$ por US$", "BRA"),
     _fred("DEXCHUS", "Dólar em yuans", "CN¥ por US$", "CHN"),

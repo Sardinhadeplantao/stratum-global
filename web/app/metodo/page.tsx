@@ -1,5 +1,5 @@
 import AvisoAtraso from "@/components/AvisoAtraso";
-import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacaoSerie } from "@/lib/formatar";
+import { classeAgendador, classeCopia, controleFonte, dataHora, dia, faixas, hora, leituraSerie, numero, plural, situacao, textoConferencia, textoMudanca, tipoFonte, valor, variacaoSerie, GRUPOS_SERIES } from "@/lib/formatar";
 import { lerStatus, type Fonte } from "@/lib/status";
 import Titulo from "@/components/Titulo";
 
@@ -180,8 +180,18 @@ export default function Metodo() {
           <li><b>O nome diz o sentido:</b> &quot;Euro em reais&quot; sobe quando o euro fica mais caro. Cada valor aparece como a
             fonte publicou, sem conta.</li>
           <li><b>A lista é ordenada pela distância do normal</b> (em desvios medianos), nunca pelo preço ou pelo nome.</li>
+          <li><b>Commodities são o contrato futuro mais próximo.</b> Na troca de contrato, o preço pode saltar sem que o mercado
+            tenha mudado.</li>
+          <li><b>Bolsas, commodities e cripto vêm do Yahoo</b> (mercado, não oficial) e não têm fonte oficial para conferir.
+            Juros vêm dos governos e bancos centrais; moedas, do BCE e do Yahoo conferido com o BCE.</li>
         </ul>
-        {m && m.series.length > 0 && (
+        {m && <p>Nesta atualização: {plural(m.series.length, "série", "séries")},{" "}
+          {plural(m.fora_do_normal, "fora do normal", "fora do normal")}
+          {m.nao_conferem > 0 && <>, {plural(m.nao_conferem, "não confere", "não conferem")} com a fonte oficial</>}.</p>}
+        {m && GRUPOS_SERIES.map(([grupo, titulo]) => ({ titulo, series: m.series.filter((x) => (x.grupo ?? "moedas") === grupo) }))
+          .filter((g) => g.series.length > 0).map((g) => (
+          <div key={g.titulo}>
+          <h3>{g.titulo}</h3>
           <div className="tabela-rolagem">
             <table>
               <thead>
@@ -189,7 +199,7 @@ export default function Metodo() {
                   <th className="numero">Percentil</th><th className="numero">Faixa normal</th><th>Leitura</th></tr>
               </thead>
               <tbody>
-                {m.series.map((x) => {
+                {g.series.map((x) => {
                   const l = leituraSerie(x.situacao, x.extremo);
                   return (
                     <tr key={x.id}>
@@ -211,7 +221,8 @@ export default function Metodo() {
               </tbody>
             </table>
           </div>
-        )}
+          </div>
+        ))}
       </section>
 
       <section>

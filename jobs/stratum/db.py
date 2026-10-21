@@ -121,8 +121,9 @@ serie = Table(
     Column("unidade", Text, nullable=False),
     Column("pais", String(3)),                          # país ligado à série (ISO 3166 alfa-3)
     Column("frequencia", String(16), nullable=False),   # diaria | mensal
-    Column("medida", String(32), nullable=False),       # variacao_pct (domain/regua.py)
+    Column("medida", String(32), nullable=False),       # variacao_pct | diferenca (domain/regua.py)
     Column("ativa", Boolean, nullable=False),
+    Column("grupo", String(16)),                        # moedas | juros | bolsas | commodities | cripto (decisão 0013)
 )
 
 # Cada valor entra uma vez. Se a fonte revisar um valor já publicado, o novo entra como registro novo e o antigo fica:
@@ -209,7 +210,7 @@ def gravar_series(conexao, series: list[dict]) -> None:
     """Como as fontes: o banco recebe a lista atual; série que saiu fica como inativa, com as observações."""
     dialeto = postgresql if conexao.dialect.name == "postgresql" else sqlite
     for s in series:
-        linha = {k: s.get(k) for k in ("id", "codigo", "nome", "unidade", "pais", "frequencia", "medida")} | {
+        linha = {k: s.get(k) for k in ("id", "codigo", "nome", "unidade", "pais", "frequencia", "medida", "grupo")} | {
             "fonte_id": s["fonte"], "ativa": s.get("ativa", True)}
         stmt = dialeto.insert(serie).values(linha)
         conexao.execute(stmt.on_conflict_do_update(index_elements=["id"], set_={k: stmt.excluded[k] for k in linha if k != "id"}))
